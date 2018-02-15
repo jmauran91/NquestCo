@@ -4,7 +4,8 @@
   "description": "Minimalistic ES6 React boilerplate",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "nodemon --use_strict index.js",
+    "start:front": "cross-env npm run clean && webpack --config webpack.config.js --progress --watch",
     "clean": "rimraf dist",
     "production": "cross-env npm run clean && webpack --config webpack.production.config.js --progress --profile --colors",
     "lint": "eslint ./app/**/**.js",
@@ -36,11 +37,32 @@
     }
   },
   "dependencies": {
+    "aws-sdk": "^2.192.0",
+    "bcrypt": "^1.0.3",
+    "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
     "cross-env": "5.1.2",
+    "dotenv": "^5.0.0",
+    "express": "^4.16.2",
+    "file-system": "^2.2.2",
+    "history": "^4.7.2",
+    "jsonwebtoken": "^8.1.0",
+    "material-ui": "^1.0.0-beta.29",
+    "mongoose": "^5.0.0",
+    "nodemon": "^1.14.11",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "pryjs": "^1.0.3",
     "react": "16.2.0",
+    "react-addons-update": "^15.6.2",
+    "react-bootstrap": "^0.32.0",
     "react-dom": "16.2.0",
     "react-hot-loader": "3.1.3",
-    "react-router-dom": "4.2.2"
+    "react-onscroll": "^1.0.4",
+    "react-router-dom": "^4.2.2",
+    "react-tap-event-plugin": "^3.0.2",
+    "s3fs": "git+https://github.com/RiptideElements/s3fs.git",
+    "validator": "^9.2.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
