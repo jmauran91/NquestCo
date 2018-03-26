@@ -11,11 +11,19 @@ const ProjectSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  ownername: { type: String },
   users: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
   }],
+  usernames: [{
+    type: String
+  }],
   description: String,
+  notes: [{
+    type: String,
+    unique: true
+  }],
   documents: [{ type: String }],
   created: {
     type: Date,

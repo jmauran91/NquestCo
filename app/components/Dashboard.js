@@ -2,6 +2,7 @@ import React from 'react';
 import Auth from '../modules/Auth';
 import NewProjectPage from '../containers/NewProjectPage';
 import ProjectListPage from '../containers/ProjectListPage';
+import PropTypes from 'prop-types';
 
 class Dashboard extends React.Component {
   constructor(props){
@@ -23,15 +24,14 @@ class Dashboard extends React.Component {
     var token_props = JSON.parse(window.atob(base64));
     var user_finder_id = token_props['sub'].toString();
     //
-    const url = "http://localhost:3000/api/users";
+    const url = `http://localhost:3000/api/users/${user_finder_id}`;
     fetch(url, {
-      method: 'POST',
+      method: 'GET',
       mode: 'cors',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization' : ['bearer', token].join(' ')
       },
-      body: JSON.stringify({ _id: user_finder_id })
     })
     .then(response => response.json())
     .then((response) => {
@@ -49,7 +49,12 @@ class Dashboard extends React.Component {
   }
 
   handleFeatureClick(event){
-    this.setState({ component: event.target.name})
+    if(this.state.component != event.target.name){
+      this.setState({ component: event.target.name })
+    }
+    else {
+      this.setState({ component: '' })
+    }
   }
 
   render(){
@@ -96,9 +101,11 @@ class Dashboard extends React.Component {
           </div>
           <div className="center-side-dash">
             {this.state.component == 'new_project' && <NewProjectPage />}
-            {this.state.component == 'my_projects' && <ProjectListPage />}
-          </div>
-          <div className="right-side-dash">
+
+            {this.state.component == 'my_projects'
+             && <ProjectListPage
+                 url={this.state.current_user._id}/>}
+
           </div>
         </div>
       </div>

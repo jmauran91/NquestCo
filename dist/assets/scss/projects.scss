@@ -1,0 +1,53 @@
+$color: lighten(#18a29a, 6%);
+$secondary_color: lightgrey;
+@import url('//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+
+
+/* ===================================*/
+
+/* PROJECTS LIST */
+
+.project-matrix {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 4vh 4vw;
+}
+
+.project-holder {
+  background-color: lighten($color, 6%);
+  border-radius: 12px;
+  width: 24vw;
+  margin: 8px 8px;
+  padding: 16px;
+}
+
+.project-element {
+  margin: 8px 8px;
+  display: block;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-all;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.project-element a {
+  font-size: 130%;
+  font-style: bold;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+.no-projects-text {
+  margin: 4vh 4vw;
+  margin-left: 8vw;
+  border-style: inset;
+  padding: 4vh 4vw;
+  font-size: 170%;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-style: italic;
+  color: grey;
+}
+
+/* ===================================*/

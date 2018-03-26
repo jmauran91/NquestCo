@@ -55,19 +55,28 @@ class NewProjectPage extends React.Component{
 
   render(){
     return(
-      <div className = "">
+      <div className = "dash-form-container">
         <form onSubmit={this.handleSubmit}>
-          <label> Title </label>
-            <input name="title" type="text" onChange={this.handleChange} />
-          <label> Description </label>
-            <input name="description" type="text" onChange={this.handleChange} />
-          <label> Owner </label>
-            <input name="owner" type="text" onChange={this.handleChange} />
-          <label> Add filename </label>
-            <input name="documents" type="text" onChange={this.handleChange} />
-
+          <ul>
+            <li>
+            <label> Title </label>
+              <input name="title" type="text" onChange={this.handleChange} />
+            </li>
+            <li>
+            <label> Description </label>
+              <input name="description" type="text" onChange={this.handleChange} />
+            </li>
+            <li>
+            <label> (User should have this done automatically for him) Owner </label>
+              <input name="owner" type="text" onChange={this.handleChange} />
+            </li>
+            <li>
+            <label> (Add in an actual file field also) Add filename </label>
+              <input name="documents" type="text" onChange={this.handleChange} />
+            </li>
+          </ul>
           <button type="submit">
-          Add Project
+            Add Project
           </button>
         </form>
       </div>

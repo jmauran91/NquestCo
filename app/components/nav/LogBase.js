@@ -13,15 +13,44 @@ class LogBase extends React.Component {
     this.state = {
       email: '',
       password: '',
-      errors: {}
+      errors: {},
+      current_user: {}
     };
 
     this.handleScrollCallback = this.handleScrollCallback.bind(this);
     this.handleLogIn = this.handleLogIn.bind(this);
     this.handleFieldChangeEmail = this.handleFieldChangeEmail.bind(this);
     this.handleFieldChangePword = this.handleFieldChangePword.bind(this);
-
+    this.getCurrentUser = this.getCurrentUser.bind(this);
   }
+
+  getCurrentUser(){
+    var token = localStorage.getItem('token');
+    var base64url = token.split('.')[1];
+    var base64 = base64url.replace('-', '+').replace('_', '/');
+    var token_props = JSON.parse(window.atob(base64));
+    var user_finder_id = token_props['sub'].toString();
+    //
+    const url = `http://localhost:3000/api/users/${user_finder_id}`;
+    fetch(url, {
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization' : ['bearer', token].join(' ')
+      },
+    })
+    .then(response => response.json())
+    .then((response) => {
+      var user = response['user']
+      this.setState({ current_user: user })
+    })
+    .catch((error) => {
+      console.log(error)
+      return( error )
+    })
+  }
+
 
     handleScrollCallback(){
       var navbar = document.getElementById('navbar');
@@ -59,7 +88,7 @@ class LogBase extends React.Component {
       .then((response) => {
         console.log(response);
         Auth.authenticateUser(response.token);
-        this.context.router.history.push('/');
+        this.context.router.history.push(`/${this.state.current_user._id}`);
       })
       .catch((error) => {
         console.log(error);
@@ -77,7 +106,7 @@ class LogBase extends React.Component {
         <Navbar.Header>
           <Navbar.Brand className="NavbarBrand">
             <a href="/">
-            <img src="../assets/images/eA9ILzv.png"
+            <img src="http://localhost:3000/assets/images/eA9ILzv.png"
                 height="60" width="60" />
             </a>
           </Navbar.Brand>
@@ -89,9 +118,9 @@ class LogBase extends React.Component {
               </NavItem>
           </Nav>
         ) : (
-          <Navbar.Form pullRight>
+          <Navbar.Form pullRight className="nav-right">
             <form onSubmit={this.handleLogIn}>
-              <FormGroup>
+              <FormGroup className="form-inline">
                 <ControlLabel> Email </ControlLabel>
                 <FormControl
                  type="text"
@@ -108,8 +137,8 @@ class LogBase extends React.Component {
                   placeholder=""
                   onChange={this.handleFieldChangePword}
                 />
+                <Button type="submit" >Log In</Button>
               </FormGroup>
-              <Button type="submit" >Log In</Button>
             </form>
           </Navbar.Form>
         )}

@@ -1,0 +1,119 @@
+$color: lighten(#18a29a, 6%);
+$secondary_color: lightgrey;
+@import url('//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+
+
+/* ===================================*/
+
+/* PROJECT :ID */
+
+.project-show {
+  overflow-x: hidden;
+  margin: 4vw 4vh;
+  padding: 8px 8px;
+
+}
+
+.project-user-area{
+  background-color: lighten($color, 50%);
+  float: right;
+}
+
+.project-header {
+  margin: 4vw 4vh;
+}
+
+.project-title {
+  margin: 0 8px;
+}
+
+.project-add-user-form{
+  width: 15vw;
+  margin: 0 8px;
+}
+
+
+.project-add-file-form{
+  width: 60vw;
+}
+
+.project-add-user-form button {
+  background-color: $color;
+  border-radius: 12px;
+}
+
+.project-add-file-form button {
+  background-color: $color;
+  border-radius: 12px;
+}
+
+.new-doc-true, .new-doc-false, .new-doc-null, .new-user-true, .new-user-false, .new-user-null {
+  margin: 5px 0px;
+  padding:8px;
+}
+
+.new-doc-true div, .new-doc-false div, .new-doc-null div, .new-user-true div, .new-user-false div, .new-user-null div {
+  margin:5px 11px;
+  font-size:1.2em;
+  vertical-align:middle;
+}
+
+
+.new-doc-true, .new-user-true {
+  color: #4F8A10;
+  background-color: #DFF2BF;
+}
+
+.new-doc-false, .new-user-false {
+  color: #D8000C;
+  background-color: #FFD2D2;
+}
+
+.new-doc-null, .new-user-null {
+
+}
+
+
+.anchor:hover {
+  cursor: pointer;
+  color: blue;
+  text-decoration-color: blue;
+
+}
+
+.project-add-note{
+  overflow: hidden;
+}
+
+.project-add-note-anchor {
+  float: left;
+}
+
+
+.project-add-note-anchor:hover{
+  cursor: pointer;
+  color: blue;
+  text-decoration-color: blue;
+}
+
+
+.projecteditor-container {
+  width: 40%;
+}
+
+.quill {
+  width: 40%;
+  margin: 0 auto;
+}
+
+.arrow-right {
+  float: left;
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 6px solid black;
+  margin-top: 6px;
+  margin-left: 8px;
+
+}

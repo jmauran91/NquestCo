@@ -7,10 +7,13 @@ import LogoutSwitcher from '../components/LogoutSwitcher';
 import IndexSwitcher from '../components/IndexSwitcher';
 import NavSwitcher from '../components/nav/NavSwitcher';
 import ProjectPage from '../containers/ProjectPage';
+import ProfilePage from '../components/ProfilePage';
 import ProjectFiles from '../components/ProjectFiles';
+import Dashboard from '../components/Dashboard';
 import Base  from '../components/nav/Base';
 import Auth from '../modules/Auth';
 import history from '../history';
+
 
 const Root = () => {
     return (
@@ -18,11 +21,12 @@ const Root = () => {
         <div>
           <NavSwitcher />
           <Route path="/" exact component={IndexSwitcher} />
+          <Route path="/:id" exact component={Dashboard} />
           <Route path="/login" component={LoginPage} />
           <Route path="/signup" component={SignUpPage} />
           <Route path="/logout" component={LogoutSwitcher}/>
+          <Route path="/profile/:id" exact component={ProfilePage} />
           <Route path="/project/:id" exact component={ProjectPage} />
-          <Route path="/project/:id/files" exact component={ProjectFiles} />
         </div>
       </Router>
     );

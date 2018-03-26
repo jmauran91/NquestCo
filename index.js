@@ -3,7 +3,11 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const config = require('./config');
 const path = require('path');
-const dotenv = require('dotenv')
+const dotenv = require('dotenv');
+const busboy = require('connect-busboy');
+const fileUpload = require('express-fileupload')
+const fs = require('fs');
+
 
 dotenv.config();
 
@@ -11,8 +15,10 @@ require('./server/models').connect(config.dbUri);
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }))
 app.use(bodyParser.json())
+app.use(fileUpload())
+app.use(busboy())
 
 app.use(express.static('./server/static/'));
 app.use(express.static('./dist'))
