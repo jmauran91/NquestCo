@@ -9,7 +9,10 @@ const UserSchema = new mongoose.Schema({
   },
   password: String,
   name: String,
-  projects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project'}]
+  projects: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Project'
+  }]
 });
 
 UserSchema.methods.comparePassword = function comparePassword(password, callback){

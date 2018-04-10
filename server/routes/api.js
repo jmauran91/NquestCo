@@ -3,6 +3,8 @@ const Project = require('../models/project');
 const User = require('../models/user');
 const Note = require('../models/note');
 const File = require('../models/file');
+const Conversation = require('../models/conversation');
+const Message = require('../models/message');
 const stream = require('stream');
 const cors = require('cors');
 const fs = require('fs');
@@ -40,6 +42,34 @@ function validateDocumentForm(payload){
     errors
   }
 }
+
+function uploadFile(filedata, filename, filetype){
+  return new Promise((resolve, reject) => {
+    s3bucket.createBucket(() => {
+      var data = {
+        Bucket: BucketName,
+        Key: filename,
+        Body: filedata,
+        ContentType: filetype,
+        Expires: 60,
+        ACL: 'public-read'
+      }
+      s3bucket.upload(data, function(err, data){
+        if(err){
+          console.log('s3 bucket upload failure')
+          console.log(err)
+          reject(err)
+        }
+        else {
+          console.log('s3 bucket upload')
+          console.log(data)
+          resolve(data)
+        }
+      });
+    });
+  });
+}
+
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -128,30 +158,58 @@ router.get('/:id/projects', (req, res) => {
 //////////////////////////////////////////////////
 
 router.post('/projects', (req, res) => {
-    User.findOne({ name: req.body.owner }, (err, owner) => {
-      if (owner){
-        const userData = {
-            title: req.body.title.trim(),
-            description: req.body.description.trim(),
-            documents: req.body.documents.trim(),
-        }
-        var project = new Project(userData);
-        project.owner = owner._id
-        project.ownername = owner.name
+  console.log('enter api')
+    User.findOne({ name: req.body.owner }, (err, user) => {
+      if (user){
+        console.log('owner found')
+        ///// PREPARING THE VARIABLES
+        const title = req.body.title;
+        const owner = req.body.owner;
+        const description = req.body.description;
+        const filedata = req.files.file.data;
+        const filename = req.files.file.name;
+        const filetype = req.files.file.mimetype;
 
-        project.save((err)=> {
-            if (err){ res.send(err); }
-            if (project.documents) {
+        const userData = {
+          title: title,
+          description: description,
+          documents: [filename]
+        }
+        //// CREATE THE PROJECT
+        var project = new Project(userData)
+        ///// CREATE PROJECT CONNECTION WITH OWNER
+        project.owner = user._id
+        project.ownername = user.name
+
+        project.save().then(()=> {
+          console.log('project saved')
+          if (project.documents) {
+            ///// NOW UPLOAD FILE TO S3 BUCKET
+            uploadFile(filedata, filename, filetype)
+            .then((result) => {
+              console.log('file uploaded')
+              ////// NOW CREATE FILE ENTRY IN DB
               var fileparams = {
+                title: filename,
+                project: project._id,
+                body: result.Location
               }
               var newfile = new File(fileparams)
               newfile.save().then(() => {
-                res.json({ message: 'Project created!', project: project, request: req.body });
+                console.log('file saved')
+                res.json({ message: 'Project created!', project: project, request: req.body, result: result });
               })
-            }
-            else {
-              res.json({ message: 'Project created!', project: project, request: req.body });
-            }
+            })
+            .catch((err) => {
+              res.json({ message: 'Failed to Upload File', project: project})
+            })
+          }
+          else {
+            res.json({ message: 'Project created without file', project: project });
+          }
+        })
+        .catch((err) => {
+          console.log(err)
         })
       }
       else {
@@ -170,6 +228,12 @@ router.post('/projects', (req, res) => {
 
 router.get('/project/:id', (req, res) => {
   var obj_id = req.url.split('/')[2]
+  try{
+    console.log('this is user ' + req.user)
+  }
+  catch(err){
+    console.log(err)
+  }
   Project.findOne({ _id: obj_id}, (err, project) => {
     if (err) { res.send(err) }
     if (project){
@@ -214,34 +278,6 @@ router.patch('/project/:id', (req, res) => {
     const filedata = req.files.file.data
     const filename = req.body.filename
     const filetype = req.files.file.mimetype
-
-    function uploadFile(filedata, filename, filetype){
-      return new Promise((resolve, reject) => {
-        s3bucket.createBucket(() => {
-          var data = {
-            Bucket: BucketName,
-            Key: filename,
-            Body: filedata,
-            ContentType: filetype,
-            Expires: 60,
-            ACL: 'public-read'
-          }
-          s3bucket.upload(data, function(err, data){
-            if(err){
-              console.log('s3 bucket upload failure')
-              console.log(err)
-              reject(err)
-            }
-            else {
-              console.log('s3 bucket upload')
-              console.log(data)
-              resolve(data)
-            }
-          });
-        });
-      });
-    }
-
     ////// WE USE THIS CHUNK OF CODE
     // TO UPLOAD FILE TO S3 AND THEN
     // TO ADD RECORD TO DB BY WHICH TO RECALL IT
@@ -291,16 +327,19 @@ router.get('/project/:id/files', (req, res) => {
   var obj_id = req.url.split('/')[2];
   var server_doc_arr = []
   var res_files = [];
+
   function fetchFile(file, res_files){
-    var params = {
-      Bucket: BucketName,
-      Key: file,
-    }
     return new Promise((resolve, reject) => {
+      var params = {
+        Bucket: BucketName,
+        Key: file,
+      }
       s3bucket.getObject(params, (err, obj) => {
         if (err) { reject(err); }
-        obj["name"] = file
-        res_files.push(obj)
+        if (obj) {
+          obj["name"] = file
+          res_files.push(obj)
+        }
         resolve(res_files);
       })
     })
@@ -310,12 +349,14 @@ router.get('/project/:id/files', (req, res) => {
     return new Promise((resolve, reject) => {
       for ( var i = 0; i < server_doc_arr.length; i++ ){
         var filename_get = server_doc_arr[i]
-        fetchFile(filename_get, res_files).then((result) => {
+        fetchFile(filename_get, res_files)
+        .then((result) => {
           if (server_doc_arr.length == res_files.length) {
             resolve(res_files);
           }
         })
         .catch((err) => {
+          console.log(err)
           console.log('error happened after fetch file')
         })
       }
@@ -424,16 +465,24 @@ router.get('/project/:id/notes', (req, res) => {
       Project.findOne({ _id: _id}, (err, project) => {
         if(err){
           console.log(err)
-          res.send(err)
+          reject(err)
         }
         var notes_arr = []
-        for (var i = 0; i < project.notes.length; i++){
-          Note.findOne({ title : project.notes[i] }, (err, note) => {
-            notes_arr.push(note)
-            if(notes_arr.length == project.notes.length){
-              resolve(notes_arr)
-            }
-          })
+        console.log('project found')
+        if(project.notes[0]){
+          for (var i = 0; i < project.notes.length; i++){
+            Note.findOne({ title : project.notes[i] }, (err, note) => {
+              notes_arr.push(note)
+              console.log('at the if')
+              if(notes_arr.length == project.notes.length){
+                console.log('in the if')
+                resolve(notes_arr)
+              }
+            })
+          }
+        }
+        else {
+          resolve('No notes')
         }
       })
     })
@@ -487,10 +536,12 @@ router.get('/users/:id', cors(), (req, res) => {
 router.get('/users', cors(), (req,res) => {
   var id = req.url.split("/")[2]
   User.find((err, users) => {
-
+    if(err){
+      res.status(404).send(err)
+    }
+    res.json({ users: users })
+    console.log('users fetched')
   })
 })
-
-
 
 module.exports = router;

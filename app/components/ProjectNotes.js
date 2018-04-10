@@ -9,6 +9,7 @@ class ProjectNotes extends React.Component {
     super(props);
     this.state = {
       notes: null,
+      success: null,
       modal_file: null,
       isShowingModal: false,
       isShowingEdit: false,
@@ -86,7 +87,13 @@ class ProjectNotes extends React.Component {
     .then((response) => {
       console.log(response)
       console.log(response['msg'])
-      this.setState({ notes: response.notes, msg: response.msg })
+      if (typeof(response.notes) == String){
+        debugger;
+        this.setState({ notes: response.notes, msg: response.msg, success: true })
+      }
+      else {
+        this.setState({ success: false, msg: response.msg })
+      }
     })
     .catch((err) => {
       console.log(err)
@@ -109,40 +116,50 @@ class ProjectNotes extends React.Component {
 
     var note_img_url = ""
 
-    if(this.state.notes!=null){
-      var renderNotes = this.state.notes.map((note, i) => {
+    if(this.state.success == true){
+      var renderNotes;
+        var renderNotesMap = this.state.notes.map((note, i) => {
         return(
-          <li
-          className="note-tile"
-          ref="fnote"
-          key={i}
-          onClick={()=> {
-            this.toggleModal();
-            this.setState({
-              modal_file: this.state.notes[i]
-            })
-          }}
-          value={i}
-          >
-          <img src={note_img_url} />
-          <div className="note-tile-name">
-            {note.title}
-          </div>
-          <div className="note-tile-date">
-            {note.created}
-          </div>
-          </li>
+          <td
+            className="note-tile"
+            ref="fnote"
+            key={i}
+            onClick={()=> {
+              this.toggleModal();
+              this.setState({
+                modal_file: this.state.notes[i]
+              })
+            }}
+            value={i}
+            >
+            <img src={note_img_url} />
+            <div className="note-tile-name">
+              {note.title}
+            </div>
+            <div className="note-tile-date">
+              {note.created}
+            </div>
+          </td>
         )
       })
-    } else {
-      var renderNotes = "<div> No notes yet. </div>"
+      renderNotes = <table className="scrollbox">
+                      <tbody>
+                        <tr className="rendernotes-show">
+                          {renderNotesMap}
+                        </tr>
+                      </tbody>
+                    </table>
+                    
+    } else if (this.state.success == false){
+      var renderNotes = <div className="scrollbox"> No notes yet. </div>
+    }
+    else {
+      var renderNotes;
     }
 
     return(
-      <div>
-        <ul>
-          {renderNotes}
-        </ul>
+      <div className="projectnotes-show">
+        {renderNotes}
 
         <Modal
         show={this.state.isShowingModal}

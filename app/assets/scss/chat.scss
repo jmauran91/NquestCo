@@ -1,0 +1,65 @@
+.convo-tile:hover, .conv-list-new-message:hover {
+  cursor: pointer;
+  background-color: darken(white, 15%);
+
+}
+
+.convo-tile, .convo-tile-no-convos, .conv-list-new-message {
+  list-style-type: none;
+}
+
+.chatcontainer {
+  height: 100%;
+}
+
+.chatlist {
+  float: left;
+  height: 100%;
+  border-right: 2px solid gray;
+}
+
+.chatcell {
+  position: relative;
+  float: right;
+  height: 100%;
+}
+
+.chatlist ul {
+  padding: 0;
+}
+
+.conv-list li {
+  list-style-type: none;
+  width: 30vw;
+  height: 80px;
+  padding: 24px 12px;
+  border: 1px solid gray;
+  margin-right: 20px;
+
+}
+
+
+.chatcell-container {
+
+}
+
+.chat-input {
+  position: absolute;
+  bottom: 0;
+  left: -30vw;
+  display: flex;
+  flex-flow: column;
+}
+
+.chat-input input {
+  width: 30vw;
+}
+
+.react-autosuggest__suggestions-list {
+
+}
+
+.react-autosuggest__suggestions-list li {
+  list-style-type: none;
+
+}

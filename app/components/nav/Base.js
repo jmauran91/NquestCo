@@ -19,30 +19,32 @@ class Base extends React.Component {
   }
 
   getCurrentUser(){
-    var token = localStorage.getItem('token');
-    var base64url = token.split('.')[1];
-    var base64 = base64url.replace('-', '+').replace('_', '/');
-    var token_props = JSON.parse(window.atob(base64));
-    var user_finder_id = token_props['sub'].toString();
-    //
-    const url = `http://localhost:3000/api/users/${user_finder_id}`;
-    fetch(url, {
-      method: 'GET',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization' : ['bearer', token].join(' ')
-      },
-    })
-    .then(response => response.json())
-    .then((response) => {
-      var user = response['user']
-      this.setState({ current_user: user })
-    })
-    .catch((error) => {
-      console.log(error)
-      return( error )
-    })
+    if(localStorage.getItem('token') != null){      
+      var token = localStorage.getItem('token');
+      var base64url = token.split('.')[1];
+      var base64 = base64url.replace('-', '+').replace('_', '/');
+      var token_props = JSON.parse(window.atob(base64));
+      var user_finder_id = token_props['sub'].toString();
+      //
+      const url = `http://localhost:3000/api/users/${user_finder_id}`;
+      fetch(url, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization' : ['bearer', token].join(' ')
+        },
+      })
+      .then(response => response.json())
+      .then((response) => {
+        var user = response['user']
+        this.setState({ current_user: user })
+      })
+      .catch((error) => {
+        console.log(error)
+        return( error )
+      })
+    }
   }
 
 

@@ -3,15 +3,16 @@ const User = require('./user');
 
 const ProjectSchema = new mongoose.Schema({
   title: {
-    type: String,
-    index: { unique: true}
+    type: String
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  ownername: { type: String },
+  ownername: {
+    type: String
+  },
   users: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
@@ -22,7 +23,6 @@ const ProjectSchema = new mongoose.Schema({
   description: String,
   notes: [{
     type: String,
-    unique: true
   }],
   documents: [{ type: String }],
   created: {

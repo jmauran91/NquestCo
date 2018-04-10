@@ -23,7 +23,7 @@ const Root = () => {
           <Route path="/" exact component={IndexSwitcher} />
           <Route path="/:id" exact component={Dashboard} />
           <Route path="/login" component={LoginPage} />
-          <Route path="/signup" component={SignUpPage} />
+          <Route path="/signup" exact component={SignUpPage} />
           <Route path="/logout" component={LogoutSwitcher}/>
           <Route path="/profile/:id" exact component={ProfilePage} />
           <Route path="/project/:id" exact component={ProjectPage} />

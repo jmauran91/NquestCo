@@ -6,23 +6,19 @@
 @import 'project.scss';
 @import 'files.scss';
 @import 'modal.scss';
+@import 'scrollbox.scss';
+@import 'chat.scss';
+@import 'autosuggest.scss';
 
 $color: lighten(#18a29a, 6%);
 $secondary_color: lightgrey;
 
 
-.dash-container {
+.dash-container, .profile-container, .project-show {
   margin-top: 80px;
+
 }
 
-.profile-container {
-  margin-top: 80px;
-}
-
-.project-show {
-  margin-top: 80px;
-}
 
 body {
-  top: 0;
 }

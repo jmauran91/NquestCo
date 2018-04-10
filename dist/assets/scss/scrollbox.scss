@@ -1,0 +1,22 @@
+
+.scrollbox {
+  border: 1px solid black;
+  box-shadow: 2px 2px 2px #888888;
+  background-color: #A9A9A9;
+  height:22vh;
+  min-width: 60vw;
+  overflow: auto;
+  color:white;
+  font-family:sans-serif;
+  padding:10px;
+  padding-bottom: 2px;
+}
+
+.scrollbox td {
+  border: 0px solid #999;
+  padding: 0.5rem;
+}
+
+.projectfiles-show, .projectnotes-show {
+  width: 60vw;
+}

@@ -12,10 +12,13 @@ $secondary_color: lightgrey;
   flex-direction: column;
 }
 
-.renderfiles-show {
+.renderfiles-show, .rendernotes-show {
   display: flex;
   flex-flow: row;
   flex-direction: row;
+  padding: 0;
+  width: 100%;
+  height: 100%;
 
 }
 

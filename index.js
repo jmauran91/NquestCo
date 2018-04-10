@@ -32,17 +32,25 @@ passport.use('local-login', localLoginStrategy);
 
 const authCheckMiddleware = require('./server/middleware/auth-check');
 app.use('/api', authCheckMiddleware);
+app.use('/chat', authCheckMiddleware);
 
 const authRoutes = require('./server/routes/auth');
 const apiRoutes = require('./server/routes/api');
+const chatRoutes = require('./server/routes/chat');
 app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
+app.use('/chat', chatRoutes);
+
 
 app.get('*', function(req, res) {
   res.sendFile(path.resolve(__dirname, 'dist/index.html'));
 });
 
 
-app.listen(3000, () => {
+let server = app.listen(3000, () => {
   console.log('Server is running on localhost:3000');
 })
+
+const io = require('socket.io')(server, {'transports': ['websocket', 'flashsocket', 'polling']});
+const socketEvents = require('./server/middleware/socketEvents')
+socketEvents(io);

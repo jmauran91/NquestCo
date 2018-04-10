@@ -2,6 +2,7 @@ import React from 'react';
 import Auth from '../modules/Auth';
 import NewProjectPage from '../containers/NewProjectPage';
 import ProjectListPage from '../containers/ProjectListPage';
+import ChatContainer from '../components/chat/ChatContainer';
 import PropTypes from 'prop-types';
 
 class Dashboard extends React.Component {
@@ -18,30 +19,33 @@ class Dashboard extends React.Component {
   }
 
   getCurrentUser(){
-    var token = localStorage.getItem('token');
-    var base64url = token.split('.')[1];
-    var base64 = base64url.replace('-', '+').replace('_', '/');
-    var token_props = JSON.parse(window.atob(base64));
-    var user_finder_id = token_props['sub'].toString();
-    //
-    const url = `http://localhost:3000/api/users/${user_finder_id}`;
-    fetch(url, {
-      method: 'GET',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization' : ['bearer', token].join(' ')
-      },
-    })
-    .then(response => response.json())
-    .then((response) => {
-      var user = response['user']
-      this.setState({ current_user: user })
-    })
-    .catch((error) => {
-      console.log(error)
-      return( error )
-    })
+    if(localStorage.getItem('token') != null){
+      var token = localStorage.getItem('token');
+      var base64url = token.split('.')[1];
+      var base64 = base64url.replace('-', '+').replace('_', '/');
+      var token_props = JSON.parse(window.atob(base64));
+      var user_finder_id = token_props['sub'].toString();
+      //
+      const url = `http://localhost:3000/api/users/${user_finder_id}`;
+      fetch(url, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization' : ['bearer', token].join(' ')
+        },
+      })
+      .then(response => response.json())
+      .then((response) => {
+        var user = response['user']
+        this.setState({ current_user: user })
+        console.log(user)
+      })
+      .catch((error) => {
+        console.log(error)
+        return( error )
+      })
+    }
   }
 
   componentDidMount(){
@@ -74,6 +78,11 @@ class Dashboard extends React.Component {
           </div>
         )
       }
+      if (this.state.component == 'chat'){
+        <div>
+          <ChatContainer />
+        </div>
+      }
     }
 
     return(
@@ -97,15 +106,28 @@ class Dashboard extends React.Component {
                   name="my_projects"
                 > My Projects </button>
               </li>
+              <li>
+                <button
+                  onClick={this.handleFeatureClick}
+                  name="chat"
+                > Messenger </button>
+              </li>
             </ul>
           </div>
           <div className="center-side-dash">
-            {this.state.component == 'new_project' && <NewProjectPage />}
+            {this.state.component == 'new_project'
+              && <NewProjectPage
+                  owner_id={this.state.current_user._id}
+                  owner_name={this.state.current_user.name}
+                 />}
 
             {this.state.component == 'my_projects'
              && <ProjectListPage
                  url={this.state.current_user._id}/>}
 
+            {this.state.component == 'chat'
+             && <ChatContainer
+                current_user={this.state.current_user}/>}
           </div>
         </div>
       </div>

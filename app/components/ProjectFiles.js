@@ -40,10 +40,13 @@ class ProjectFiles extends React.Component{
     .then(response => response.json())
     .then((response)=> {
       console.log(response)
-      this.setState({ project: response['project'] })
+      this.setState({ project: response['project'],
+                      msg: response.msg
+                    })
     })
     .catch((error) => {
       console.log(error)
+      this.setState({ msg: error.msg })
     })
 
   }
@@ -158,38 +161,46 @@ class ProjectFiles extends React.Component{
 
     var ren_modalSelector = this.modalSelector();
 
-    var renderFiles = this.state.files.map((file, i) => {
-      return(
-        <li
-          className="file-tile"
-          ref="ftile"
-          key={i}
-          onClick={() => {
-             this.toggleModal();
-             var clicked_file = this.state.files[i]
-             this.setState({
-               modal_file: clicked_file
-             })
-           }}
-           value={i}
-         >
+    if(this.state.files){
+      var renderFiles = this.state.files.map((file, i) => {
+        return(
+          <td
+            className="file-tile"
+            ref="ftile"
+            key={i}
+            onClick={() => {
+              this.toggleModal();
+              var clicked_file = this.state.files[i]
+              this.setState({
+                modal_file: clicked_file
+              })
+            }}
+            value={i}
+            >
 
-          {this.fileTypeSwitcher(file, i)}
-          <div className="file-tile-name">
-           {file.name}
-          </div>
-          <div className="file-tile-desc"> </div>
-          <div className="file-tile-users"> </div>
-
-        </li>
-      )
-    })
+            {this.fileTypeSwitcher(file, i)}
+            <div className="file-tile-name">
+            {file.name}
+            </div>
+            <div className="file-tile-desc"> </div>
+            <div className="file-tile-users"> </div>
+          </td>
+        )
+      })
+    }
+    else {
+      var renderFiles;
+    }
 
     return(
       <div className="projectfiles-show">
-        <ul className="renderfiles-show">
-          {renderFiles}
-        </ul>
+        <table className="scrollbox">
+          <tbody>
+              <tr className="renderfiles-show">
+                {renderFiles}
+              </tr>
+          </tbody>
+        </table>
 
         <Modal
         show={this.state.isShowingModal}
