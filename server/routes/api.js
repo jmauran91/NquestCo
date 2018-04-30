@@ -3,6 +3,7 @@ const Project = require('../models/project');
 const User = require('../models/user');
 const Note = require('../models/note');
 const File = require('../models/file');
+const Ping = require('../models/ping');
 const Conversation = require('../models/conversation');
 const Message = require('../models/message');
 const stream = require('stream');
@@ -70,6 +71,20 @@ function uploadFile(filedata, filename, filetype){
   });
 }
 
+function createPing(u_id, p_id, body){
+  var _ping = new Ping();
+  _ping.userId = u_id;
+  _ping.projectId = p_id;
+  _ping.text = body;
+  _ping.save((err, new_ping) => {
+    if(err){
+      console.log(err)
+      return(null)
+    }
+    return(new_ping)
+  })
+}
+
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -88,12 +103,60 @@ router.get('/dashboard', (req, res) => {
 //////////////////////////////////////////////////
 
 
+//////////////////////////////////////////////////
+///// THE SEARCH QUERIES APIS ////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+
+router.get('/search/projects/:params', (req, res) => {
+  var url_array = req.url.params.split("+")
+  var searchparams = ""
+  url_array.each((term) => {
+    searchparams += (term + " ")
+  })
+  Project.find({ $text: { $search: searchparams } }, { "score": { "$meta": "textScore" } })
+  .sort({ score: { $meta: "textScore"}})
+  .exec((err, projects) => {
+    if(err){
+      console.log(err)
+      res.send(err)
+    }
+    res.status(200).json({ })
+
+  })
+})
+
+router.get('/search/users/:params', (req, res) => {
+  var url_array = req.url.params.split("+")
+  var searchparams = ""
+  url_array.each((term) => {
+    searchparams += (term + " ")
+  })
+  User.find({ $text: { $search: searchparams } }, { "score": { "$meta": "textScore" } })
+  .sort({ score: { $meta: "textScore"}})
+  .exec((err, users) => {
+    if(err){
+      console.log(err)
+      res.send(err)
+    }
+    res.status(200).json({ })
+    
+  })
+})
+
+
+
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+
+
 // THE 'PROJECTS' ROUTES ///
 
+
 router.get('/:id/projects', (req, res) => {
-
   var u_id = req.url.split('/')[1]
-
   function validateOwnerName(currentProject){
     return currentProject.owner_name instanceof String
   }
@@ -121,9 +184,7 @@ router.get('/:id/projects', (req, res) => {
           var pj = projects[i]
           addNameToProject(pj, i)
           .then((result) => {
-            console.log(result.i)
             if(result.pobject.owner == u_id || result.pobject.users.indexOf(u_id) > -1 ){
-              console.log(result.pobject.owner)
               updated_projects.push(result.pobject)
               if( result.i == projects.length - 1 ) {
                 resolve(updated_projects)
@@ -144,7 +205,6 @@ router.get('/:id/projects', (req, res) => {
   var updated_projects = [];
   addProjectToArr()
   .then((result) => {
-    console.log(result)
     res.status(200).json({ msg: 'we did something', projects: result })
   })
   .catch((err) => {
@@ -158,18 +218,20 @@ router.get('/:id/projects', (req, res) => {
 //////////////////////////////////////////////////
 
 router.post('/projects', (req, res) => {
-  console.log('enter api')
     User.findOne({ name: req.body.owner }, (err, user) => {
       if (user){
-        console.log('owner found')
         ///// PREPARING THE VARIABLES
-        const title = req.body.title;
-        const owner = req.body.owner;
-        const description = req.body.description;
-        const filedata = req.files.file.data;
-        const filename = req.files.file.name;
-        const filetype = req.files.file.mimetype;
-
+        try{
+          const title = req.body.title;
+          const owner = req.body.owner;
+          const description = req.body.description;
+          const filedata = req.files.file.data;
+          const filename = req.files.file.name;
+          const filetype = req.files.file.mimetype;
+        }
+        catch(error){
+          res.status(400).json({ msg: 'You have not provided proper inputs'})
+        }
         const userData = {
           title: title,
           description: description,
@@ -182,12 +244,11 @@ router.post('/projects', (req, res) => {
         project.ownername = user.name
 
         project.save().then(()=> {
-          console.log('project saved')
           if (project.documents) {
             ///// NOW UPLOAD FILE TO S3 BUCKET
+            createPing(project.owner, project._id, (project.ownername + " has created the project [" + project.title +"]"))
             uploadFile(filedata, filename, filetype)
             .then((result) => {
-              console.log('file uploaded')
               ////// NOW CREATE FILE ENTRY IN DB
               var fileparams = {
                 title: filename,
@@ -196,7 +257,7 @@ router.post('/projects', (req, res) => {
               }
               var newfile = new File(fileparams)
               newfile.save().then(() => {
-                console.log('file saved')
+                createPing(project.owner, project._id, (project.ownername + " has added a file to the project [" + project.title +"]"))
                 res.json({ message: 'Project created!', project: project, request: req.body, result: result });
               })
             })
@@ -229,7 +290,7 @@ router.post('/projects', (req, res) => {
 router.get('/project/:id', (req, res) => {
   var obj_id = req.url.split('/')[2]
   try{
-    console.log('this is user ' + req.user)
+    console.log('this is user ' )
   }
   catch(err){
     console.log(err)
@@ -260,6 +321,7 @@ router.patch('/project/:id', (req, res) => {
           if (err) { res.send(err) };
           project.save((err)=> {
             if(err) { res.send(err) }
+            createPing(project.owner, project._id, (project.ownername + " has added a user to the project [" + project.title + "]"))
             res.status(200).json({ user_message: 'User successfully added.', form_stat: true, project: project, field:'user' });
           })
         })
@@ -272,9 +334,6 @@ router.patch('/project/:id', (req, res) => {
 
   else if (!req.body.new_user) {
     /////// THIS IS FOR ADDING FILES TO THE PROJECT / S3 ///////
-    console.log(req.body)
-    console.log(req.files)
-
     const filedata = req.files.file.data
     const filename = req.body.filename
     const filetype = req.files.file.mimetype
@@ -284,12 +343,12 @@ router.patch('/project/:id', (req, res) => {
     Project.findOneAndUpdate({ _id: req.body._id}, { $push: { documents: filename}}, (err, project) => {
       // insert S3 Bucket Upload here
       uploadFile(filedata, filename, filetype).then((result) => {
-        console.log('after promise')
-        console.log(result)
         if (err) { res.send({err, form_stat: false }) };
         //// SAVING THE FILE NAME INTO THE PROJECT
         project.save((err) => {
           if(err) { res.send(err) }
+          createPing(project.owner, project._id, (project.ownername + " has added a filename to the project [" + project.title + "]"))
+
           //// NOW SAVING THE FILE AS A DB ENTRY IN ITS OWN RIGHT
           var fileparams = {
             title: result.Key,
@@ -298,6 +357,7 @@ router.patch('/project/:id', (req, res) => {
           }
           var newfile = new File(fileparams)
           newfile.save().then(() => {
+            createPing(project.owner, project._id, (project.ownername + " has added a file to the project [" + project.title + "]"))
             res.json({ doc_message: 'Document successfully added.', form_stat: true, project: project, field:'doc', file: newfile});
           })
         })
@@ -436,6 +496,8 @@ router.patch('/project/:id/note', (req, res) => {
         if(err){
           console.log(err)
         }
+        createPing(project.owner, project._id, (project.ownername + " has added a note to the project [" + project.title + "]"))
+
       })
       // Exiting newNote Save
       if(err){
@@ -513,6 +575,10 @@ router.patch('/project/:id/notes/:note_id', (req, res) => {
     }
     res.send({ msg: 'note succesfully patched', note: note })
   })
+  .populate('project')
+  .exec((err, project) => {
+    createPing(project.owner, project._id, (project.ownername + " has edited a note in the project [" + project.title + "]"))
+  })
 })
 
 //////////////////////////////////////////////////
@@ -525,11 +591,54 @@ router.get('/users/:id', cors(), (req, res) => {
   var id = req.url.split("/")[2]
   User.findOne({ _id: id}, (err, user) => {
     if (user){
-      res.json({msg: 'Current User Retrieval Successful', user: user})
+      res.status(200).json({msg: 'User Retrieval Successful', user: user})
     }
     else {
+      console.log('ping 4')
       res.status(400)
     }
+  })
+})
+
+router.patch('/users/:id', cors(), (req, res) => {
+  var _id = req.url.split("/")[2]
+  var edit;
+  const filedata = req.files.file.data
+  const filename = req.body.filename
+  const filetype = req.files.file.mimetype
+
+  User.findOne({ _id: _id}, (err, user) => {
+    if(err){
+      console.log(err)
+      res.send(err)
+    }
+    if(typeof user.profpic === 'undefined' || !user.profpic){
+      edit = false;
+    }
+    else {
+      edit = true
+    }
+    uploadFile(filedata, filename, filetype).then((result) => {
+      var url = `https://s3.amazonaws.com/rsearcherdockbucket/${result.Key}`
+
+      user.profpic = url
+      user.save((err) => {
+        if(err){
+          console.log(err)
+          res.send(err)
+        }
+        if(edit == true){
+          res.status(200).json({ msg: "Prof pic successfully edited "})
+        }
+        else {
+          res.status(200).json({ msg: "Prof pic successfully added "})
+        }
+      })
+    })
+    .catch((err) => {
+      console.log(err)
+      res.json({err})
+    })
   })
 })
 
@@ -542,6 +651,26 @@ router.get('/users', cors(), (req,res) => {
     res.json({ users: users })
     console.log('users fetched')
   })
+})
+
+router.get('/users/:user_id/pings', (req, res) => {
+  var url = req.url.split('/')[2]
+  Ping.find({ userId: url })
+    .populate({
+      path: 'userId',
+      select: 'name'
+    })
+    .populate({
+      path: 'projectId',
+      select: ['title', 'ownername', 'usernames']
+    })
+    .exec((err, pings) => {
+      if(err){
+        console.log(err)
+        res.send(err)
+      }
+      res.status(200).json({ msg: 'pings fetched', pings: pings })
+    })
 })
 
 module.exports = router;

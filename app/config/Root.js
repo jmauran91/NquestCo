@@ -20,13 +20,15 @@ const Root = () => {
       <Router history={browserHistory} >
         <div>
           <NavSwitcher />
-          <Route path="/" exact component={IndexSwitcher} />
-          <Route path="/:id" exact component={Dashboard} />
-          <Route path="/login" component={LoginPage} />
-          <Route path="/signup" exact component={SignUpPage} />
-          <Route path="/logout" component={LogoutSwitcher}/>
-          <Route path="/profile/:id" exact component={ProfilePage} />
-          <Route path="/project/:id" exact component={ProjectPage} />
+          <Switch>
+            <Route exact path="/login" component={LoginPage} />
+            <Route exact path="/signup" component={SignUpPage} />
+            <Route exact path="/logout" component={LogoutSwitcher}/>
+            <Route exact path="/project/:id" component={ProjectPage} />
+            <Route exact path="/profile/:id" component={ProfilePage} />
+            <Route exact path="/:id" component={Dashboard} />
+            <Route exact path="/" component={IndexSwitcher} />
+          </Switch>
         </div>
       </Router>
     );

@@ -16,10 +16,20 @@ $secondary_color: lightgrey;
 }
 
 .container {
+  display: flex;
+  flex-direction: row;
   margin-right: 0;
   margin-left: 0;
   width: 100%;
 }
+
+@media screen and (min-width: 1200px){
+  .container {
+    max-width: 1800px !important;
+  }
+}
+
+
 
 .navswitcher{
   top: 0;
@@ -47,6 +57,35 @@ $secondary_color: lightgrey;
 
 .nav-right form {
 
+}
+
+.nav-right {
+  float: right;
+  padding-top: 12px;
+}
+
+.control-label {
+  padding-top: 6px;
+}
+
+.nav-right li {
+  margin: 0 8px;
+  padding: 4px 6px;
+  border-radius: 16px;
+  background-color: white;
+  float: right;
+}
+
+.nav-right li:hover{
+  background-color: darken(white, 15%);
+}
+
+.nav-right a {
+  color: black;
+}
+
+.nav-right a:hover{
+  text-decoration: none !important;
 }
 
 

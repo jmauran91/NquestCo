@@ -10,30 +10,29 @@ const LoginForm = ({
   successMessage,
   user
 }) => (
-  <div className="container">
+  <div className="login-form-container">
     <form action="/" onSubmit={onSubmit}>
-      <h2 className="card-heading">Login</h2>
 
       {successMessage && <p className="success-message">{successMessage}</p>}
       {errors.summary && <p className="error-message">{errors.summary}</p>}
 
       <div className="field-line">
-      <label> Email:   </label>
         <input
           type="text"
           name="email"
           onChange={onChange}
           value={user.email}
+          placeholder="Email..."
         />
       </div>
 
       <div className="field-line">
-      <label> Password:   </label>
         <input
-          type="text"
+          type="password"
           name="password"
           onChange={onChange}
           value={user.password}
+          placeholder="Password..."
         />
       </div>
 

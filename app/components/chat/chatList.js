@@ -9,73 +9,60 @@ class ChatList extends React.Component{
     this.socket = this.props.socket;
 
     this.state = {
-      conversations: [],
-      response_msg: ''
+
     }
   }
 
-  componentWillMount(){
-    var _id = this.props.current_user._id
-    var url = `http://localhost:3000/chat/users/${_id}/conversations`
-    if(this.state.conversations.length == 0 || this.state.response_msg == ''){
-      fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: `bearer ${Auth.getToken()}`
-        }
-      })
-      .then(response => response.json())
-      .then((response) => {
-        if(response.message){
-          console.log(response.message)
-          this.setState({ response_msg: response.message })
-        }
-        else{
-          this.setState({ conversations: response.conversations_array })
-          console.log(response.conversations_array)
-          console.log(response.conversations_array[0])
-
-        }
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-    }
-  }
 
   render(){
-
-    if(this.state.conversations.length != 0){
-      var renderConvos = this.state.conversations.map((conversation, i) => {
-        if(conversation.recipients){
-          var conv_recipients = ``;
-          conversation.recipients.map((recip) => {
-            conv_recipients + `${recip}, `
+    var chatListStyle = {}
+    if(this.props.conversations){
+      if(typeof this.props.conversations !== 'undefined' &&
+                        this.props.conversations.length != 0 &&
+                          this.props.conversations[0].length != 0){
+        var renderConvos = this.props.conversations.map((conversation, i) => {
+          /// choosing the first message of the conversation
+          /// recipients should be the same for all msgs in conversation
+          if(conversation[0].recipients){
+            var conv_recipients = ``;
+            conversation[0].recipients.map((recip) => {
+              conv_recipients + `${recip}, `
+            })
+          }
+          else if (conversation[0].recipient){
+            var conv_recipients = conversation[0].recipient
+          }
+          // setting the recipients to be 1 recipient in the event
+          // of a 1-on-1 conversation or all of the recipients in the event
+          // of a 1-on-many conversation
+          conversation.forEach((msg) => {
+            if(msg.isRead == false){
+              chatListStyle = {
+                fontWeight: 'bold'
+              }
+            }
           })
-        }
-        else if (conversation.recipient){
-          var conv_recipients = conversation.recipient
-        }
-        return(
-          <li
-            key={i+1}
-            className="convo-tile"
-            onClick={this.props.convoSelector}
-            id={conversation.conversationId}
-          >
-            <div className="convo-avatar">
-              <img />
-            </div>
-            <div className="convo-recipients">
-              {conv_recipients}
-            </div>
-          </li>
-        )
-      })
+          // Setting the chatList element to be Bold if there
+          // are any unread messages within the conversation
+          return(
+            <li
+              key={i+1}
+              className="convo-tile"
+              onClick={this.props.convoSelector}
+              id={conversation[0].conversationId}
+            >
+              <div className="convo-recipients" style={chatListStyle}>
+                {conv_recipients}
+              </div>
+            </li>
+          )
+        })
+      }
     }
     else {
       var renderConvos = <li id="no-convo" className="convo-tile-no-convos">No convos yet</li>
     }
+
 
     return(
       <div>

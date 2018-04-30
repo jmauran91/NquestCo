@@ -30,7 +30,8 @@ class ProjectPage extends React.Component{
       quillText: '',
       noteTitle: '',
       arrowHide_file: true,
-      arrowHide_note: true
+      arrowHide_note: true,
+      XOut: false
     }
 
     this.onDrop = this.onDrop.bind(this);
@@ -49,6 +50,7 @@ class ProjectPage extends React.Component{
     this.quillHandleChange = this.quillHandleChange.bind(this);
     this.quillTitleHandle = this.quillTitleHandle.bind(this);
     this.submitNote = this.submitNote.bind(this);
+    this.quillXOut = this.quillXOut.bind(this);
   }
 
   quillHandleChange(value){
@@ -57,6 +59,10 @@ class ProjectPage extends React.Component{
 
   quillTitleHandle(event){
     this.setState({ noteTitle: event.target.value })
+  }
+
+  quillXOut(){
+    this.setState({ XOut: !this.state.XOut })
   }
 
   componentWillMount(){
@@ -253,9 +259,11 @@ class ProjectPage extends React.Component{
     if(this.state.showEditor == true){
       var myEditStyle = {
         display: 'block',
-        position: 'absolute',
-        top: '-180px',
-        left: '20px',
+        position: 'fixed',
+        width: '85%',
+        height: '85%',
+        top: '100px',
+        left: '100px',
         backgroundColor: 'white',
         zIndex: '5',
         boxShadow: '2px 2px 2px #888888',
@@ -440,11 +448,6 @@ class ProjectPage extends React.Component{
 
           <div className="projectnotes-big-container">
             <div className="anchor-container-notes">
-            {/*
-              <div className="anchor" onClick={this.switchProjectNotes}>
-              Show Notes
-              </div>
-            */}
               <div className="project-add-note-anchor"onClick={this.switchProjectEditor}>
                 <div className="project-add-note-anchor-text">Add Note</div>
                 <div style={rightArrowNoteStyle} className="arrow-right"></div>
@@ -460,13 +463,16 @@ class ProjectPage extends React.Component{
             <br />
               <div id="projecteditor-container" style={myEditStyle}>
                 <form onSubmit={this.submitNote}>
-                  <label> Note Title </label>
-                  <input
-                  label="Note Title"
-                  type="text"
-                  value={this.state.noteTitle}
-                  onChange={this.quillTitleHandle}
-                  />
+                  <div className="note-title-box">
+                    <label> Note Title </label>
+                    <input
+                    label="Note Title"
+                    type="text"
+                    value={this.state.noteTitle}
+                    onChange={this.quillTitleHandle}
+                    />
+                  </div>
+                  <div className="quill-xout" onClick={quillXOut} style={XOutStyle}></div>
                   <ReactQuill
                   value={this.state.quillText}
                   onChange={this.quillHandleChange}

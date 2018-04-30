@@ -14,6 +14,124 @@ $secondary_color: lightgrey;
   width: 100%;
   height: 100vh;
   padding-bottom: 20vh;
+  padding-top:82px;
+}
+
+.home-main {
+  display: block;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: darkgrey;
+  white-space: nowrap;
+}
+
+.home-welcomer {
+  display: block;
+  position: absolute;
+  background-color: darken(white, 5%);
+  margin: 8px;
+  padding: 32px;
+  padding-right: 12px;
+  width: 500px;
+  white-space: pre-line;
+  top: 25%;
+  left: 10%;
+  border: 2px solid black;
+  box-shadow: -3px 3px 3px grey;
+  z-index: 4;
+  font-family: 'Helvetica', sans-serif;
+  font-size: 140%;
+  font-weight: 600;
+  color: $color;
+  line-height: 130%;
+}
+
+.home-welcomer-banner {
+  font-size: 400% !important;
+  font-family: 'Helvetica', sans-serif;
+  font-size: 140%;
+  font-weight: 300;
+  color: $color;
+  display: block;
+  padding: 8px;
+}
+
+.home-welcomer-banner img {
+  margin-left: 40px;
+}
+
+.home-welcomer-text {
+  margin-right: 12px;
+}
+
+.slideshow{
+  position: relative;
+  overflow: hidden;
+  overflow-x: hidden;
+  height: 100%;
+  width: 3550px;
+  display: block;
+  white-space: nowrap;
+}
+
+.slideshow-images  {
+  display: inline-block;
+  position: relative;
+  width: 600px;
+  height: 600px;
+}
+
+.slideshow-images img {
+  display: block;
+  float: left;
+  width: 100%;
+  height: 100%;
+}
+
+.first-img {
+  -webkit-animation: bannermove 30s linear infinite;
+     -moz-animation: bannermove 30s linear infinite;
+      -ms-animation: bannermove 30s linear infinite;
+       -o-animation: bannermove 30s linear infinite;
+          animation: bannermove 30s linear infinite;
+
+}
+
+@keyframes bannermove {
+ 0% { margin-left: 0px; }
+ 100% { margin-left: -2400px; }
+
+}
+
+@-moz-keyframes bannermove {
+ 0% { margin-left: 0px; }
+ 100% { margin-left: -2400px; }
+
+}
+
+@-webkit-keyframes bannermove {
+ 0% { margin-left: 0px; }
+ 100% { margin-left: -2400px; }
+
+}
+
+@-ms-keyframes bannermove {
+ 0% { margin-left: 0px; }
+ 100% { margin-left: -2400px; }
+
+}
+
+@-o-keyframes bannermove {
+ 0% { margin-left: 0px; }
+ 100% { margin-left: -2400px; }
+}
+
+.home-footer {
+  font-size: 80%;
+  font-style: italic;
+  font-weight: 400;
 }
 
 /* Left Side */

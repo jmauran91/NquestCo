@@ -58,14 +58,39 @@ $secondary_color: lightgrey;
 }
 
 
-.projecteditor-container {
-  width: 40%;
+#projecteditor-container {
+  padding: 16px;
+}
+
+#projecteditor-container form {
+  height: 90%;
+}
+
+.note-title-box {
+  display: flex;
+  flex-direction: row;
+}
+
+#projecteditor-container label {
+  padding: 8px;
+  text-decoration: underline;
+}
+
+#projecteditor-container input {
+  padding: 8px;
+  width: 20vw;
 }
 
 .quill {
   width: 90%;
-  height: 20vh;
+  height: 70%;
   margin: 0 auto;
+}
+
+#projecteditor-container button {
+  display: block;
+  padding: 8px;
+  margin: 8px;
 }
 
 

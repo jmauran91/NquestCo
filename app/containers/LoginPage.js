@@ -24,7 +24,6 @@ class LoginPage extends React.Component {
         password: ''
       }
     };
-
     this.processForm = this.processForm.bind(this);
     this.changeUser = this.changeUser.bind(this);
   }
@@ -53,10 +52,10 @@ class LoginPage extends React.Component {
     .then(response => response.json())
     .then((response) => {
       Auth.authenticateUser(response.token);
-      this.context.router.history.push('/');
       this.setState({
         errors: {}
       })
+      this.context.router.history.push('/');
     })
     .catch((error) => {
       console.log(error);
@@ -89,13 +88,18 @@ class LoginPage extends React.Component {
    */
   render() {
     return (
-      <LoginForm
-        onSubmit={this.processForm}
-        onChange={this.changeUser}
-        errors={this.state.errors}
-        successMessage={this.state.successMessage}
-        user={this.state.user}
-      />
+      <div className="login-container">
+        <div className="login-banner">
+          Log In
+        </div>
+        <LoginForm
+          onSubmit={this.processForm}
+          onChange={this.changeUser}
+          errors={this.state.errors}
+          successMessage={this.state.successMessage}
+          user={this.state.user}
+        />
+      </div>
     );
   }
 

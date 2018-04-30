@@ -8,12 +8,20 @@ const UserSchema = new mongoose.Schema({
     index: { unique: true }
   },
   password: String,
-  name: String,
+  firstName: {
+    type: String,
+  },
+  lastName: {
+    type: String,
+  },
+  profpic: String,
   projects: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project'
   }]
 });
+
+UserSchema.index({ firstName: 'text', lastName: 'text' })
 
 UserSchema.methods.comparePassword = function comparePassword(password, callback){
   bcrypt.compare(password, this.password, callback);

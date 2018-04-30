@@ -3,7 +3,7 @@ const User = require('./user');
 
 const ProjectSchema = new mongoose.Schema({
   title: {
-    type: String
+    type: String,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -20,7 +20,9 @@ const ProjectSchema = new mongoose.Schema({
   usernames: [{
     type: String
   }],
-  description: String,
+  description: {
+    type: String,
+  },
   notes: [{
     type: String,
   }],
@@ -29,7 +31,8 @@ const ProjectSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+});
 
-})
+ProjectSchema.index({ description: 'text', title: 'text' })
 
 module.exports = mongoose.model('Project', ProjectSchema);

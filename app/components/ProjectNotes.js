@@ -88,7 +88,6 @@ class ProjectNotes extends React.Component {
       console.log(response)
       console.log(response['msg'])
       if (typeof(response.notes) == String){
-        debugger;
         this.setState({ notes: response.notes, msg: response.msg, success: true })
       }
       else {
@@ -149,7 +148,7 @@ class ProjectNotes extends React.Component {
                         </tr>
                       </tbody>
                     </table>
-                    
+
     } else if (this.state.success == false){
       var renderNotes = <div className="scrollbox"> No notes yet. </div>
     }

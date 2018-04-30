@@ -1,4 +1,3 @@
-
 class Auth {
 
   static authenticateUser(token){

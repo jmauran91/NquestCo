@@ -1,5 +1,6 @@
 import React from 'react';
 import Auth from '../modules/Auth';
+import Fetch from '../modules/Fetch';
 import NewProjectPage from '../containers/NewProjectPage';
 import ProjectListPage from '../containers/ProjectListPage';
 import ChatContainer from '../components/chat/ChatContainer';
@@ -11,45 +12,63 @@ class Dashboard extends React.Component {
 
     this.state = {
       current_user: {},
-      component: ''
+      component: '',
+      notiTally: 0,
+      hamburgerShow: false,
+      searchquery: '',
+      searchReturns: []
     };
 
     this.handleFeatureClick = this.handleFeatureClick.bind(this);
-    this.getCurrentUser = this.getCurrentUser.bind(this);
+    this.notiTallyUpdater = this.notiTallyUpdater.bind(this);
+    this.getCurrentUser = Fetch.GetCurrentUser.bind(this);
+    this.handleHamburger = this.handleHamburger.bind(this);
+    this.handleSearchBar = this.handleSearchBar.bind(this);
+    this.submitSearch = this.submitSearch.bind(this);
+    this.clearSearch = this.clearSearch.bind(this);
   }
 
-  getCurrentUser(){
-    if(localStorage.getItem('token') != null){
-      var token = localStorage.getItem('token');
-      var base64url = token.split('.')[1];
-      var base64 = base64url.replace('-', '+').replace('_', '/');
-      var token_props = JSON.parse(window.atob(base64));
-      var user_finder_id = token_props['sub'].toString();
-      //
-      const url = `http://localhost:3000/api/users/${user_finder_id}`;
-      fetch(url, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization' : ['bearer', token].join(' ')
-        },
+  handleSearchBar(event){
+    this.setState({ searchquery: event.target.value})
+  }
+
+  submitSearch(){
+    var searchParams = ""
+    this.state.searchquery.split(' ').map((term, i) => {
+      searchParams += (term + "+")
+    })
+    var url = `http://localhost:3000/api/search/projects/${searchParams}`
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `bearer ${Auth.getToken()}`
+      }
+    })
+    .then(response => response.json())
+    .then((response) => {
+      console.log(response)
+      this.setState({
+        searchReturns: response.projects
       })
-      .then(response => response.json())
-      .then((response) => {
-        var user = response['user']
-        this.setState({ current_user: user })
-        console.log(user)
-      })
-      .catch((error) => {
-        console.log(error)
-        return( error )
-      })
-    }
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+    this.clearSearch();
+  }
+
+  clearSearch(){
+    this.setState({ searchquery: '' })
   }
 
   componentDidMount(){
-    this.getCurrentUser();
+    try{
+      this.getCurrentUser().then((response)=>{this.setState({current_user: response})})
+    }
+    catch(error){
+      console.log(error)
+      this.context.router.history.push('/')
+    }
   }
 
   handleFeatureClick(event){
@@ -61,8 +80,33 @@ class Dashboard extends React.Component {
     }
   }
 
+  handleHamburger(){
+    this.setState({ hamburgerShow: !this.state.hamburgerShow })
+  }
+
+  notiTallyUpdater(num){
+    this.setState({ notiTally: num })
+  }
+
   render(){
 
+    //// This handles the logic for selecting features
+    //// to show, from the menu on the left of screen
+    if(this.state.hamburgerShow){
+      var hambStyle = {
+        display: 'inline-block',
+        width: '18vw',
+        height: '100%',
+        'float': 'left',
+        borderRight: '1px solid black',
+        padding: '25px 10px',
+      }
+    }
+    else {
+      var hambStyle = {
+        display: 'none'
+      }
+    }
     var featSwitcher = () => {
       if (this.state.component == 'new_project'){
         return(
@@ -84,15 +128,61 @@ class Dashboard extends React.Component {
         </div>
       }
     }
+    /// this handles the unread msgs notifications
+    if (this.state.notiTally > 0){
+      var parStyle = {
+        position: 'relative',
+        zIndex: '1',
+      }
+      var notiStyle = {
+        position: 'absolute',
+        color: 'white',
+        zIndex: '2',
+        right: '10px',
+        top: '5px',
+        paddingLeft: '8px',
+        height: '25px',
+        width: '25px',
+        backgroundColor: 'red',
+        borderRadius: '50%',
+        display: 'inline-block',
+      }
+      var btnStyle = {
+        paddingRight: '50px'
+
+      }
+      var notiMsg = this.state.notiTally
+    }
+    else {
+      var notiMsg = ''
+      var notiStyle = {
+        display: 'none'
+      }
+    }
 
     return(
       <div className="dash-container">
         <div className="dash-banner">
-          <h1> Welcome to the Home Page </h1>
-          <h3>{this.state.secretData}</h3>
+          <div className="hamburger" onClick={this.handleHamburger}>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <span> Nquest </span>
+          <form onSubmit={this.submitSearch} className="dash-banner-searchbar">
+            <input
+              type="text"
+              placeholder="...search..."
+              onChange={this.handleSearchBar}
+              value={this.state.searchquery}
+            />
+            <button type="submit">
+              <img src="assets/images/icons8-search.png" height='32px' width='32px'/>
+            </button>
+          </form>
         </div>
         <div className="dash-body">
-          <div className="left-side-dash">
+          <div className="left-side-dash" style={hambStyle}>
             <ul className="feature-list">
               <li>
                 <button
@@ -106,11 +196,15 @@ class Dashboard extends React.Component {
                   name="my_projects"
                 > My Projects </button>
               </li>
-              <li>
-                <button
+              <li className="noti-ticker-parent" style={parStyle}>
+                <button style={btnStyle}
                   onClick={this.handleFeatureClick}
                   name="chat"
-                > Messenger </button>
+                > Messenger
+                </button>
+                <span className="notification-ticker" style={notiStyle}>
+                  {notiMsg}
+                </span>
               </li>
             </ul>
           </div>
@@ -127,12 +221,21 @@ class Dashboard extends React.Component {
 
             {this.state.component == 'chat'
              && <ChatContainer
-                current_user={this.state.current_user}/>}
+                current_user={this.state.current_user}
+                notiTallyUpdater={this.notiTallyUpdater}
+                total_unread={this.state.notiTally}
+                />
+              }
           </div>
         </div>
       </div>
     )
   }
 }
+
+Dashboard.contextTypes = {
+  router: PropTypes.object.isRequired
+};
+
 
 export default Dashboard;

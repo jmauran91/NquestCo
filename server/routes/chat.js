@@ -32,57 +32,67 @@ router.get('/users/:id/conversations', (req,res) => {
         console.log(err)
         res.send({err: err})
       }
-      if(conversations.length == 0){
+      else if(conversations.length == 0){
         res.status(200).json({ message: 'no conversations for this user yet'})
       }
-      let fullConversations = []
-      conversations.forEach((conversation) => {
-        console.log('ping conv')
-        Message.find({ conversationId: conversation._id})
-        .sort('-createdAt')
-        .limit(1)
-        .populate({
-          path: "author",
-          select: "name"
-        })
-        .exec((err, message) => {
-          if(err){
-            console.log(err)
-            res.send({ err: err })
-          }
-          var message = message[0].toObject();
-          if(conversation.participants){
-            if(conversation.participants.length == 2){
-              if(message.author.name == conversation.participants[0].name){
-                message.recipient = conversation.participants[1].name;
-              }
-              else {
-                message.recipient = conversation.participants[0].name;
-              }
+      else {
+        let fullConversations = []
+        conversations.forEach((conversation) => {
+          Message.find({ conversationId: conversation._id})
+          .sort('-createdAt')
+          .limit(10)
+          .populate({
+            path: "author",
+            select: "name"
+          })
+          .exec((err, messages) => {
+            if(err){
+              console.log(err)
+              res.send({ err: err })
             }
-            else {
-              var recipients = [];
-              conversation.participants.forEach((recipient) => {
-                recipients.push(recipient)
-              })
-              message.recipients = recipients
+            var message_arr = []
+            messages.forEach((message) => {
+              var message = message.toObject();
+              if(conversation.participants){
+                if(conversation.participants.length == 2){
+                  if(message.author.name == conversation.participants[0].name){
+                    message.recipient = conversation.participants[1].name;
+                  }
+                  else {
+                    message.recipient = conversation.participants[0].name;
+                  }
+                }
+                else {
+                  var recipients = [];
+                  conversation.participants.forEach((recipient) => {
+                    recipients.push(recipient)
+                  })
+                  message.recipients = recipients
+                }
+              }
+              message_arr.push(message)
+            })
+
+            fullConversations.push(message_arr)
+            if(conversations.length == 0){
+              res.status(200).json({ message: 'No conversations yet' })
             }
-          }
-          fullConversations.push(message)
-          if(conversations.length == 0){
-            res.status(200).json({ message: 'No conversations yet' })
-          }
-          else if(fullConversations.length === conversations.length){
-            return res.status(200).json({ conversations_array: fullConversations })
-          }
-        })
-    })
+            else if(fullConversations.length === conversations.length){
+              return res.status(200).json({ conversations_array: fullConversations })
+              //// fullConversations is an array of conversations
+              //// each conversation is an array of message objects
+              //// each message object contains the text of the message
+            }
+          })
+      })
+    }
   })
 })
 
 router.get('/users/:id/conversation/:conv_id', (req,res) => {
   var _id = req.url.split('/')[2]
   var conv_id = req.url.split('/')[4]
+  console.log(conv_id)
   Message.find({ conversationId: conv_id })
   .select('createdAt body author')
   .sort('-createdAt')
@@ -94,8 +104,6 @@ router.get('/users/:id/conversation/:conv_id', (req,res) => {
     if(err){
       res.send({ err: err })
     }
-    console.log('is this being called?')
-    console.log(messages)
     res.status(200).json({ conversation: messages })
   })
 })
@@ -110,8 +118,6 @@ router.post('/users/:id/conversations', (req, res) => {
     res.status(422).send({ error: 'Please include a message '})
   }
 
-  console.log(_id)
-  console.log(req.body.recipient)
   User.findOne({ name: req.body.recipient}, (err, user) => {
     var convoRecipients = [ _id, user._id ]
     var conversation = new Conversation({
@@ -122,44 +128,50 @@ router.post('/users/:id/conversations', (req, res) => {
         console.log(err)
         res.send({ err: err })
       }
-      console.log(newConvo)
-      var message = new Message({
-        conversationId: newConvo._id,
-        body: req.body.composedMessage,
-        author: _id
-      })
-      message.save((err, newMessage) => {
-        if(err){
-          console.log(err)
-          res.send({ err: err })
-        }
         res.status(200).json({ message: 'Conversation started!', conversation: newConvo })
-      })
-  })
+    })
   })
 })
 
 router.patch('/users/:id/conversations/:conv_id', (req, res) => {
   var _id = req.url.split('/')[2]
   var conv_id = req.url.split('/')[4]
-  console.log(req.body)
-  var reply = new Message({
-    conversationId: req.body.convo_id,
-    body: req.body.composedMessage,
-    author: _id
-  })
+  if(req.body.body){
+    var text = req.body.body;
+  }
+  else {
+    var text = req.body.composedMessage
+  }
+  Message.findOne({ body: text }, (err, msg) => {
+    if(msg){
+      msg.isRead = true;
+      msg.save((err) => {
 
-  reply.save((err) => {
-    if(err){
-      console.log(err)
-      res.send({ err: err })
+        if(err){
+          console.log(err)
+        }
+        console.log('message saved (isRead from false to true)')
+        res.status(200).json({ message: 'Message successfully updated - isRead from false to true'})
+      })
     }
+    else {
+      var message = new Message({
+        conversationId: conv_id,
+        body: req.body.composedMessage,
+        author: _id
+      })
 
-    res.status(200).json({ message: 'Reply successfully sent' })
+      message.save((err, newMsg) => {
+        if(err){
+          console.log(err)
+          res.send({ err: err })
+        }
+
+        res.status(200).json({ message: 'Reply successfully sent' })
+      })
+    }
   })
 })
-
-
 
 
 module.exports = router;

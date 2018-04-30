@@ -2,6 +2,7 @@ import React from 'react';
 import update from 'react-addons-update';
 import PropTypes from 'prop-types';
 import Auth from '../modules/Auth';
+import Dropzone from 'react-dropzone';
 
 class NewProjectPage extends React.Component{
   constructor(props){
@@ -18,7 +19,7 @@ class NewProjectPage extends React.Component{
     this.handleChange = this.handleChange.bind(this);
     this.clearForm = this.clearForm.bind(this);
     this.afterSubmission = this.afterSubmission.bind(this);
-    this.fileHandle = this.fileHandle.bind(this);
+    this.onDrop = this.onDrop.bind(this);
   }
 
   handleSubmit(event){
@@ -40,7 +41,12 @@ class NewProjectPage extends React.Component{
     .then(response => response.json())
     .then((response)=> {
       console.log(response)
-      this.afterSubmission(true);
+      if(response.msg == "You have not provided proper inputs"){
+        this.afterSubmission(false);
+      }
+      else {
+        this.afterSubmission(true);
+      }
     })
     .catch((error) => {
       console.log("Error: " + error)
@@ -54,11 +60,6 @@ class NewProjectPage extends React.Component{
     var obj = {}
     obj[key] = val
     this.setState( obj );
-  }
-
-  fileHandle(event){
-    var file = event.target.files[0]
-    this.setState({ documents: file })
   }
 
   afterSubmission(status){
@@ -79,15 +80,19 @@ class NewProjectPage extends React.Component{
     this.setState({ success: status})
   }
 
+  onDrop(files){
+    var file = files[0]
+    this.setState({ documents: file })
+  }
+
   render(){
 
     if (this.state.success == true){
       var successStyle = {
-        width: '40%',
-        margin: '5px 0px',
+        width: '70%',
         padding: '8px',
         color: '#4F8A10',
-        backgroundColor: '#DFF2BF'
+        backgroundColor: '#DFF2BF',
       }
       var successTextStyle = {
         margin: '5px 11px',
@@ -96,20 +101,19 @@ class NewProjectPage extends React.Component{
       }
       var successMsg = "Project successfully added"
     }
-    else if (this.state.sucecss == false){
+    else if (this.state.success == false){
       var successStyle = {
-        width: '40%',
-        margin: '5px 0px',
+        width: '70%',
         padding: '8px',
         color: '#D8000C',
-        backgroundColor: '#FFD2D2'
+        backgroundColor: '#FFD2D2',
       }
       var successTextStyle = {
         margin: '5px 11px',
         fontSize: '1.2em',
         verticalAlign: 'middle'
       }
-      var successMsg = "Error"
+      var successMsg = "Error - check your inputs"
     }
     else {
       var successStyle, successTextStyle, successMsg;
@@ -120,26 +124,33 @@ class NewProjectPage extends React.Component{
         <div className="dash-form-return-msg" style={successStyle}>
           <div style={successTextStyle} >{successMsg}</div>
         </div>
-        <form onSubmit={this.handleSubmit}>
-          <ul>
+        <form onSubmit={this.handleSubmit} autoComplete="off">
+          <ul className="dash-form-list-holder">
             <li>
-            <label> Title </label>
-              <input value={this.state.title} name="title" type="text" onChange={this.handleChange} />
+              <input
+                value={this.state.title}
+                name="title"
+                type="text"
+                onChange={this.handleChange}
+                placeholder="Title..."
+              />
             </li>
             <li>
-            <label> Description </label>
-              <input value={this.state.description} name="description" type="text" onChange={this.handleChange} />
+              <input
+                value={this.state.description}
+                name="description"
+                type="text"
+                onChange={this.handleChange}
+                placeholder="Description..."
+              />
             </li>
-            <li>
+            <li className="new-project-drop">
+              <Dropzone onDrop={this.onDrop} className="new-project-drop-dropzone">
+                Drag file or click to upload
+              </Dropzone>
               <label>
-                <div>
-                  Add filename
-                </div>
-                <div>
-                  You can add more later
-                </div>
-             </label>
-              <input className="file-input" name="documents" type="file" onChange={this.fileHandle} />
+                -- You must add a file to start the project --
+              </label>
             </li>
           </ul>
           <button type="submit">

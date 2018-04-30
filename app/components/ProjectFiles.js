@@ -108,7 +108,6 @@ class ProjectFiles extends React.Component{
 
     var ftile = ReactDOM.findDOMNode(this.refs.ftile)
     var i = ftile.value;
-    debugger;
     this.setState({
       modal_file: this.state.files[i]
     })

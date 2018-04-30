@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import SignUpForm from '../components/SignUpForm';
+import Convert from '../modules/Convert';
 
 class SignUpPage extends React.Component {
 
@@ -22,6 +23,8 @@ class SignUpPage extends React.Component {
 
     this.processForm = this.processForm.bind(this);
     this.changeUser = this.changeUser.bind(this);
+    this.scrollToBottom = this.scrollToBottom.bind(this);
+    this.emptyForm = this.emptyForm.bind(this);
   }
 
   /**
@@ -37,6 +40,20 @@ class SignUpPage extends React.Component {
     this.setState({
       user
     });
+  }
+
+  scrollToBottom(){
+    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+  }
+
+  emptyForm(){
+    this.setState({
+      user: {
+        email: '',
+        name: '',
+        password: ''
+      }
+    })
   }
 
   /**
@@ -64,8 +81,17 @@ class SignUpPage extends React.Component {
     .then(response => response.json())
     .then((response) => {
       console.log(response)
-      localStorage.setItem('successMessage', response.message);
-      this.context.router.history.push('/login');
+      if(response.success == true){
+        localStorage.setItem('successMessage', response.message);
+        this.context.router.history.push('/login');
+        this.scrollToBottom();
+        this.emptyForm();
+      }
+      else {
+        this.setState({ errors: response.errors })
+        this.scrollToBottom();
+        this.emptyForm();
+      }
     })
     .catch(function(error){
       console.log("Error: " + error)
@@ -80,13 +106,59 @@ class SignUpPage extends React.Component {
    * Render the component.
    */
   render() {
+    if( !Convert.isObjEmpty(this.state.errors) ){
+      var errStyleCont = {
+        width: '40%',
+        margin: '5px 0px',
+        padding: '8px',
+        color: '#D8000C',
+        backgroundColor: '#FFD2D2'
+      }
+      var errStyleText = {
+        margin: '5px 11px',
+        fontSize: '1.2em',
+        verticalAlign: 'middle'
+      }
+    }
+    else {
+      var errStyleCont = {}
+      var errStyleText = {}
+    }
     return (
-      <SignUpForm
-        onSubmit={this.processForm}
-        onChange={this.changeUser}
-        errors={this.state.errors}
-        user={this.state.user}
-      />
+      <div className="signup-container">
+        <div className="signup-banner">
+          <div className="signup-banner-opener">
+            What is this?
+          </div>
+          <div className="signup-banner-text">
+            Nquest is an online collaborative workspace, a place for people to get
+            together to work on their projects and contribute to other ones. Using
+            the site is simple: create an account, then you can create your own
+            projects and work on them, or contribute to other users' project
+            (with their permission).
+            <br/>
+            <br/>
+            <span className="signup-banner-text-projects">Projects</span> are
+            essentially aggregations of view-only files and
+            online-editable notes. Users can add files and notes to their
+            own projects and to those for which they've been given permissions.
+          </div>
+        </div>
+        <div className="signup-form-container">
+          <SignUpForm
+            onSubmit={this.processForm}
+            onChange={this.changeUser}
+            errors={this.state.errors}
+            user={this.state.user}
+            errStyleCont={errStyleCont}
+            errStyleText={errStyleText}
+          />
+        </div>
+        <div style={{ float:"left", clear: "both" }}
+             ref={(el) => { this.messagesEnd = el; }}>
+        </div>
+
+      </div>
     );
   }
 

@@ -4,11 +4,16 @@
 @import 'home.scss';
 @import 'projects.scss';
 @import 'project.scss';
+@import 'new_project.scss';
 @import 'files.scss';
 @import 'modal.scss';
 @import 'scrollbox.scss';
 @import 'chat.scss';
 @import 'autosuggest.scss';
+@import 'message.scss';
+@import 'profile.scss';
+@import 'sign_up.scss';
+@import 'login.scss';
 
 $color: lighten(#18a29a, 6%);
 $secondary_color: lightgrey;
