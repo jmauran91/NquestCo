@@ -1,0 +1,34 @@
+
+.admin-master {
+  display: block;
+  height: 100%;
+  width: 100%;
+  padding: 32px;
+  padding-top: 120px;
+}
+
+.admin-master h1 {
+  margin: 32px;
+}
+
+.admin-control {
+  color: blue;
+  margin: 12px;
+}
+
+.admin-control span{
+  cursor: pointer;
+
+}
+
+.admin-control-holder {
+  position: relative;
+  background-color: red;
+  padding: 60px 8px;
+}
+
+.admin-control-holder h2 {
+  position: absolute;
+  top: 5%;
+  left: 35%;
+}

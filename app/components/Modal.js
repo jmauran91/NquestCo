@@ -16,7 +16,7 @@ class Modal extends React.Component{
     }
 
     return (
-      <div>
+      <div className="modal-master">
         <div className="modal-window">
           <div className="modal-header">
             <div className="modal-text">

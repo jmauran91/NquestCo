@@ -20,12 +20,43 @@ const AWSid = process.env.AWS_ACCESS_KEY_ID;
 const BucketName = process.env.S3_BUCKET;
 
 
+
 var s3bucket = new AWS.S3({
   accessKeyId: AWSid,
   secretAccessKey: AWSsecret,
   Bucket: BucketName,
   region: 'us-east-1'
 });
+
+function isArrEmpty(arr){
+  if(arr){
+    if (typeof arr !== 'undefined' && arr.length > 0) {
+      return false
+    // the array is defined and has at least one element
+    }
+    else {
+      return true
+    }
+  }
+  else {
+    return true
+  }
+}
+
+function isExist(obj){
+  if(obj){
+    if(typeof obj !== 'undefined' && obj.keys !== 'undefined'){
+      return true
+    }
+    else {
+      return false
+    }
+  }
+  else {
+    return false
+  }
+
+}
 
 
 function validateDocumentForm(payload){
@@ -109,39 +140,56 @@ router.get('/dashboard', (req, res) => {
 //////////////////////////////////////////////////
 
 
+
+
 router.get('/search/projects/:params', (req, res) => {
-  var url_array = req.url.params.split("+")
-  var searchparams = ""
-  url_array.each((term) => {
-    searchparams += (term + " ")
-  })
-  Project.find({ $text: { $search: searchparams } }, { "score": { "$meta": "textScore" } })
+  var url_array = req.url.split("/")[3]
+  url_array = url_array.split("+")
+  var searchparams = url_array.join(" ")
+  console.log(searchparams)
+  Project.find({ $text: { $search: searchparams } },
+               { score: { $meta: "textScore"  } })
   .sort({ score: { $meta: "textScore"}})
+  .limit(30)
   .exec((err, projects) => {
+    console.log(projects)
     if(err){
       console.log(err)
-      res.send(err)
+      res.status(400).json({ err: err })
     }
-    res.status(200).json({ })
+    else if(projects.length == 0){
+      console.log(projects)
+      res.status(200).json({ msg: "Sorry, we couldn't find any results for this query" })
+    }
+    else {
+      res.status(200).json({ projects: projects })
+    }
 
   })
 })
 
 router.get('/search/users/:params', (req, res) => {
-  var url_array = req.url.params.split("+")
-  var searchparams = ""
-  url_array.each((term) => {
-    searchparams += (term + " ")
-  })
-  User.find({ $text: { $search: searchparams } }, { "score": { "$meta": "textScore" } })
+  var url_array = req.url.split("/").slice(3)
+  url_array = url_array.join("+")
+  console.log(url_array)
+  var searchparams = url_array.join(" ")
+  console.log(searchparams)
+  User.find({ $text: { $search: searchparams } },
+            { score: { $meta: "textScore" } })
   .sort({ score: { $meta: "textScore"}})
+  .limit(30)
   .exec((err, users) => {
     if(err){
       console.log(err)
-      res.send(err)
+      res.status(400).json({ err: err })
     }
-    res.status(200).json({ })
-    
+    else if(users.length == 0){
+      res.json({ msg: "Sorry, we couldn't find any results for this query" })
+    }
+    else {
+      res.status(200).json({ users: users })
+    }
+
   })
 })
 
@@ -205,7 +253,7 @@ router.get('/:id/projects', (req, res) => {
   var updated_projects = [];
   addProjectToArr()
   .then((result) => {
-    res.status(200).json({ msg: 'we did something', projects: result })
+    res.status(200).json({ msg: 'here are your projects', projects: result })
   })
   .catch((err) => {
     res.json({ msg: " ... You don't currently have any projects ... ", projects: err})
@@ -218,32 +266,39 @@ router.get('/:id/projects', (req, res) => {
 //////////////////////////////////////////////////
 
 router.post('/projects', (req, res) => {
+    console.log(req.body.owner)
+    console.log(req.body)
     User.findOne({ name: req.body.owner }, (err, user) => {
       if (user){
         ///// PREPARING THE VARIABLES
         try{
-          const title = req.body.title;
-          const owner = req.body.owner;
-          const description = req.body.description;
-          const filedata = req.files.file.data;
-          const filename = req.files.file.name;
-          const filetype = req.files.file.mimetype;
+          var title = req.body.title;
+          var owner = req.body.owner;
+          var description = req.body.description;
+          var filedata = req.files.file.data;
+          var filename = req.files.file.name;
+          var filetype = req.files.file.mimetype;
         }
         catch(error){
+          console.log(error)
           res.status(400).json({ msg: 'You have not provided proper inputs'})
         }
         const userData = {
           title: title,
           description: description,
-          documents: [filename]
+          documents: [filename],
+          owner: user._id,
+          ownername: user.firstName + " " + user.lastName
         }
         //// CREATE THE PROJECT
         var project = new Project(userData)
         ///// CREATE PROJECT CONNECTION WITH OWNER
-        project.owner = user._id
-        project.ownername = user.name
-
         project.save().then(()=> {
+          User.findOneAndUpdate({ _id: user._id }, { $push: { projects: project._id } }, (err, new_user) => {
+            if(err){
+              console.log(err)
+            }
+          })
           if (project.documents) {
             ///// NOW UPLOAD FILE TO S3 BUCKET
             createPing(project.owner, project._id, (project.ownername + " has created the project [" + project.title +"]"))
@@ -262,6 +317,7 @@ router.post('/projects', (req, res) => {
               })
             })
             .catch((err) => {
+              console.log(err)
               res.json({ message: 'Failed to Upload File', project: project})
             })
           }
@@ -274,6 +330,7 @@ router.post('/projects', (req, res) => {
         })
       }
       else {
+        console.log(err)
         res.json(err)
       }
     })
@@ -289,22 +346,25 @@ router.post('/projects', (req, res) => {
 
 router.get('/project/:id', (req, res) => {
   var obj_id = req.url.split('/')[2]
-  try{
-    console.log('this is user ' )
-  }
-  catch(err){
-    console.log(err)
-  }
+  console.log('ping 0 ')
   Project.findOne({ _id: obj_id}, (err, project) => {
-    if (err) { res.send(err) }
-    if (project){
-      res.json({ message: 'project Fetch successful', project: project, url: req.url });
+    console.log('ping 1')
+    if (err) {
+      res.send(err)
+      console.log(err)
+    }
+    console.log(project)
+    if (isExist(project)){
+      res.json({ message: 'project Fetch successful', project: project })
+      console.log('sent project back to fetch')
     }
     else {
-      res.json({ message: ' project Fetch unsuccessful' });
+      res.json({ message: ' project Fetch unsuccessful' })
+      console.log('sent back only message')
     }
   })
 });
+
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -409,6 +469,7 @@ router.get('/project/:id/files', (req, res) => {
     return new Promise((resolve, reject) => {
       for ( var i = 0; i < server_doc_arr.length; i++ ){
         var filename_get = server_doc_arr[i]
+        console.log(filename_get)
         fetchFile(filename_get, res_files)
         .then((result) => {
           if (server_doc_arr.length == res_files.length) {
@@ -424,6 +485,13 @@ router.get('/project/:id/files', (req, res) => {
   }
 
   Project.findOne({ _id: obj_id}, (err, project) => {
+    if(err){
+      console.log(err)
+      res.send(err)
+    }
+    if(!isExist(project)){
+      res.status(400).send({ msg: "couldn't fetch" })
+    }
     for ( var i = 0, len = project.documents.length; i < len; i++){
       var doc_title = project.documents[i];
       server_doc_arr.push(doc_title)
@@ -433,8 +501,8 @@ router.get('/project/:id/files', (req, res) => {
       res.send({ msg: 'files fetch successful', files: result })
     })
     .catch((err) => {
-      console.log('failure')
       res.send({ msg: 'files fetch failed', err: err })
+      console.log('failure')
     })
 
   });
@@ -531,7 +599,8 @@ router.get('/project/:id/notes', (req, res) => {
         }
         var notes_arr = []
         console.log('project found')
-        if(project.notes[0]){
+        if(isExist(project)){
+          console.log(project)
           for (var i = 0; i < project.notes.length; i++){
             Note.findOne({ title : project.notes[i] }, (err, note) => {
               notes_arr.push(note)
@@ -587,59 +656,148 @@ router.patch('/project/:id/notes/:note_id', (req, res) => {
 //////////////////////////////////////////////////
 
 
+//// GET USER
+
 router.get('/users/:id', cors(), (req, res) => {
-  var id = req.url.split("/")[2]
-  User.findOne({ _id: id}, (err, user) => {
-    if (user){
-      res.status(200).json({msg: 'User Retrieval Successful', user: user})
+  var _id = req.url.split("/")[2]
+  console.log('fetched to get user address')
+  console.log(_id)
+  User.findOne({ _id: _id}, (err, user) => {
+    console.log('here')
+    if(err){
+      console.log(err)
+      console.log('if err')
+    }
+    if (!isArrEmpty(user.projects)){
+      console.log('user projects length is greater than  0')
+      var promise1 = new Promise((resolve, reject) => {
+        console.log(user.name)
+        Project.find({ ownername: user.name })
+        .exec((err, owned_projects) => {
+          console.log('found owned projects by username')
+          if(err){
+            console.log(err)
+            reject()
+          }
+          if(owned_projects.length > 0){
+            console.log('user owns projects - now pushing them in and setting to true')
+            resolve(owned_projects)
+          }
+          else {
+            console.log('user is not an owner of any project')
+            resolve( [] )
+          }
+        })
+      })
+      var promise2 = new Promise((resolve, reject) => {
+        Project.find({ usernames: user.name })
+        .exec((err, guest_projects) => {
+          console.log('found guest projects by username')
+          if(err){
+            console.log(err)
+            reject()
+          }
+          if(guest_projects.length > 0){
+            console.log('user is guest to projects - now pushing them in and setting to true')
+            resolve(guest_projects)
+          }
+          else {
+            console.log('this user is not a guest to any project')
+            resolve( [] )
+          }
+        })
+      })
+
+      Promise.all([promise1, promise2]).then((results) => {
+        var userObj = user.toObject();
+        console.log(results)
+        if(isArrEmpty(results[0]) && isArrEmpty(results[1])){
+          console.log("User not currently working on any projects")
+          res.json({ msg: "User not currently working on any projects", user: userObj })
+        }
+        else if (isArrEmpty(results[0])) {
+          userObj.guest_projects = results[1]
+          console.log("User contributes to projects")
+          res.json({ msg: "User contributes to projects", user: userObj })
+        }
+        else if (isArrEmpty(results[1])) {
+          userObj.owned_projects = results[0]
+          console.log("User owns projects")
+          res.json({ msg: "User owns projects", user: userObj })
+        }
+        else {
+          userObj.owned_projects = results[0]
+          userObj.guest_projects = results[1]
+          console.log("User owns projects and contributes to others")
+          res.json({ msg: "User owns projects and contributes to others", user: userObj })
+        }
+      })
+      .catch((err) => {
+        res.json({ err })
+      })
     }
     else {
-      console.log('ping 4')
-      res.status(400)
+      console.log('ping 12')
+      res.json({ user: user })
     }
   })
 })
 
 router.patch('/users/:id', cors(), (req, res) => {
+  console.log(req)
   var _id = req.url.split("/")[2]
-  var edit;
-  const filedata = req.files.file.data
-  const filename = req.body.filename
-  const filetype = req.files.file.mimetype
+  if(isExist(req.files)){
+    var edit;
+    const filedata = req.files.file.data
+    const filename = req.body.filename
+    const filetype = req.files.file.mimetype
 
-  User.findOne({ _id: _id}, (err, user) => {
-    if(err){
-      console.log(err)
-      res.send(err)
-    }
-    if(typeof user.profpic === 'undefined' || !user.profpic){
-      edit = false;
-    }
-    else {
-      edit = true
-    }
-    uploadFile(filedata, filename, filetype).then((result) => {
-      var url = `https://s3.amazonaws.com/rsearcherdockbucket/${result.Key}`
+    User.findOne({ _id: _id}, (err, user) => {
+      if(err){
+        console.log(err)
+        res.send(err)
+      }
+      if(typeof user.profpic === 'undefined' || !user.profpic){
+        edit = false;
+      }
+      else {
+        edit = true
+      }
+      uploadFile(filedata, filename, filetype).then((result) => {
+        var url = `https://s3.amazonaws.com/rsearcherdockbucket/${result.Key}`
 
-      user.profpic = url
-      user.save((err) => {
-        if(err){
-          console.log(err)
-          res.send(err)
-        }
-        if(edit == true){
-          res.status(200).json({ msg: "Prof pic successfully edited "})
-        }
-        else {
-          res.status(200).json({ msg: "Prof pic successfully added "})
-        }
+        user.profpic = url
+        user.save((err) => {
+          if(err){
+            console.log(err)
+            res.send(err)
+          }
+          if(edit == true){
+            res.status(200).json({ msg: "Prof pic successfully edited "})
+          }
+          else {
+            res.status(200).json({ msg: "Prof pic successfully added "})
+          }
+        })
+      })
+      .catch((err) => {
+        console.log(err)
+        res.json({err})
       })
     })
-    .catch((err) => {
-      console.log(err)
-      res.json({err})
+  }
+  else if (req.body.about){
+    var new_about = req.body.about
+    User.findOneAndUpdate({ _id: _id }, { $set: { about: new_about } }, (err, new_user) => {
+      if(err){
+        console.log(err)
+      }
+      res.status(200).json({ msg: 'User AboutMe edited', new_about: new_user.about })
     })
-  })
+  }
+  else {
+    res.status(400).json({ msg: 'Inputs not recognized'})
+  }
 })
 
 router.get('/users', cors(), (req,res) => {

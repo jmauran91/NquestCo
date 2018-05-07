@@ -32,36 +32,13 @@ class Base extends React.Component {
 
   }
 
-  componentWillMount = () => {
-  this.setState({
-      isMounted: true
-  })
-}
-
-componentWillUnmount = () => {
-  this.setState({
-      isMounted: false
-  })
-}
-
-
   componentDidMount(){
-    try{
-      if(this.state.isMounted){
-        this.getCurrentUser()
-        .then((response) => {
-            this.setState({
-              current_user: response,
-              user_url: `/profile/${response._id}`
-            })
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-      }
-    }
-    catch(error){
-      console.log(error)
+    if(this.getCurrentUser()){
+      this.getCurrentUser().then((response) => {
+          this.setState({ current_user: response, user_url: "/profile/" + response._id })
+      })
+      .catch((err) => {
+      })
     }
   }
 

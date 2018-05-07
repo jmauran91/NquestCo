@@ -43,6 +43,7 @@
   display: flex;
   flex-flow: column;
   background-color: lighten(lightgrey, 10%);
+  position: relative;
 }
 
 .profile-body-text p {
@@ -69,10 +70,25 @@
   margin: 0 !important;
 }
 
+.profile-guestprojects {
+  padding: 4px;
+  font-weight: 250;
+  margin: 0 !important;
+}
+
 .profile-about-me {
   padding: 4px;
   font-weight: 250;
   margin: 0 !important;
+}
+
+.profile-edit {
+  position: absolute;
+  top: 6px;
+  right: 24px;
+  cursor: pointer;
+  text-decoration: underline;
+  color: blue;
 }
 
 .avatar-upload {
@@ -131,4 +147,36 @@
 
 .empty-ping-date {
   float: right;
+}
+
+.profile-ping-createdat {
+  float: right;
+}
+
+.profile-aboutme-editor {
+  position: absolute;
+  display: block;
+  top: 40%;
+  left: 15%;
+  height: 35vh;
+  width: 50vw;
+  padding: 24px 12px;
+  background-color: lighten(lightgrey, 5%);
+  z-index: 9;
+
+}
+
+.profile-aboutme-editor form {
+  display: block;
+  height: 200px;
+  max-height: 200px;
+  width: 100%;
+}
+
+.profile-aboutme-editor button {
+  display: block;
+  position: relative;
+  margin: 8px;
+  float: right;
+  cursor: pointer;
 }

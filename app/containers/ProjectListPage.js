@@ -1,5 +1,6 @@
 import React from 'react';
 import Auth from '../modules/Auth';
+import Fetch from '../modules/Fetch';
 
 class ProjectListPage extends React.Component{
   constructor(props){
@@ -9,33 +10,12 @@ class ProjectListPage extends React.Component{
       no_project: ''
     }
 
+      this.getProjects = Fetch.getProjects.bind(this);
   }
 
-  componentWillMount(){
-    let url = `http://localhost:3000/api/${this.props.url}/projects`
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `bearer ${Auth.getToken()}`
-      }
-    })
-    .then( response => response.json())
-    .then((response) => {
-      if (response.projects){
-        var projects = response.projects
-        console.log(projects)
-        this.setState({ projects: projects })
-      }
-      else {
-        console.log(response)
-        this.setState({ no_project: response.msg})
-      }
-    })
-    .catch((err) => {
-      console.log(err)
-      this.setState({ no_project: err.msg })
-    })
+
+  componentDidMount(){
+    this.getProjects(this.props.url)
   }
 
   render(){
@@ -49,24 +29,14 @@ class ProjectListPage extends React.Component{
     }
     else {
       projectList = this.state.projects.map((project, index) => {
-        let docPrint = project.documents.map((doc, i) => {
-          if( i ==  (project.documents.length - 1) ){
-            return(
-              `${doc}`
-            )
-          }
-          else {
-            return(
-              `${doc}, `
-            )
-          }
-        })
+        var url =`/project/${project._id}`
+        var docPrint = this.state.projects.length.toString();
         return(
           <div className="project-holder" key={index}>
-          <div className="project-element"><a href={'/project/' + (project._id)}> {project.title} </a></div>
-          <div className="project-element"> Owner: {project.owner_name} </div>
+          <div className="project-element"><a href={url}> {project.title} </a></div>
+          <div className="project-element"> Owner: {project.ownername} </div>
           <div className="project-element"> Description: {project.description} </div>
-          <div className="project-element"> Document: {docPrint} </div>
+          <div className="project-element"> Files: {docPrint} </div>
           </div>
         )
       })

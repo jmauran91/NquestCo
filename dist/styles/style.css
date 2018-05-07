@@ -61,6 +61,13 @@
 .nav-right a:hover {
   text-decoration: none !important; }
 
+.login-error-msg {
+  display: inline;
+  padding: 8px;
+  margin: 0 8px;
+  background-color: #ffcccc;
+  border: 1 solid red; }
+
 /*
 .sticky + .content {
   padding-top: 60px;
@@ -108,6 +115,94 @@
   display: flex;
   flex-flow: row; }
 
+.dash-banner-searchbar {
+  width: 40vw;
+  padding: 8px;
+  height: 50px;
+  border-radius: 6px;
+  border: 1px solid grey;
+  background-color: white;
+  margin: 0 10vw; }
+
+.dash-banner-searchbar input {
+  border: none;
+  height: 100%;
+  width: 75%;
+  outline: none !important; }
+
+.dash-banner-searchbar button {
+  cursor: pointer;
+  float: right;
+  background-color: white;
+  border: none;
+  padding-bottom: 12px;
+  height: 100%; }
+
+.search-results-banner {
+  font-style: italic;
+  font-weight: 300;
+  text-decoration: underline;
+  padding: 4vh 8vw; }
+
+.search-results {
+  display: block;
+  margin: 0 auto;
+  width: 50vw; }
+
+.search-results ul {
+  padding: 0 !important;
+  margin: 0 !important; }
+
+.search-result-tile {
+  padding: 12px;
+  margin: 12px;
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 15vh; }
+
+#search-error-tile {
+  display: block;
+  font-family: 'Helvetica', sans-serif;
+  font-size: 120%;
+  font-style: italic;
+  padding-left: 60px;
+  position: relative;
+  border: none;
+  background-color: inherit; }
+
+.search-result-tile span {
+  font-family: 'Helvetica', sans-serif;
+  font-size: 120%; }
+
+.search-result-title {
+  font-family: 'Helvetica', sans-serif;
+  font-size: 160%;
+  font-weight: bold;
+  position: absolute;
+  top: 5%;
+  left: 2%; }
+
+.search-result-description {
+  display: block;
+  position: relative;
+  margin-top: 38px;
+  padding: 12px 6px;
+  background-color: #c6c6c6;
+  width: 80%; }
+
+.search-result-owner {
+  position: absolute;
+  font-size: 70%;
+  bottom: 5%;
+  left: 80%; }
+
+.search-result-date {
+  position: absolute;
+  font-size: 70%;
+  top: 5%;
+  left: 80%; }
+
 .feature-list {
   margin: 0 0;
   padding: 0 0; }
@@ -125,9 +220,9 @@
   cursor: pointer; }
 
 .center-side-dash {
-  padding: 0px 0px;
   height: 100%;
-  width: 82vw; }
+  width: 100vw;
+  overflow: auto; }
 
 .center-side-dash form {
   margin: 0; }
@@ -400,7 +495,7 @@
   float: right; }
 
 .project-header-container {
-  margin: 4vw 4vh;
+  margin: 4vh 4vw;
   display: inline;
   float: left;
   height: 10vh; }
@@ -440,12 +535,23 @@
 
 #projecteditor-container input {
   padding: 8px;
-  width: 20vw; }
+  width: 20vw;
+  margin: 12px; }
 
 .quill {
+  display: block;
   width: 90%;
-  height: 70%;
+  height: 100%;
   margin: 0 auto; }
+
+.ql-container {
+  height: 80%;
+  background-color: white;
+  color: black; }
+
+.ql-toolbar {
+  height: 20%;
+  background-color: lightgrey; }
 
 #projecteditor-container button {
   display: block;
@@ -463,7 +569,7 @@
 .page-bisector {
   border-top: 2px solid black;
   width: 38%;
-  margin-bottom: 12vh;
+  margin-bottom: 8vh;
   margin-left: 6vw; }
 
 .project-add-file-form button {
@@ -495,7 +601,55 @@
   flex-direction: row; }
 
 .projectfiles-show {
-  width: 60vw; }
+  width: 100%; }
+
+.projectfiles-big-container-guest, .projectnotes-big-container-guest {
+  margin: 32px 8px;
+  max-height: 22vh;
+  height: 22vh;
+  width: 60vw;
+  position: relative;
+  display: block; }
+
+.projectfiles-big-container, .projectnotes-big-container {
+  margin: 32px 8px;
+  max-height: 22vh;
+  height: 22vh;
+  width: 60vw;
+  position: relative;
+  display: block; }
+
+.projectnotes-big-container, .projectnotes-big-container-guest {
+  margin-top: 15vh; }
+
+.pfn-header {
+  float: left; }
+
+.pfn-expander {
+  float: right;
+  cursor: pointer;
+  text-decoration: underline; }
+
+#projectfiles-container, #projectnotes-container {
+  height: 100%;
+  max-height: 100%; }
+
+.projectfiles-show, .projectnotes-show {
+  max-height: 100%;
+  height: 100%;
+  width: 100%; }
+
+.renderfiles-show, .rendernotes-show {
+  max-height: 100%;
+  height: 100%;
+  width: 100%; }
+
+.scrollbox {
+  max-height: 100% !important;
+  height: 100% !important; }
+
+.projectnotes-big-container-guest {
+  margin-top: 100px !important; }
 
 .arrow-right {
   float: left;
@@ -539,6 +693,13 @@
 .new-doc-false, .new-user-false {
   color: #D8000C;
   background-color: #FFD2D2; }
+
+.quill-xout {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: black;
+  cursor: pointer; }
 
 .file-input {
   margin-bottom: 6px; }
@@ -611,6 +772,8 @@
   width: 128px; }
 
 .file-tile {
+  width: 152px !important;
+  overflow: hidden;
   margin: 12px 12px;
   list-style-type: none;
   cursor: pointer; }
@@ -618,36 +781,43 @@
 /* ================================ */
 /* MODAL */
 .modal-backdrop {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
   top: 0px;
   left: 0px;
   z-index: 9998;
-  background: rgba(0, 0, 0, 0.3); }
+  background: black; }
 
 .modal-window {
+  display: block;
   position: absolute;
   top: 50%;
   left: 50%;
-  height: 80%;
-  width: 60%;
-  transform: translate(-50%, -50%);
+  margin: 0 auto;
+  height: 80vh;
+  transform: translate(-30%, -50%);
   z-index: 9999;
-  background: #fff; }
+  background-color: black; }
 
 .modal-header {
+  display: none;
+  /*
   position: relative;
   top: 0;
-  border-bottom: 4px solid black;
-  padding: 8px;
-  margin: 0 auto;
-  text-align: center; }
+  border-bottom: 1px solid black;
+  margin: 4px 16px;
+  text-align: center;
+  */ }
 
 .modal-text {
-  margin: 8px 8px; }
+  /*
+  margin: 24px 8px;
+  */ }
 
 .modal-exit {
+  padding-top: 8px;
+  padding-right: 2px;
   position: relative;
   float: right;
   top: 2px;
@@ -657,27 +827,127 @@
   text-align: center;
   cursor: pointer; }
 
+.modal-internal {
+  padding: 40px; }
+
 .iframe_pdf_div {
-  height: 90%;
-  width: 90%;
+  height: 100%;
   margin: 0 auto; }
 
 #iframe_pdf {
+  border: none;
+  display: block;
   padding-left: 4vw;
-  height: 90%;
-  width: 90%;
-  margin: 0 auto; }
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto; }
 
 .iframe_jpg_div {
-  height: 90%;
-  width: 90%;
+  height: 100%;
   margin: 0 auto; }
 
 #iframe_jpg {
+  border: none;
+  display: block;
   padding-left: 4vw;
-  height: 90%;
-  width: 90%;
-  margin: 0 auto; }
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto; }
+
+.matrix-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 0 !important;
+  margin: 0 !important; }
+
+.matrix-item-tile {
+  position: relative;
+  height: 200px;
+  width: 160px; }
+
+.matrix-item-tile-img {
+  position: absolute;
+  height: 128px;
+  width: 96px;
+  top: 0%;
+  margin: 6px auto; }
+
+.matrix-item-tile-name {
+  position: absolute;
+  bottom: 0;
+  margin: 6px auto; }
+
+/* FILE AND NOTe MATRIX */
+.notetrx-backdrop, .filetrx-backdrop {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0px;
+  left: 0px;
+  z-index: 9997;
+  background: rgba(0, 0, 0, 0.3); }
+
+.notetrx-window, .filetrx-window {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 90vh;
+  width: 60vw;
+  transform: translate(-50%, -50%);
+  z-index: 9998;
+  border: 1px solid black;
+  box-shadow: 2px 2px 2px #888888;
+  background-color: #A9A9A9;
+  padding: 24px; }
+
+.filetrx-list, .notetrx-list {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: wrap;
+  flex-wrap: wrap; }
+
+.file-li, .note-li {
+  list-style-type: none;
+  position: relative;
+  overflow: hidden;
+  height: 200px;
+  width: 160px;
+  margin: 10px;
+  padding: 4px; }
+
+.file-li-pic, .note-li-pic {
+  position: absolute;
+  top: 5%;
+  left: 10%;
+  height: 130px !important;
+  max-height: 130px !important;
+  width: 130px !important;
+  max-width: 130px !important; }
+
+.file-li-title, .note-li-title {
+  position: absolute;
+  top: 75%;
+  left: 15%; }
+
+.filetrx-view {
+  z-index: 9999;
+  position: fixed;
+  padding: 5vh 5vw;
+  background-color: black;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw; }
+
+.filetrx-exit, .notetrx-exit {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 12px 12px;
+  position: absolute;
+  top: 0%;
+  right: 0%; }
 
 .scrollbox {
   border: 1px solid black;
@@ -698,6 +968,12 @@
 .projectfiles-show, .projectnotes-show {
   width: 60vw; }
 
+.note-tile {
+  cursor: pointer;
+  width: 180px;
+  padding: 8px 16px;
+  margin: 0 8px; }
+
 .convo-tile:hover, .conv-list-new-message:hover {
   cursor: pointer;
   background-color: #d9d9d9; }
@@ -714,14 +990,16 @@
   width: 40%;
   float: left;
   height: 100%;
-  border-right: 2px solid gray; }
+  border-right: 2px solid gray;
+  padding-top: 4vh; }
 
 .chatcell {
   position: relative;
   float: right;
   height: 100%;
   width: 60%;
-  padding: 4px 12px; }
+  padding: 4px 12px;
+  padding-top: 4vh; }
 
 .chatlist ul {
   padding: 0; }
@@ -919,7 +1197,8 @@
   padding: 16px;
   display: flex;
   flex-flow: column;
-  background-color: #ededed; }
+  background-color: #ededed;
+  position: relative; }
 
 .profile-body-text p {
   font-family: 'Helvetica', sans-serif; }
@@ -941,10 +1220,23 @@
   font-weight: 250;
   margin: 0 !important; }
 
+.profile-guestprojects {
+  padding: 4px;
+  font-weight: 250;
+  margin: 0 !important; }
+
 .profile-about-me {
   padding: 4px;
   font-weight: 250;
   margin: 0 !important; }
+
+.profile-edit {
+  position: absolute;
+  top: 6px;
+  right: 24px;
+  cursor: pointer;
+  text-decoration: underline;
+  color: blue; }
 
 .dropzone {
   padding: 8px;
@@ -991,6 +1283,33 @@
 
 .empty-ping-date {
   float: right; }
+
+.profile-ping-createdat {
+  float: right; }
+
+.profile-aboutme-editor {
+  position: absolute;
+  display: block;
+  top: 40%;
+  left: 15%;
+  height: 35vh;
+  width: 50vw;
+  padding: 24px 12px;
+  background-color: #e0e0e0;
+  z-index: 9; }
+
+.profile-aboutme-editor form {
+  display: block;
+  height: 200px;
+  max-height: 200px;
+  width: 100%; }
+
+.profile-aboutme-editor button {
+  display: block;
+  position: relative;
+  margin: 8px;
+  float: right;
+  cursor: pointer; }
 
 .signup-container {
   margin-top: 82px;
@@ -1103,5 +1422,39 @@
   border: 1px solid #1cbdb3;
   color: white; }
 
+.admin-master {
+  display: block;
+  height: 100%;
+  width: 100%;
+  padding: 32px;
+  padding-top: 120px; }
+
+.admin-master h1 {
+  margin: 32px; }
+
+.admin-control {
+  color: blue;
+  margin: 12px; }
+
+.admin-control span {
+  cursor: pointer; }
+
+.admin-control-holder {
+  position: relative;
+  background-color: red;
+  padding: 60px 8px; }
+
+.admin-control-holder h2 {
+  position: absolute;
+  top: 5%;
+  left: 35%; }
+
 .dash-container, .profile-container, .project-show {
   margin-top: 80px; }
+
+.no-select {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }

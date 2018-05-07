@@ -1,6 +1,7 @@
 import React from 'react';
 import Auth from '../modules/Auth';
 import Fetch from '../modules/Fetch';
+import Convert from '../modules/Convert';
 import NewProjectPage from '../containers/NewProjectPage';
 import ProjectListPage from '../containers/ProjectListPage';
 import ChatContainer from '../components/chat/ChatContainer';
@@ -16,44 +17,27 @@ class Dashboard extends React.Component {
       notiTally: 0,
       hamburgerShow: false,
       searchquery: '',
-      searchReturns: []
+      searchReturns: null,
     };
 
     this.handleFeatureClick = this.handleFeatureClick.bind(this);
     this.notiTallyUpdater = this.notiTallyUpdater.bind(this);
-    this.getCurrentUser = Fetch.GetCurrentUser.bind(this);
     this.handleHamburger = this.handleHamburger.bind(this);
     this.handleSearchBar = this.handleSearchBar.bind(this);
     this.submitSearch = this.submitSearch.bind(this);
     this.clearSearch = this.clearSearch.bind(this);
+
+    this.getCurrentUser = Fetch.GetCurrentUser.bind(this);
+    this.searchProjectsFetch = Fetch.searchProjects.bind(this);
   }
 
   handleSearchBar(event){
     this.setState({ searchquery: event.target.value})
   }
 
-  submitSearch(){
-    var searchParams = ""
-    this.state.searchquery.split(' ').map((term, i) => {
-      searchParams += (term + "+")
-    })
-    var url = `http://localhost:3000/api/search/projects/${searchParams}`
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `bearer ${Auth.getToken()}`
-      }
-    })
-    .then(response => response.json())
-    .then((response) => {
-      console.log(response)
-      this.setState({
-        searchReturns: response.projects
-      })
-    })
-    .catch((err) => {
-      console.log(err)
-    })
+  submitSearch(event){
+    event.preventDefault();
+    this.searchProjectsFetch(this.state.searchquery)
     this.clearSearch();
   }
 
@@ -62,13 +46,13 @@ class Dashboard extends React.Component {
   }
 
   componentDidMount(){
-    try{
-      this.getCurrentUser().then((response)=>{this.setState({current_user: response})})
-    }
-    catch(error){
-      console.log(error)
-      this.context.router.history.push('/')
-    }
+    this.getCurrentUser()
+    .then((response) => {
+      this.setState({ current_user: response })
+    })
+    .catch((err) => {
+      console.log(err)
+    })
   }
 
   handleFeatureClick(event){
@@ -90,14 +74,74 @@ class Dashboard extends React.Component {
 
   render(){
 
+    ///////////////////////////////////////////////////////
+    //// handle the error / returns and rendering of search results
+    //// for the projects search
+    if(!this.state.hamburgerShow){
+      var centerSideStyle = { }
+    } else {
+      var centerSideStyle = { paddingLeft: '18vw' }
+    }
+    var srchBannerStyle = { display: 'none' }
+    if(this.state.searchReturns){
+      if(this.state.searchReturns.length && this.state.searchReturns.length > 0){
+        var srchBannerStyle = {
+
+        }
+      }
+      else {
+        var srchBannerStyle = {
+          display: 'none'
+        }
+      }
+    }
+    if(this.state.searchReturns instanceof Array){
+      var searchStyle = {
+        backgroundColor: 'lightgrey',
+        border: '1px solid black',
+
+      }
+      var searchText = this.state.searchReturns.map((result, i) => {
+        var u_name = this.state.current_user.name
+        if( u_name == result.ownername || Convert.isInArr(u_name, result.usernames) ){
+          var url = `/project/${result._id}`
+        }
+        else {
+          var url = `/project/${result._id}/read`
+        }
+        var date = Convert.prettifyDate(result.created)
+        return(
+          <li
+            className="search-result-tile"
+            key={i}
+            style={searchStyle}
+          >
+            <a href={url} className="search-result-title"> {result.title}</a>
+            <span className="search-result-description"> {result.description} </span>
+            <span className="search-result-owner"> {result.ownername} </span>
+            <span className="search-result-date"> {date} </span>
+          </li>
+        )
+      })
+    }
+    else if (this.state.searchReturns instanceof String){
+      var searchStyle = {
+      }
+      var searchText = <li className="search-result-tile" id="search-error-tile" key={0} style={searchStyle}> ...{this.state.searchReturns}... </li>
+    }
+
+    ///////////////////////////////////////////////////////
     //// This handles the logic for selecting features
     //// to show, from the menu on the left of screen
     if(this.state.hamburgerShow){
       var hambStyle = {
+        display: 'block',
+        position: 'absolute',
+        zIndex: '5',
+        left: '0',
         display: 'inline-block',
         width: '18vw',
         height: '100%',
-        'float': 'left',
         borderRight: '1px solid black',
         padding: '25px 10px',
       }
@@ -208,7 +252,13 @@ class Dashboard extends React.Component {
               </li>
             </ul>
           </div>
-          <div className="center-side-dash">
+          <div className="center-side-dash" style={centerSideStyle}>
+            <h3 className="search-results-banner" style={srchBannerStyle}>Search results: </h3>
+            <div className="search-results">
+              <ul>
+                {searchText}
+              </ul>
+            </div>
             {this.state.component == 'new_project'
               && <NewProjectPage
                   owner_id={this.state.current_user._id}
@@ -217,7 +267,10 @@ class Dashboard extends React.Component {
 
             {this.state.component == 'my_projects'
              && <ProjectListPage
-                 url={this.state.current_user._id}/>}
+                 url={this.state.current_user._id}
+                 current_user={this.state.current_user}
+                 />
+               }
 
             {this.state.component == 'chat'
              && <ChatContainer

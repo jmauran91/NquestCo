@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Auth from '../modules/Auth';
+import Fetch from '../modules/Fetch';
 import FileViewer from 'react-file-viewer';
 import PDFviewer from './PDFviewer';
 import Modal from './Modal';
+import FileMatrix from './FileMatrix';
 
 class ProjectFiles extends React.Component{
   constructor(props){
@@ -16,77 +18,36 @@ class ProjectFiles extends React.Component{
       project: {},
       msg: '',
       modal_file: {},
-      isShowingModal: false
+      isShowingModal: false,
+      fileExpand: false
     }
 
-    this.loadFiles = this.loadFiles.bind(this);
-    this.loadProject = this.loadProject.bind(this);
+    this.loadFiles = Fetch.loadFiles.bind(this);
+    this.loadProject = Fetch.loadProject.bind(this);
     this.fileTypeSwitcher = this.fileTypeSwitcher.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
     this.modalFileSet = this.modalFileSet.bind(this);
     this.modalSelector = this.modalSelector.bind(this);
     this.bigToggle = this.bigToggle.bind(this);
+    this.handleFileExpand = this.handleFileExpand.bind(this);
   }
 
-  loadProject(){
-    const url = `http://localhost:3000/api/project/${this.props.url_id}`
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization' : `bearer ${Auth.getToken()}`
-      }
-    })
-    .then(response => response.json())
-    .then((response)=> {
-      console.log(response)
-      this.setState({ project: response['project'],
-                      msg: response.msg
-                    })
-    })
-    .catch((error) => {
-      console.log(error)
-      this.setState({ msg: error.msg })
-    })
-
+  componentWillReceiveProps(nextProps){
+    if(typeof nextProps.project._id != 'undefined'){
+      this.loadFiles(nextProps.project._id);
+    }
   }
 
-  loadFiles(){
-    var url_id = this.props.url_id
-    var url = `http://localhost:3000/api/project/${url_id}/files`;
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `bearer ${Auth.getToken()}`
-      }
-    })
-    .then(response => response.json())
-    .then((response) => {
-      this.setState({
-         files: response.files,
-         msg: response.msg
-      })
-      console.log( response['msg'] )
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+  handleFileExpand(){
+    this.setState({ fileExpand: !this.state.fileExpand })
   }
-
-  componentDidMount(){
-    this.loadProject();
-    this.loadFiles();
-  }
-
-
 
   fileTypeSwitcher(file, i){
     var img_selector = file.name
     var img_filepath = `https://rsearcherdockbucket.s3.amazonaws.com/${img_selector}`;
     var pdf_filepath = "http://localhost:3000/assets/images/pdf_thumbnail.png"
 
-    if ( file["ContentType"] == "image/jpeg" ){
+    if ( file["ContentType"] == "image/jpeg" || file["ContentType"] == "image/png"){
       return( <img src={img_filepath} />)
     }
     else if ( file["ContentType"] == "application/pdf" ){
@@ -96,7 +57,6 @@ class ProjectFiles extends React.Component{
       return null
     }
   }
-
 
   toggleModal(){
     this.setState({
@@ -119,7 +79,7 @@ class ProjectFiles extends React.Component{
   }
 
 
-  modalSelector(){
+  modalSelector( imShow, file ){
 
     function arrayBufferToBase64(buffer) {
         var binary = '';
@@ -131,25 +91,25 @@ class ProjectFiles extends React.Component{
         return window.btoa( binary );
     }
 
-    if( this.state.isShowingModal) {
-      if( this.state.modal_file.ContentType == "application/pdf"){
+    if( imShow) {
+      if( file.ContentType == "application/pdf"){
 
-        var arrayBuffer = this.state.modal_file.Body.data
+        var arrayBuffer = file.Body.data
         var pdf64 = arrayBufferToBase64(arrayBuffer)
         var pdf_src = `data:application/pdf;base64,${pdf64}`;
         return(
-          <div className="iframe_pdf_div">
+          <div className="iframe_pdf_div" style={{textAlign: 'center'}}>
             <iframe id="iframe_pdf" src={pdf_src}></iframe>
           </div>
         )
       }
       else {
-        var arrayBuffer = this.state.modal_file.Body.data
+        var arrayBuffer = file.Body.data
         var jpg64 = arrayBufferToBase64(arrayBuffer)
         var jpg_src = `data:image/jpg;base64,${jpg64}`
         return(
-          <div className="iframe_jpg_div">
-            <iframe id="iframe_jpg" src={jpg_src}></iframe>
+          <div className="iframe_jpg_div" style={{textAlign: 'center'}}>
+            <img id="iframe_jpg" src={jpg_src} />
           </div>
         )
       }
@@ -158,7 +118,7 @@ class ProjectFiles extends React.Component{
 
   render(){
 
-    var ren_modalSelector = this.modalSelector();
+    var ren_modalSelector = this.modalSelector(this.state.isShowingModal, this.state.modal_file);
 
     if(this.state.files){
       var renderFiles = this.state.files.map((file, i) => {
@@ -173,26 +133,28 @@ class ProjectFiles extends React.Component{
               this.setState({
                 modal_file: clicked_file
               })
+              window.scrollTo(0, 0)
             }}
+            style={{width: '152px', overflow: 'hidden'}}
             value={i}
             >
 
             {this.fileTypeSwitcher(file, i)}
-            <div className="file-tile-name">
+            <div className="file-tile-name no-select">
             {file.name}
             </div>
-            <div className="file-tile-desc"> </div>
-            <div className="file-tile-users"> </div>
           </td>
         )
       })
     }
     else {
-      var renderFiles;
+      var renderFiles = (<li className="file-tile no-select"> No files yet... </li>)
     }
 
     return(
       <div className="projectfiles-show">
+        <span className="pfn-header no-select" >Files</span>
+        <span className="pfn-expander" onClick={this.handleFileExpand}>Expand...</span>
         <table className="scrollbox">
           <tbody>
               <tr className="renderfiles-show">
@@ -206,9 +168,16 @@ class ProjectFiles extends React.Component{
         onClose={this.toggleModal}
         container={this}
         >
-
         {ren_modalSelector}
         </Modal>
+
+        <FileMatrix
+        files={this.state.files}
+        show={this.state.fileExpand}
+        onClose={this.handleFileExpand}
+        container={this}
+        />
+
       </div>
     )
   }

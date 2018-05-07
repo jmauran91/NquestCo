@@ -89,6 +89,14 @@ $secondary_color: lightgrey;
 }
 
 
+.login-error-msg {
+  display: inline;
+  padding: 8px;
+  margin: 0 8px;
+  background-color: lighten(red, 40%);
+  border: 1 solid red;
+}
+
 /*
 .sticky + .content {
   padding-top: 60px;

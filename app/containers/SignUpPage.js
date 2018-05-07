@@ -23,7 +23,6 @@ class SignUpPage extends React.Component {
 
     this.processForm = this.processForm.bind(this);
     this.changeUser = this.changeUser.bind(this);
-    this.scrollToBottom = this.scrollToBottom.bind(this);
     this.emptyForm = this.emptyForm.bind(this);
   }
 
@@ -40,10 +39,6 @@ class SignUpPage extends React.Component {
     this.setState({
       user
     });
-  }
-
-  scrollToBottom(){
-    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
   }
 
   emptyForm(){
@@ -84,12 +79,10 @@ class SignUpPage extends React.Component {
       if(response.success == true){
         localStorage.setItem('successMessage', response.message);
         this.context.router.history.push('/login');
-        this.scrollToBottom();
         this.emptyForm();
       }
       else {
         this.setState({ errors: response.errors })
-        this.scrollToBottom();
         this.emptyForm();
       }
     })
@@ -154,10 +147,6 @@ class SignUpPage extends React.Component {
             errStyleText={errStyleText}
           />
         </div>
-        <div style={{ float:"left", clear: "both" }}
-             ref={(el) => { this.messagesEnd = el; }}>
-        </div>
-
       </div>
     );
   }

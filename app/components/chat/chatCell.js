@@ -62,7 +62,7 @@ class ChatCell extends React.Component{
     }
   }
 
-  componentWillMount(){
+  componentDidMount(){
     this.getUsers();
   }
 
@@ -82,7 +82,7 @@ class ChatCell extends React.Component{
   sendHandler(event){
     event.preventDefault();
     const messageObject = {
-      username: this.props.current_user.name,
+      username: this.props.current_user.firstName + " " + this.props.current_user.lastName,
       composedMessage: this.state.message,
       convo_id: this.props.current_convo,
     }
@@ -105,7 +105,7 @@ class ChatCell extends React.Component{
   startNewHandler(event){
     event.preventDefault();
     const messageObject = {
-      username: this.props.current_user.name,
+      username: this.props.current_user.firstName + " " + this.props.current_user.lastName,
       composedMessage: this.state.message,
       recipient: this.state.recipient,
     }

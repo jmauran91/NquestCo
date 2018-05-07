@@ -15,7 +15,8 @@ class LogBase extends React.Component {
       email: '',
       password: '',
       errors: {},
-      current_user: {}
+      current_user: {},
+      success: true
     };
 
     this.handleScrollCallback = this.handleScrollCallback.bind(this);
@@ -57,9 +58,14 @@ class LogBase extends React.Component {
       })
       .then(response => response.json())
       .then((response) => {
-        console.log(response);
-        Auth.authenticateUser(response.token);
-        this.context.router.history.push(`/${response.user._id}`);
+        if(response.success){
+          console.log(response);
+          Auth.authenticateUser(response.token);
+          this.context.router.history.push(`/${response.user._id}`);
+        }
+        else {
+          this.setState({ success: false, email: '', password: '' })
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -70,6 +76,16 @@ class LogBase extends React.Component {
     }
 
   render(){
+    if(this.state.success == false){
+      var errMsgStyle = {
+        display: 'inline'
+      }
+    }
+    else {
+      var errMsgStyle = {
+        display: 'none'
+      }
+    }
     return(
       <div>
       <Navbar id="navbar">
@@ -82,6 +98,10 @@ class LogBase extends React.Component {
             </a>
           </Navbar.Brand>
         </Navbar.Header>
+        <div className="login-error-msg" style={errMsgStyle}>
+        ! Invalid Login Credentials !
+        </div>
+
         {Auth.isUserAuthenticated()? (
           <Nav pullRight className="nav-right">
               <NavItem href="/logout">

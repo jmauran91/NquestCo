@@ -41,6 +41,9 @@ app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 app.use('/chat', chatRoutes);
 
+const adminRoutes = require('./server/routes/admin');
+app.use('/admin/', adminRoutes)
+
 
 app.get('*', function(req, res) {
   res.sendFile(path.resolve(__dirname, 'dist/index.html'));

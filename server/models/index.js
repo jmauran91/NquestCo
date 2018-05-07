@@ -16,5 +16,6 @@ module.exports.connect = (uri) => {
   require('./note');
   require('./message');
   require('./file');
+  require('./ping');
   require('./conversation');
 }

@@ -8,11 +8,17 @@ const UserSchema = new mongoose.Schema({
     index: { unique: true }
   },
   password: String,
+  name: {
+    type: String,
+  },
   firstName: {
     type: String,
   },
   lastName: {
     type: String,
+  },
+  about: {
+    type: String
   },
   profpic: String,
   projects: [{

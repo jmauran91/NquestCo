@@ -12,7 +12,7 @@ class Autosuggestor extends React.Component {
       value: ''
     }
 
-    this.users = this.props.users.map((user, i) => ({ user_id: user._id, user_name: user.name, user_index: i }));
+    this.users = this.props.users.map((user, i) => ({ user_id: user._id, user_name: user.firstName + " " + user.lastName, user_index: i }));
 
     this.changeHandler = this.changeHandler.bind(this);
     this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this);

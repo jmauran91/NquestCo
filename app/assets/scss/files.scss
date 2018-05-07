@@ -32,6 +32,8 @@ $secondary_color: lightgrey;
 }
 
 .file-tile {
+  width: 152px !important;
+  overflow: hidden;
   margin: 12px 12px;
   list-style-type: none;
   cursor: pointer;

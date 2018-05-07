@@ -23,7 +23,7 @@ $secondary_color: lightgrey;
 }
 
 .project-header-container {
-  margin: 4vw 4vh;
+  margin: 4vh 4vw;
   display: inline;
   float: left;
   height: 10vh;
@@ -79,12 +79,25 @@ $secondary_color: lightgrey;
 #projecteditor-container input {
   padding: 8px;
   width: 20vw;
+  margin: 12px;
 }
 
 .quill {
+  display: block;
   width: 90%;
-  height: 70%;
+  height: 100%;
   margin: 0 auto;
+}
+
+.ql-container {
+  height: 80%;
+  background-color: white;
+  color: black;
+}
+
+.ql-toolbar {
+  height: 20%;
+  background-color: lightgrey
 }
 
 #projecteditor-container button {
@@ -114,7 +127,7 @@ $secondary_color: lightgrey;
 .page-bisector {
   border-top: 2px solid black;
   width: 38%;
-  margin-bottom: 12vh;
+  margin-bottom: 8vh;
   margin-left: 6vw;
 }
 
@@ -163,8 +176,68 @@ $secondary_color: lightgrey;
 }
 
 .projectfiles-show {
-  width: 60vw;
+  width: 100%;
 }
+
+.projectfiles-big-container-guest, .projectnotes-big-container-guest {
+  margin: 32px 8px;
+  max-height: 22vh;
+  height: 22vh;
+  width: 60vw;
+  position: relative;
+  display: block;
+}
+
+.projectfiles-big-container, .projectnotes-big-container {
+  margin: 32px 8px;
+  max-height: 22vh;
+  height: 22vh;
+  width: 60vw;
+  position: relative;
+  display: block;
+}
+
+.projectnotes-big-container, .projectnotes-big-container-guest {
+  margin-top: 15vh;
+}
+
+.pfn-header {
+  float: left;
+}
+
+.pfn-expander {
+  float: right;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+#projectfiles-container, #projectnotes-container {
+  height: 100%;
+  max-height: 100%;
+}
+
+.projectfiles-show, .projectnotes-show {
+  max-height: 100%;
+  height: 100%;
+  width: 100%;
+}
+
+.renderfiles-show, .rendernotes-show {
+  max-height: 100%;
+  height: 100%;
+  width: 100%;
+}
+
+.scrollbox {
+  max-height: 100% !important;
+  height: 100% !important;
+}
+
+
+.projectnotes-big-container-guest {
+  margin-top: 100px !important;
+}
+
 
 
 //////////////////////////////////
@@ -245,3 +318,20 @@ $secondary_color: lightgrey;
 
 //////////////////////////////////
 //////////////////////////////////
+
+
+//////////////////////////////////
+//////////////////////////////////
+///////////EDITOR ////////////////
+//////////////////////////////////
+//////////////////////////////////
+
+
+
+.quill-xout {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: black;
+  cursor: pointer;
+}

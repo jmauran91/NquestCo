@@ -6,41 +6,48 @@ $secondary_color: lightgrey;
 
 /* MODAL */
 
-.modal-backdrop {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+.modal-backdrop  {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
   top: 0px;
   left: 0px;
   z-index: 9998;
-  background: rgba(0, 0, 0, 0.3);
+  background: black;
 }
 
 .modal-window {
+  display: block;
   position: absolute;
   top: 50%;
   left: 50%;
-  height: 80%;
-  width: 60%;
-  transform: translate(-50%, -50%);
+  margin: 0 auto;
+  height: 80vh;
+  transform: translate(-30%, -50%);
   z-index: 9999;
-  background: #fff;
+  background-color: black;
 }
 
 .modal-header {
+  display: none;
+  /*
   position: relative;
   top: 0;
-  border-bottom: 4px solid black;
-  padding: 8px;
-  margin: 0 auto;
+  border-bottom: 1px solid black;
+  margin: 4px 16px;
   text-align: center;
+  */
 }
 
 .modal-text{
-  margin: 8px 8px;
+  /*
+  margin: 24px 8px;
+  */
 }
 
 .modal-exit {
+  padding-top: 8px;
+  padding-right: 2px;
   position: relative;
   float: right;
   top: 2px;
@@ -52,29 +59,146 @@ $secondary_color: lightgrey;
 
 }
 
+.modal-internal {
+  padding: 40px;
+}
+
 .iframe_pdf_div {
-  height: 90%;
-  width: 90%;
+  height: 100%;
   margin: 0 auto;
 }
 
 #iframe_pdf {
+  border: none;
+  display: block;
   padding-left: 4vw;
-  height: 90%;
-  width: 90%;
-  margin: 0 auto;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .iframe_jpg_div {
-  height: 90%;
-  width: 90%;
+  height: 100%;
   margin: 0 auto;
 
 }
 
 #iframe_jpg {
+  border: none;
+  display: block;
   padding-left: 4vw;
-  height: 90%;
-  width: 90%;
-  margin: 0 auto;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+.matrix-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.matrix-item-tile {
+  position: relative;
+  height: 200px;
+  width: 160px;
+}
+
+.matrix-item-tile-img {
+  position: absolute;
+  height: 128px;
+  width: 96px;
+  top: 0%;
+  margin: 6px auto;
+}
+
+.matrix-item-tile-name {
+  position: absolute;
+  bottom: 0;
+  margin: 6px auto;
+}
+
+
+/* FILE AND NOTe MATRIX */
+
+
+.notetrx-backdrop, .filetrx-backdrop {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0px;
+  left: 0px;
+  z-index: 9997;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.notetrx-window, .filetrx-window {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 90vh;
+  width: 60vw;
+  transform: translate(-50%, -50%);
+  z-index: 9998;
+  border: 1px solid black;
+  box-shadow: 2px 2px 2px #888888;
+  background-color: #A9A9A9;
+  padding: 24px;
+}
+
+.filetrx-list, .notetrx-list {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: wrap;
+  flex-wrap: wrap;
+}
+
+.file-li, .note-li {
+  list-style-type: none;
+  position: relative;
+  overflow: hidden;
+  height: 200px;
+  width: 160px;
+  margin: 10px;
+  padding: 4px;
+}
+
+.file-li-pic, .note-li-pic{
+  position: absolute;
+  top: 5%;
+  left: 10%;
+  height: 130px !important;
+  max-height: 130px !important;
+  width: 130px !important;
+  max-width: 130px !important;
+}
+
+.file-li-title, .note-li-title{
+  position: absolute;
+  top: 75%;
+  left: 15%;
+}
+
+.filetrx-view {
+  z-index: 9999;
+  position: fixed;
+  padding: 5vh 5vw;
+  background-color: black;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+}
+
+.filetrx-exit, .notetrx-exit{
+  cursor: pointer;
+  font-weight: bold;
+  padding: 12px 12px;
+  position: absolute;
+  top: 0%;
+  right: 0%;
 }

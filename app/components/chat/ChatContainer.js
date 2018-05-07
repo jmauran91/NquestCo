@@ -4,7 +4,7 @@ import ChatCell from './chatCell';
 import io from 'socket.io-client';
 import Auth from '../../modules/Auth';
 import Fetch from '../../modules/Fetch';
-const socket = io("http://localhost:3000", { rejectUnauthorized: false, 'transports': ['websockets', 'flashsocket', 'polling'] })
+const socket = io( { rejectUnauthorized: false, 'transports': ['websockets', 'flashsocket', 'polling'] })
 
 
 class ChatContainer extends React.Component {
@@ -26,7 +26,7 @@ class ChatContainer extends React.Component {
     this.funcOnConvSelect = this.funcOnConvSelect.bind(this);
   }
 
-  componentWillMount(){
+  componentDidMount(){
     this.getConvos();
   }
 
@@ -115,12 +115,12 @@ class ChatContainer extends React.Component {
           if(this.state.conversations[0].length > 0){
             this.state.conversations.forEach((conversation) => {
               if(this.state.current_convo == conversation[0].conversationId){
-                var convo_user = conversation[0].author.name;
+                var convo_user = conversation[0].author.firstName + " " + conversation[0].author.lastName;
                 if(this.state.current_convo_msgs[0].username){
                   var selected_convo_user = this.state.current_convo_msgs[0].username
                 }
                 else {
-                  var selected_convo_user = this.state.current_convo_msgs[0].author.name
+                  var selected_convo_user = this.state.current_convo_msgs[0].author.firstName + " " + this.state.current_convo_msgs[0].author.lastName
                 }
                 if( selected_convo_user == convo_user ){
                   message_objects_old = this.state.current_convo_msgs;

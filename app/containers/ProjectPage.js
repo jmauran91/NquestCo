@@ -1,7 +1,10 @@
 import React from 'react';
 import Auth from '../modules/Auth';
+import Fetch from '../modules/Fetch';
+import Convert from '../modules/Convert';
 import {Button, ControlLabel, FormGroup, FormControl } from 'react-bootstrap';
 import Dropzone from 'react-dropzone';
+import PropTypes from 'prop-types';
 import ProjectFiles from '../components/ProjectFiles';
 import ProjectNotes from '../components/ProjectNotes';
 import {Editor, EditorState, RichUtils } from 'draft-js';
@@ -15,6 +18,7 @@ class ProjectPage extends React.Component{
 
     this.state = {
       project: {},
+      current_user: {},
       message: '',
       form_stat: null,
       field: '',
@@ -31,7 +35,9 @@ class ProjectPage extends React.Component{
       noteTitle: '',
       arrowHide_file: true,
       arrowHide_note: true,
-      XOut: false
+      XOut: false,
+      isShowingModal: false,
+      isShowingAddEditor: false,
     }
 
     this.onDrop = this.onDrop.bind(this);
@@ -50,7 +56,38 @@ class ProjectPage extends React.Component{
     this.quillHandleChange = this.quillHandleChange.bind(this);
     this.quillTitleHandle = this.quillTitleHandle.bind(this);
     this.submitNote = this.submitNote.bind(this);
-    this.quillXOut = this.quillXOut.bind(this);
+    this.toggleModal = this.toggleModal.bind(this);
+    this.toggleEdit = this.toggleEdit.bind(this);
+
+    this.loadProject = Fetch.loadProject.bind(this);
+    this.addUserFetch = Fetch.AddUserToProject.bind(this);
+    this.addDocumentFetch = Fetch.addDocumentToProject.bind(this);
+    this.addNoteFetch = Fetch.submitNote.bind(this);
+    this.getCurrentUser = Fetch.GetCurrentUser.bind(this);
+  }
+
+  componentDidMount(){
+    const _id = this.props.match.params.id
+    if(localStorage.getItem('token') == null){
+      this.context.router.history.push('/')
+    }
+    else {
+      this.loadProject(_id).then((projresponse) => {
+        this.getCurrentUser().then((user) => {
+          this.setState({ current_user: user, project: projresponse.project }, () => {
+            if(this.state.current_user.name != this.state.project.ownername && !Convert.isInArr(this.state.current_user.name, this.state.project.usernames)){
+              this.context.router.history.push(`/project/${this.state.project._id}/read`)
+            }
+          })
+        })
+        .catch((err) => {
+          this.context.router.history.push('/')
+        })
+      })
+      .catch((err) => {
+        this.context.router.history.push('/')
+      })
+    }
   }
 
   quillHandleChange(value){
@@ -59,29 +96,6 @@ class ProjectPage extends React.Component{
 
   quillTitleHandle(event){
     this.setState({ noteTitle: event.target.value })
-  }
-
-  quillXOut(){
-    this.setState({ XOut: !this.state.XOut })
-  }
-
-  componentWillMount(){
-    const url = `http://localhost:3000/api/project/${this.props.match.params.id}`
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization' : `bearer ${Auth.getToken()}`
-      }
-    })
-    .then(response => response.json())
-    .then((response)=> {
-      console.log(response)
-      this.setState({ project: response['project'] })
-    })
-    .catch((error) => {
-      console.log(error)
-    })
   }
 
   changeUserHandler(event){
@@ -94,32 +108,7 @@ class ProjectPage extends React.Component{
 
   addUserHandler(event){
     event.preventDefault();
-    var url = `http://localhost:3000/api/project/${this.props.match.params.id}`;
-    var _id = this.state.project._id;
-    var new_user = this.state.add_user;
-    var formData = `_id=${_id}&new_user=${new_user}`;
-    fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization' : `bearer ${Auth.getToken()}`
-      },
-      body: formData
-    })
-    .then(response => response.json())
-    .then((response) => {
-      console.log(response)
-      this.clearUserForm();
-      this.setState({
-        user_message: response.user_message,
-        form_stat: response.form_stat,
-        field: response.field
-      })
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-
+    this.addUserFetch(this.state.project._id, this.state.add_user);
   }
 
   convertFileToB64(file){
@@ -133,55 +122,11 @@ class ProjectPage extends React.Component{
 
   addDocumentHandler(event){
     event.preventDefault();
-    var url = `http://localhost:3000/api/project/${this.props.match.params.id}`;
-    var new_file = this.state.add_file
-    var payload = `file=${new_file}`
-    const data = new FormData();
-    data.append('file', this.state.add_file)
-    data.append('filename', this.state.add_file.name)
-    data.append('_id', this.state.project._id)
-    fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Authorization' : `bearer ${Auth.getToken()}`
-      },
-      body: data
-    })
-    .then(response => response.json())
-    .then((response) => {
-      console.log(response)
-      this.clearDocumentForm();
-      this.setState({
-        doc_message: response.doc_message,
-        project: response.project,
-        form_stat: response.form_stat,
-        field: response.field
-      })
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+    this.addDocumentFetch(this.state.project._id, this.state.add_file);
   }
 
   submitNote(){
-    var url = `http://localhost:3000/api/project/${this.props.match.params.id}/note`
-    var formData = `note=${this.state.quillText}&title=${this.state.noteTitle}`
-    fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization' : `bearer ${Auth.getToken()}`
-      },
-      body: formData
-    })
-    .then(response => response.json())
-    .then((response) => {
-      console.log(response)
-      this.setState({project: response.project })
-    })
-    .catch((err) => {
-      console.log(err)
-    })
+    this.addNoteFetch(this.state.project._id, this.state.quillText, this.state.noteTitle);
   }
 
   clearUserForm(){
@@ -221,6 +166,17 @@ class ProjectPage extends React.Component{
     }
   }
 
+  toggleEdit(){
+    this.setState({
+      isShowingAddEditor: !this.state.isShowingAddEditor
+    })
+  }
+
+  toggleModal(){
+    this.setState({
+      isShowingModal: !this.state.isShowingModal
+    })
+  }
 
   switchProjectNotes(){
     if(this.state.showNotes == false) {
@@ -234,11 +190,13 @@ class ProjectPage extends React.Component{
   switchProjectEditor(){
     if(this.state.showEditor == false) {
       this.setState({ showEditor: true,
-                      arrowHide_note: false})
+                      arrowHide_note: false,
+                      isShowingAddEditor: true })
     }
     else {
       this.setState({ showEditor: false,
-                      arrowHide_note: true })
+                      arrowHide_note: true,
+                      isShowingAddEditor: false})
     }
   }
 
@@ -293,7 +251,12 @@ class ProjectPage extends React.Component{
       }
     }
 
+    if(this.state.XOut == true){
+      display: 'none'
+    }
+    else {
 
+    }
 
 
     if(this.state.showFiles == true){
@@ -348,25 +311,34 @@ class ProjectPage extends React.Component{
         display: 'block'
       }
     }
-    if(this.state.project.usernames){
-      var print_users = this.state.project.usernames.map((user, i) => {
-        return(
-          <li key={i}>
-          {user}
-          </li>
-        )
-      })
+    if(Convert.isExist(this.state.project)){
+      if(!Convert.isArrEmpty(this.state.project.usernames)){
+        var print_users = this.state.project.usernames.map((user, i) => {
+          return(
+            <li key={i}>
+            {user}
+            </li>
+          )
+        })
+      }
+      else {
+        var print_users = (<p> none </p>)
+      }
     }
 
-
     return(
-      <div className="project-show">
-
+      <div className="project-show" onClick={() => {
+        if(this.state.isShowingAddEditor == true && this.state.isShowingModal == false){
+          this.setState({ isShowingAddEditor: !this.state.isShowingAddEditor,
+                          showEditor: !this.state.showEditor,
+                          arrowHide_note: !this.state.arrowHide_note })
+        }
+      }}>
         <div className="project-header-container">
-          <h1 className="project-header">
+          <h1 className="project-header ">
             {this.state.project.title}
           </h1>
-          <div className="project-title">
+          <div className="project-title ">
             {this.state.project.description}
           </div>
         </div>
@@ -379,7 +351,7 @@ class ProjectPage extends React.Component{
             Owner: {this.state.project.ownername}
           </div>
           <div className="project-user-area-users">
-            Users:
+            Guest Contributors:
             <ul>
               {print_users}
             </ul>
@@ -411,21 +383,18 @@ class ProjectPage extends React.Component{
         <div className="project-main-area">
           <div className="page-bisector"> </div>
           <div className="projectfiles-big-container">
-            <div className="anchor-container-files">
-            {/*
-              <div className="anchor" onClick={this.switchProjectFiles}>
-                Show Files
-              </div>
-              */}
-              <div className="project-add-file-anchor" onClick={this.addFileToggle}>
-                <div className="project-add-file-anchor-text">Add File</div>
-                <div style={rightArrowFileStyle} className="arrow-right"></div>
-                <div style={downArrowFileStyle} className="arrow-down"></div>
-              </div>
-            </div>
             <div id="projectfiles-container" style={myFileStyle} >
+              <div className="anchor-container-files">
+                <div className="project-add-file-anchor" onClick={this.addFileToggle}>
+                  <div className="project-add-file-anchor-text">Add File</div>
+                  <div style={rightArrowFileStyle} className="arrow-right"></div>
+                  <div style={downArrowFileStyle} className="arrow-down"></div>
+                </div>
+              </div>
               <ProjectFiles
-              url_id={this.props.match.params.id}/>
+              project={this.state.project}
+              fileExpand={this.state.fileExpand}
+              noteExpand={this.state.noteExpand}/>
             </div>
             <div className="project-add-file">
               <div className={this.changeClassName('doc')}>
@@ -447,16 +416,22 @@ class ProjectPage extends React.Component{
 
 
           <div className="projectnotes-big-container">
-            <div className="anchor-container-notes">
-              <div className="project-add-note-anchor"onClick={this.switchProjectEditor}>
-                <div className="project-add-note-anchor-text">Add Note</div>
-                <div style={rightArrowNoteStyle} className="arrow-right"></div>
-                <div style={downArrowNoteStyle} className="arrow-down"></div>
-              </div>
-            </div>
             <div id="projectnotes-container" style={myNoteStyle} >
+              <div className="anchor-container-notes">
+                <div className="project-add-note-anchor" onClick={this.switchProjectEditor}>
+                  <div className="project-add-note-anchor-text">Add Note</div>
+                  <div style={rightArrowNoteStyle} className="arrow-right"></div>
+                  <div style={downArrowNoteStyle} className="arrow-down"></div>
+                </div>
+              </div>
               <ProjectNotes
-                url_id={this.props.match.params.id}
+                project={this.state.project}
+                fileExpand={this.state.fileExpand}
+                noteExpand={this.state.noteExpand}
+                isShowingModal={this.state.isShowingModal}
+                toggleModal={this.toggleModal}
+                isShowingAddEditor={this.state.isShowingAddEditor}
+                toggleEdit={this.toggleEdit}
               />
             </div>
             <div className="project-add-note" >
@@ -472,7 +447,18 @@ class ProjectPage extends React.Component{
                     onChange={this.quillTitleHandle}
                     />
                   </div>
-                  <div className="quill-xout" onClick={quillXOut} style={XOutStyle}></div>
+                  <div
+                    className="quill-xout"
+                    onClick={() => {
+                      this.setState({
+                        showEditor: !this.state.showEditor,
+                        arrowHide_note: !this.state.arrowHide_note,
+                        isShowingAddEditor: !this.state.isShowingAddEditor
+                      })
+                    }}
+                    >
+                  X
+                  </div>
                   <ReactQuill
                   value={this.state.quillText}
                   onChange={this.quillHandleChange}
@@ -493,6 +479,10 @@ class ProjectPage extends React.Component{
       </div>
     )
   }
+}
+
+ProjectPage.contextTypes = {
+  router: PropTypes.object.isRequired
 }
 
 export default ProjectPage;
