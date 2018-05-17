@@ -1,6 +1,7 @@
 import React from 'react';
 import io from 'socket.io-client';
 import Auth from '../../modules/Auth';
+import Convert from '../../modules/Convert';
 
 
 class ChatList extends React.Component{
@@ -24,6 +25,7 @@ class ChatList extends React.Component{
           /// choosing the first message of the conversation
           /// recipients should be the same for all msgs in conversation
           if(conversation[0].recipients){
+            var profpic = "/assets/images/question_mark_PNG.png"
             var conv_recipients = ``;
             conversation[0].recipients.map((recip) => {
               conv_recipients + `${recip}, `
@@ -31,6 +33,12 @@ class ChatList extends React.Component{
           }
           else if (conversation[0].recipient){
             var conv_recipients = conversation[0].recipient
+            if(Convert.isStrExist(conversation[0].profpic)){
+              var profpic = conversation[0].profpic
+            }
+            else {
+              var profpic = "/assets/images/question_mark_PNG.png"
+            }
           }
           // setting the recipients to be 1 recipient in the event
           // of a 1-on-1 conversation or all of the recipients in the event
@@ -47,10 +55,14 @@ class ChatList extends React.Component{
           return(
             <li
               key={i+1}
-              className="convo-tile"
+              className="convo-tile no-select"
               onClick={this.props.convoSelector}
               id={conversation[0].conversationId}
             >
+              <img style={{
+                width: '45px', height: '45px',
+                borderRadius:'50%', float: 'left'}}
+                src={profpic} />
               <div className="convo-recipients" style={chatListStyle}>
                 {conv_recipients}
               </div>
@@ -71,7 +83,7 @@ class ChatList extends React.Component{
             <li
               key={0}
               onClick={this.props.convoSelector}
-              className="conv-list-new-message"
+              className="conv-list-new-message no-select"
               id="conv-list-new-message"
             >
             New Message

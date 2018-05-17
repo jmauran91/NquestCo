@@ -25,6 +25,9 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project'
   }]
+},
+{
+  timestamps: true
 });
 
 UserSchema.index({ firstName: 'text', lastName: 'text' })

@@ -27,6 +27,23 @@ class Fetch {
     })
   }
 
+  static getProjectPings(_id){
+    var url = "http://localhost:3000/api/project/" + _id + "/pings"
+    return fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: "bearer " + Auth.getToken()
+      }
+    })
+    .then(response => response.json())
+    .then((response) => {
+      return response
+    })
+    .catch((err) => {
+      return err
+    })
+  }
+
   ///////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////
 
@@ -58,7 +75,7 @@ class Fetch {
     fetch(url, {
       method: 'GET',
       headers: {
-        ContentType: 'application/json',
+        'Content-Type': 'application/json',
         Authorization: "bearer " + Auth.getToken()
       },
     })
@@ -97,8 +114,8 @@ class Fetch {
 
     })
     .catch((err) => {
-      console.log('ping 2')
-      console.log(response)
+      console.log('error in PostToConvos')
+      console.log(err)
     })
   }
 
@@ -281,10 +298,100 @@ class Fetch {
   ////////////////// PROJECTS  ///////////////////////////////////
   ///////////////////////////////////////////////////////////////
 
+  static removeUserFromProject(_id, username){
+    console.log('revoke user to project fetch called')
+    var url = "http://localhost:3000/api/project/" + _id + "/revoke"
+    var data = new FormData()
+    data.append('username', username)
+    fetch(url, {
+      method: 'PATCH',
+      headers: {
+        Authorization: "bearer " + Auth.getToken()
+      },
+      body: data
+    })
+    .then((response) => {
+      setTimeout(() => { null, 0})
+      return response.json()
+    })
+    .then((response) => {
+      console.log(response)
+      console.log('revoke user to project fetch THEN')
+      this.setState({
+        project: response.project,
+        guest_usernames: response.project.usernames,
+        user_message: response.msg,
+        form_stat: response.form_stat,
+        field: response.field
+      }, () => {
+        setTimeout(() => {
+          this.setState({
+            user_message: '',
+            form_stat: null,
+            field: ''
+          }, () => {
+            var autosugg_input = document.getElementsByClassName('react-autosuggest__input')[0]
+            autosugg_input.value = ""
+          })
+        }, 2000)
+        var autosugg_input = document.getElementsByClassName('react-autosuggest__input')[0]
+        autosugg_input.value = ""
+      })
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  }
+
+  static AddUserToProject(proj_id, new_user){
+    console.log('add user to project fetch called')
+    var url = "http://localhost:3000/api/project/" + proj_id
+    var formData = new FormData();
+    formData.append('_id', proj_id)
+    formData.append('new_user', new_user)
+    fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Authorization' : "bearer " + Auth.getToken()
+      },
+      body: formData
+    })
+    .then((response) => {
+      setTimeout(() => { null, 0})
+      return response.json()
+    })
+    .then((response) => {
+      console.log(response)
+      console.log('add user to project fetch THEN')
+      this.setState({
+        project: response.project,
+        guest_usernames: response.project.usernames,
+        user_message: response.user_message,
+        form_stat: response.form_stat,
+        field: response.field,
+        user_autosugg: ''
+      }, () => {
+        setTimeout(() => {
+          this.setState({
+            user_message: '',
+            form_stat: null,
+            field: ''
+          }, () => {
+            var autosugg_input = document.getElementsByClassName('react-autosuggest__input')[0]
+            autosugg_input.value = ""
+          })
+        }, 2000)
+        var autosugg_input = document.getElementsByClassName('react-autosuggest__input')[0]
+        autosugg_input.value = ""
+      })
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
 
 
-  static addDocumentToProject(_id, new_file){
-
+  static addFileToProject(_id, new_file){
     var url = "http://localhost:3000/api/project/" + _id
     var data = new FormData();
     try{
@@ -301,12 +408,12 @@ class Fetch {
       .then(response => response.json())
       .then((response) => {
         console.log(response)
-        this.clearDocumentForm();
+        this.clearFileForm();
         this.setState({
-          doc_message: response.doc_message,
+          file_message: response.doc_message,
           project: response.project,
           form_stat: response.form_stat,
-          field: response.field
+          field: response.field,
         })
       })
       .catch((error) => {
@@ -370,33 +477,39 @@ class Fetch {
     })
   }
 
-  static AddUserToProject(proj_id, new_user){
-    var url = "http://localhost:3000/api/project/" + proj_id
-    var formData = new FormData();
-    formData.append('_id', proj_id)
-    formData.append('new_user', new_user)
+  static searchUsers(searchquery){
+    var searchParams = ""
+    searchquery.split(' ').map((term, i) => {
+      if (i != 0){
+        searchParams += ("+" + term)
+      }
+      else {
+        searchParams += term
+      }
+    })
+    var url = "http://localhost:3000/api/search/users/" + searchParams
     fetch(url, {
-      method: 'PATCH',
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization' : "bearer " + Auth.getToken()
-      },
-      body: formData
+        Authorization: "bearer " + Auth.getToken()
+      }
     })
     .then(response => response.json())
     .then((response) => {
       console.log(response)
-      this.clearUserForm();
-      this.setState({
-        user_message: response.user_message,
-        form_stat: response.form_stat,
-        field: response.field
-      })
+      if(response.users){
+        this.setState({ searchUsrReturns: response.users })
+      }
+      else {
+        this.setState({ searchUsrReturns: response.msg })
+      }
     })
-    .catch((error) => {
-      console.log(error)
+    .catch((err) => {
+      console.log(err)
+
     })
   }
+
 
   static searchProjects(searchquery){
     var searchParams = ""
@@ -420,12 +533,12 @@ class Fetch {
       console.log(response)
       if(response.projects){
         this.setState({
-          searchReturns: response.projects
+          searchProReturns: response.projects
         })
       }
       else if (response.msg) {
         this.setState({
-          searchReturns: response.msg
+          searchProReturns: response.msg
         })
       }
     })
@@ -442,13 +555,29 @@ class Fetch {
   ///////////////////////////////////////////////////////////////
 
 
+  static deleteFile(proj_id, name){
+    var url = 'http://localhost:3000/api/project/' + proj_id + '/files/' + name;
+    fetch(url, {
+      method: 'DELETE',
+      headers: {
+        Authorization: "bearer " + Auth.getToken()
+      }
+    })
+    .then(response => response.json())
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  }
+
   static loadFiles(_id){
 
     var url = 'http://localhost:3000/api/project/' + _id + '/files';
     fetch(url, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': "bearer " + Auth.getToken()
       }
     })
@@ -473,6 +602,23 @@ class Fetch {
   ///////////////////////////////////////////////////////////////
 
 
+  static deleteNote(proj_id, _id){
+    var url = "http://localhost:3000/api/project/" + proj_id + "/notes/" + _id
+    fetch(url, {
+      method: 'DELETE',
+      headers: {
+        Authorization: "bearer " + Auth.getToken()
+      }
+    })
+    .then(response => response.json())
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+
+  }
 
   static submitNote(proj_id, note_text, note_title){
     var url = "http://localhost:3000/api/project/" + proj_id + "/note"
@@ -482,7 +628,6 @@ class Fetch {
     fetch(url, {
       method: 'PATCH',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization' : "bearer " + Auth.getToken()
       },
       body: formData
@@ -490,7 +635,9 @@ class Fetch {
     .then(response => response.json())
     .then((response) => {
       console.log(response)
-      this.setState({project: response.project })
+      this.setState({project: response.project }, () => {
+        this.forceUpdate()
+      })
     })
     .catch((err) => {
       console.log(err)
@@ -505,7 +652,6 @@ class Fetch {
     fetch(url, {
       method: 'PATCH',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': "bearer " + Auth.getToken()
       },
       body: formData
@@ -513,7 +659,11 @@ class Fetch {
     .then(response => response.json())
     .then((response) => {
       console.log(response)
-      this.setState({ isShowingModal: false },
+      this.setState({
+        isShowingAddEditor: !this.state.isShowingAddEditor,
+        arrowHide_note: !this.state.arrowHide_note,
+        showEditor: !this.state.showEditor
+      },
       () => {
         this.fetchNotes(_id);
       })
@@ -569,6 +719,7 @@ class Fetch {
         Authorization: "bearer " + Auth.getAdmin()
       }
     })
+    .then(response => response.json())
     .then((response) => {
       console.log(response)
       this.setState({ message: response.msg })
@@ -587,6 +738,7 @@ class Fetch {
         Authorization: "bearer " + Auth.getAdmin()
       }
     })
+    .then(response => response.json())
     .then((response) => {
       console.log(response)
       this.setState({ message: response.msg })
@@ -605,9 +757,11 @@ class Fetch {
         Authorization: "bearer " + Auth.getAdmin()
       }
     })
+    .then(response => response.json())
     .then((response) => {
       console.log(response)
-      this.setState({ message: response.msg })
+      this.setState({ message: response.msg } ,() => {
+      })
     })
     .catch((err) => {
       console.log(response)
@@ -623,6 +777,7 @@ class Fetch {
         Authorization: "bearer " + Auth.getAdmin()
       }
     })
+    .then(response => response.json())
     .then((response) => {
       console.log(response)
       this.setState({ message: response.msg })
@@ -640,6 +795,7 @@ class Fetch {
         Authorization: "bearer " + Auth.getAdmin()
       }
     })
+    .then(response => response.json())
     .then((response) => {
       console.log(response)
       this.setState({ message: response.msg })
@@ -658,6 +814,7 @@ class Fetch {
         Authorization: "bearer " + Auth.getAdmin()
       }
     })
+    .then(response => response.json())
     .then((response) => {
       console.log(response)
       this.setState({ message: response.msg })
@@ -676,6 +833,7 @@ class Fetch {
         Authorization: "bearer " + Auth.getAdmin()
       }
     })
+    .then(response => response.json())
     .then((response) => {
       console.log(response)
       this.setState({ message: response.msg })
@@ -685,6 +843,56 @@ class Fetch {
 
     })
   }
+
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+
+
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+  ////////////////////      CHATBOX      ////////////////////////
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+
+  static getChatbox(_id){
+    var url = "http://localhost:3000/api/project/" + _id + "/chatbox"
+    return fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: "bearer " + Auth.getToken()
+      }
+    })
+    .then(response => response.json())
+    .then((response) => {
+      return response
+    })
+    .catch((err) => {
+      return err
+    })
+  }
+
+  static updateChatbox(_id, messages){
+
+    var data = JSON.stringify(messages)
+    var url = "http://localhost:3000/api/project/" + _id + "/chatbox"
+    return fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': "application/json",
+        Authorization: "bearer " + Auth.getToken()
+      },
+      body: data
+    })
+    .then(response => response.json())
+    .then((response) => {
+      return response
+    })
+    .catch((err) => {
+      return err
+    })
+  }
+
 
 }
 

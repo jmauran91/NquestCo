@@ -54,6 +54,6 @@ let server = app.listen(3000, () => {
   console.log('Server is running on localhost:3000');
 })
 
-const io = require('socket.io')(server, {'transports': ['websocket', 'flashsocket', 'polling']});
+const io = require('socket.io')(server, { 'transports': ['websocket', 'flashsocket' , 'polling']});
 const socketEvents = require('./server/middleware/socketEvents')
 socketEvents(io);

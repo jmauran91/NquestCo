@@ -1,5 +1,6 @@
 import React from 'react';
 import Convert from '../modules/Convert';
+import Fetch from '../modules/Fetch';
 
 
 class FileMatrix extends React.Component{
@@ -13,6 +14,9 @@ class FileMatrix extends React.Component{
     this.handleFileLiClick = this.handleFileLiClick.bind(this);
     this.fileTypeSwitcher = this.fileTypeSwitcher.bind(this);
     this.fileViewer = this.fileViewer.bind(this);
+    this.deleteFileHandler = this.deleteFileHandler.bind(this);
+
+    this.deleteFileFetch = Fetch.deleteFile.bind(this);
   }
 
   handleFileLiClick(file){
@@ -22,6 +26,14 @@ class FileMatrix extends React.Component{
     else {
       this.setState({ isViewing: !this.state.isViewing })
     }
+  }
+
+  deleteFileHandler(event, file){
+    debugger;
+    event.preventDefault();
+    this.props.handleFileExpand();
+    this.setState({ isViewing: false })
+    this.deleteFileFetch(this.props.project._id, file.name)
   }
 
   fileTypeSwitcher(file){
@@ -75,6 +87,16 @@ class FileMatrix extends React.Component{
 
   render(){
 
+    if(this.props.userThis != true){
+      var userThisStyle = {
+        display: 'none'
+      }
+    }
+    else {
+      var userThisStyle = {
+
+      }
+    }
     if(this.props.show == false){
       return null
     }
@@ -97,8 +119,11 @@ class FileMatrix extends React.Component{
           className="file-li"
           onClick={() => { this.setState({ isViewing: !this.state.isViewing, viewFile: file })}}
           >
+
             <img className="file-li-pic" src={this.fileTypeSwitcher(file)}/>
             <span className="file-li-title">{file.name}</span>
+            <span className="file-li-deleter" style={userThisStyle}
+             onClick={(event) => {this.deleteFileHandler(event, file)}}>&#10006;</span>
           </li>
         )
       })

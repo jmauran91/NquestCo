@@ -17,7 +17,9 @@ class Dashboard extends React.Component {
       notiTally: 0,
       hamburgerShow: false,
       searchquery: '',
-      searchReturns: null,
+      searchProReturns: null,
+      searchUsrReturns: null,
+      searchMode: 'projects'
     };
 
     this.handleFeatureClick = this.handleFeatureClick.bind(this);
@@ -25,10 +27,12 @@ class Dashboard extends React.Component {
     this.handleHamburger = this.handleHamburger.bind(this);
     this.handleSearchBar = this.handleSearchBar.bind(this);
     this.submitSearch = this.submitSearch.bind(this);
+    this.searchModeChange = this.searchModeChange.bind(this);
     this.clearSearch = this.clearSearch.bind(this);
 
     this.getCurrentUser = Fetch.GetCurrentUser.bind(this);
     this.searchProjectsFetch = Fetch.searchProjects.bind(this);
+    this.searchUsersFetch = Fetch.searchUsers.bind(this);
   }
 
   handleSearchBar(event){
@@ -37,7 +41,12 @@ class Dashboard extends React.Component {
 
   submitSearch(event){
     event.preventDefault();
-    this.searchProjectsFetch(this.state.searchquery)
+    if(this.state.searchMode == 'projects'){
+      this.searchProjectsFetch(this.state.searchquery)
+    }
+    else if(this.state.searchMode == 'users'){
+      this.searchUsersFetch(this.state.searchquery)
+    }
     this.clearSearch();
   }
 
@@ -72,6 +81,10 @@ class Dashboard extends React.Component {
     this.setState({ notiTally: num })
   }
 
+  searchModeChange(event){
+    this.setState({ searchMode: event.target.value })
+  }
+
   render(){
 
     ///////////////////////////////////////////////////////
@@ -83,10 +96,43 @@ class Dashboard extends React.Component {
       var centerSideStyle = { paddingLeft: '18vw' }
     }
     var srchBannerStyle = { display: 'none' }
-    if(this.state.searchReturns){
-      if(this.state.searchReturns.length && this.state.searchReturns.length > 0){
+    if(!Convert.isArrEmpty(this.state.searchProReturns)){
+      if(this.state.searchProReturns.length && this.state.searchProReturns.length > 0){
         var srchBannerStyle = {
 
+        }
+        if(this.state.searchProReturns instanceof Array){
+          var searchStyle = {
+            backgroundColor: 'lightgrey',
+            border: '1px solid black',
+          }
+          var searchText = this.state.searchProReturns.map((result, i) => {
+            var u_name = this.state.current_user.name
+            if( u_name == result.ownername || Convert.isInArr(u_name, result.usernames) ){
+              var url = `/project/${result._id}`
+            }
+            else {
+              var url = `/project/${result._id}/read`
+            }
+            var date = Convert.prettifyDate(result.createdAt)
+            return(
+              <li
+                className="search-result-tile"
+                key={i}
+                style={searchStyle}
+              >
+                <a href={url} className="search-result-title"> {result.title}</a>
+                <span className="search-result-description"> {result.description} </span>
+                <span className="search-result-owner"> {result.ownername} </span>
+                <span className="search-result-date"> {date} </span>
+              </li>
+            )
+          })
+        }
+        else if (typeof this.state.searchProReturns === 'string' ){
+          var searchStyle = {
+          }
+          var searchText = <li className="search-result-tile" id="search-error-tile" key={0} style={searchStyle}> ...{this.state.searchProReturns}... </li>
         }
       }
       else {
@@ -95,39 +141,33 @@ class Dashboard extends React.Component {
         }
       }
     }
-    if(this.state.searchReturns instanceof Array){
+    if(!Convert.isArrEmpty(this.state.searchUsrReturns)){
       var searchStyle = {
         backgroundColor: 'lightgrey',
         border: '1px solid black',
-
       }
-      var searchText = this.state.searchReturns.map((result, i) => {
-        var u_name = this.state.current_user.name
-        if( u_name == result.ownername || Convert.isInArr(u_name, result.usernames) ){
-          var url = `/project/${result._id}`
-        }
-        else {
-          var url = `/project/${result._id}/read`
-        }
-        var date = Convert.prettifyDate(result.created)
-        return(
-          <li
-            className="search-result-tile"
-            key={i}
-            style={searchStyle}
-          >
-            <a href={url} className="search-result-title"> {result.title}</a>
-            <span className="search-result-description"> {result.description} </span>
-            <span className="search-result-owner"> {result.ownername} </span>
-            <span className="search-result-date"> {date} </span>
-          </li>
-        )
-      })
-    }
-    else if (this.state.searchReturns instanceof String){
-      var searchStyle = {
+      if(this.state.searchUsrReturns instanceof Array){
+        var searchText = this.state.searchUsrReturns.map((user, i) => {
+          var date = Convert.prettifyDate(user.createdAt)
+          var url = `/profile/${user._id}`
+          var about = user.about.replace(/<(?:.|\n)*?>/gm, '')
+          return(
+            <li
+              className='search-result-tile'
+              key={i}
+              style={searchStyle}
+            >
+              <a href={url} className="search-result-title"> {user.name}</a>
+              <span className="search-result-description"> {about} </span>
+              <span className="search-result-date"> Joined at: {date} </span>
+            </li>
+          )
+        })
       }
-      var searchText = <li className="search-result-tile" id="search-error-tile" key={0} style={searchStyle}> ...{this.state.searchReturns}... </li>
+      else if (typeof this.state.searchUsrReturns === 'string') {
+        var searchStyle = {}
+        var searchText = <li className="search-result-tile" id="search-error-tile" key={0} style={searchStyle}> ...{this.state.searchUsrReturns}...</li>
+      }
     }
 
     ///////////////////////////////////////////////////////
@@ -171,6 +211,15 @@ class Dashboard extends React.Component {
           <ChatContainer />
         </div>
       }
+    }
+
+    if(this.state.searchProReturns == null && this.state.searchUsrReturns == null){
+      var srchContainerStyle = {
+        display: 'none'
+      }
+    }
+    else {
+      var srchContainerStyle = {}
     }
     /// this handles the unread msgs notifications
     if (this.state.notiTally > 0){
@@ -223,9 +272,21 @@ class Dashboard extends React.Component {
             <button type="submit">
               <img src="assets/images/icons8-search.png" height='32px' width='32px'/>
             </button>
+            <select className="search-selector" onChange={this.searchModeChange} value={this.state.searchMode}>
+              <option value="projects">Projects</option>
+              <option value="users">Users</option>
+            </select>
           </form>
         </div>
         <div className="dash-body">
+          <div className="dash-slideshow">
+            <div className="dash-slideshow-images dash-first-img">
+              <img src="/assets/images/WRLD-EPS-01-0008.png"/>
+            </div>
+            <div className="dash-slideshow-images">
+              <img src="/assets/images/WRLD-EPS-01-0008.png"/>
+            </div>
+          </div>
           <div className="left-side-dash" style={hambStyle}>
             <ul className="feature-list">
               <li>
@@ -253,11 +314,13 @@ class Dashboard extends React.Component {
             </ul>
           </div>
           <div className="center-side-dash" style={centerSideStyle}>
-            <h3 className="search-results-banner" style={srchBannerStyle}>Search results: </h3>
-            <div className="search-results">
-              <ul>
-                {searchText}
-              </ul>
+            <div className="search-results-container" style={srchContainerStyle}>
+              <h3 className="search-results-banner" style={srchBannerStyle}>Search results: </h3>
+              <div className="search-results">
+                <ul>
+                  {searchText}
+                </ul>
+              </div>
             </div>
             {this.state.component == 'new_project'
               && <NewProjectPage

@@ -79,6 +79,7 @@
     "react-pdf-js": "^3.0.7",
     "react-quill": "^1.2.6",
     "react-router-dom": "^4.2.2",
+    "react-scroll": "^1.7.9",
     "react-tap-event-plugin": "^3.0.2",
     "s3fs": "git+https://github.com/RiptideElements/s3fs.git",
     "socket.io": "^2.1.0",

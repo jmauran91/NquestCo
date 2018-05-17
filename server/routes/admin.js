@@ -37,16 +37,50 @@ router.delete('/projects', (req,res) => {
 })
 
 router.delete('/files', (req, res) => {
-  File.remove({}, (err) => {
-    if(err){
-      console.log(err)
-    }
-    res.json({ msg: 'All files deleted '})
+/////////////////////////////////////////////////////////////
+  File.find({}, (err, files) => {
+    Project.update({}, { $set: { documents: [] } } )
+    var file_params = files.map((file) => {
+      return(
+        { Key: file.title }
+      )
+    })
+/////////////////////////////////////////////////////////////
+    s3bucket.createBucket(() => {
+      var params = {
+        Bucket: BucketName,
+        Delete: {
+          Objects: file_params,
+          Quiet: false
+        }
+      }
+      s3bucket.deleteObjects(params, (err, data) => {
+        if(err){
+          console.log(err)
+        }
+        else {
+          console.log(data)
+/////////////////////////////////////////////////////////////
+          File.remove({}, (err) => {
+            if(err){
+              console.log(err)
+            }
+            else {
+              res.json({ msg: 'All files deleted '})
+            }
+          })
+/////////////////////////////////////////////////////////////
+        }
+      })
+    })
+/////////////////////////////////////////////////////////////
   })
+/////////////////////////////////////////////////////////////
 })
 
 router.delete('/notes', (req, res) => {
   Note.remove({}, (err) => {
+    Project.update({}, { $set: { notes: [] } } )
     if(err){
       console.log(err)
     }

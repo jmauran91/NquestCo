@@ -25,7 +25,7 @@ router.get('/users/:id/conversations', (req,res) => {
   Conversation.find({ participants: _id })
     .populate({
       path: "participants",
-      select: "name"
+      select: "name profpic"
     })
     .exec((err, conversations) => {
       if(err){
@@ -57,9 +57,11 @@ router.get('/users/:id/conversations', (req,res) => {
                 if(conversation.participants.length == 2){
                   if(message.author.name == conversation.participants[0].name){
                     message.recipient = conversation.participants[1].name;
+                    message.profpic = conversation.participants[1].profpic;
                   }
                   else {
                     message.recipient = conversation.participants[0].name;
+                    message.profpic = conversation.participants[0].profpic;
                   }
                 }
                 else {
@@ -119,17 +121,22 @@ router.post('/users/:id/conversations', (req, res) => {
   }
 
   User.findOne({ name: req.body.recipient}, (err, user) => {
-    var convoRecipients = [ _id, user._id ]
-    var conversation = new Conversation({
-      participants: convoRecipients
-    });
-    conversation.save((err, newConvo) => {
-      if(err){
-        console.log(err)
-        res.send({ err: err })
-      }
-        res.status(200).json({ message: 'Conversation started!', conversation: newConvo })
-    })
+    if (_id != null && user != null){
+      var convoRecipients = [ _id, user._id ]
+      var conversation = new Conversation({
+        participants: convoRecipients
+      });
+      conversation.save((err, newConvo) => {
+        if(err){
+          console.log(err)
+          res.send({ err: err })
+        }
+          res.status(200).json({ message: 'Conversation started!', conversation: newConvo })
+      })
+    }
+    else {
+
+    }
   })
 })
 

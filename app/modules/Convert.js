@@ -8,6 +8,14 @@
 class Convert {
 
 
+  static returnTime(date){
+    var t = date.split('T')[1]
+    var ti = t.split('Z')[0]
+    var tim = ti.split('.')[0]
+    var time = tim.split(':')[0] + ":" + tim.split(':')[1]
+
+    return time;
+  }
   static changeDate(date){
 
     const DAYTABLE = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -91,7 +99,7 @@ class Convert {
 
   static isExist(obj){
     if(obj){
-      if(typeof obj !== 'undefined' && obj.keys !== 'undefined'){
+      if(typeof obj !== 'undefined' && typeof obj.keys !== 'undefined'){
         return true
       }
       else {
@@ -103,7 +111,22 @@ class Convert {
     }
   }
 
-  static dateSort(arrayToSort){
+  static isStrExist(str){
+    if(str){
+      if(typeof str !== 'undefined'){
+        return true
+      }
+      else {
+        return false
+      }
+    }
+    else {
+      return false
+    }
+  }
+
+
+  static isDateANewerThanB(a,b){
     const month = (string) => {
       let month = string.split("-")[1]
       return parseInt(month)
@@ -145,52 +168,150 @@ class Convert {
       let edited_millisecond = millisecond.split("Z")[0]
       return parseInt(edited_millisecond)
     }
-    var new_arr = []
-    for( var i = 0, len = arrayToSort.length; i < len; i++){
-      if(i == len - 1){
 
-      }
-      else {
-        var a = arrayToSort[i]
-        var b = arrayToSort[i+1]
-        if( year(a.createdAt) > year(b.createdAt)){
-          new_arr.push(a)
-          new_arr.push(b)
-        }
-        else {
-          if(month(a.createdAt) > month(b.createdAt)){
-            new_arr.push(a)
-            new_arr.push(b)
-          }
-          else {
-            if(day(a.createdAt) > day(b.createdAt)){
-              new_arr.push(a)
-              new_arr.push(b)
-            }
-            else {
-              if(hour(a.createdAt) > hour(b.createdAt)){
-                new_arr.push(a)
-                new_arr.push(b)
-              }
-              else {
-                if(minute(a.createdAt) > minute(b.createdAt)){
-                  new_arr.push(a)
-                  new_arr.push(b)
+    if(year(a) > year(b)){
+      if(month(a) > month(b)){
+        if(day(a) > day(b)){
+          if(hour(a) > hour(b)){
+            if(minute(a) > minute(b)){
+              if(second(a) > second(b)){
+                if(millisecond(a) > millisecond(b)){
+                  return true
                 }
                 else {
-                  if(second(a.createdAt) > second(b.createdAt)){
-                    new_arr.push(a)
-                    new_arr.push(b)
+                  return false
+                }
+              }
+              else {
+                return false
+              }
+            }
+            else {
+              return false
+            }
+          }
+          else {
+            return false
+          }
+        }
+        else {
+          return false
+        }
+      }
+      else {
+        return false
+      }
+    }
+    else {
+      return false
+    }
+  }
+
+  static dateSort(arrayToSort, type){
+    const month = (string) => {
+      let month = string.split("-")[1]
+      return parseInt(month)
+    }
+    const year = (string) => {
+      let year = string.split("-")[0]
+      return parseInt(year)
+
+    }
+    const day = (string) => {
+      let util = string.split("-")[2]
+      let day = util.split("T")[0]
+      return parseInt(day)
+    }
+    const hour = (string) => {
+      let util = string.split("-")[2]
+      let new_util = util.split("T")[1]
+      let hour = new_util.split(":")[0]
+      return parseInt(hour)
+    }
+    const minute = (string) => {
+      let util = string.split("-")[2]
+      let new_util = util.split("T")[1]
+      let minute = new_util.split(":")[1]
+      return parseInt(minute)
+    }
+    const second = (string) => {
+      let util = string.split("-")[2]
+      let new_util = util.split("T")[1]
+      let snd_util = new_util.split(":")[2]
+      let second = snd_util.split(".")[0]
+      return parseInt(second)
+    }
+    const millisecond = (string) => {
+      let util = string.split("-")[2]
+      let new_util = util.split("T")[1]
+      let snd_util = new_util.split(":")[2]
+      let millisecond = snd_util.split(".")[1]
+      let edited_millisecond = millisecond.split("Z")[0]
+      return parseInt(edited_millisecond)
+    }
+
+    function whichIsOlder(obj1, obj2, type){
+      var a_file = obj1
+      var b_file = obj2
+      if(type == 'file'){
+        var a = a_file.LastModified
+        var b = b_file.LastModified
+      }
+      else if(type == 'note'){
+        var a = a_file.createdAt
+        var b = b_file.createdAt
+      }
+      else if(type == 'ping'){
+        var a = a_file.createdAt
+        var b = b_file.createdAt
+      }
+      if( year(a) > year(b)){
+        return a_file
+      }
+      else if( year(b) > year(a)){
+        return b_file
+      }
+      else {
+        if(month(a) > month(b)){
+          return a_file
+        }
+        else if(month(b) > month(a)){
+          return b_file
+        }
+        else {
+          if(day(a) > day(b)){
+            return a_file
+          }
+          else if(day(b) > day(a)){
+            return b_file
+          }
+          else {
+            if(hour(a) > hour(b)){
+              return a_file
+            }
+            else if(hour(b) > hour(a)){
+              return b_file
+            }
+            else {
+              if(minute(a) > minute(b)){
+                return a_file
+              }
+              else if(minute(b) > minute(a)){
+                return b_file
+              }
+              else {
+                if(second(a) > second(b)){
+                  return a_file
+                }
+                else if(second(b) > second(a)){
+                  return b_file
+                }
+                else {
+                  if(millisecond(a) > millisecond(b)){
+                    return a_file
                   }
                   else {
-                    if(millisecond(a.createdAt) > millisecond(b.createdAt)){
-                      new_arr.push(a)
-                      new_arr.push(b)
-                    }
-                    else {
-                      new_arr.push(b)
-                      new_arr.push(a)
-                    }
+                    return b_file
                   }
                 }
               }
@@ -199,7 +320,17 @@ class Convert {
         }
       }
     }
-    return new_arr
+    for( var i = arrayToSort.length -1; i >= 0; i--){
+      for( var j = 1; j<=i; j++){
+        var older = whichIsOlder(arrayToSort[j-1], arrayToSort[j], type)
+        if( older == arrayToSort[j-1] ){
+          arrayToSort[j-1] = arrayToSort[j]
+          arrayToSort[j] = older
+        }
+      }
+    }
+
+    return arrayToSort.reverse()
   }
 
 

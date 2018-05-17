@@ -18,4 +18,5 @@ module.exports.connect = (uri) => {
   require('./file');
   require('./ping');
   require('./conversation');
+  require('./chatbox');
 }

@@ -14,10 +14,15 @@ class ProjectNotes extends React.Component {
       notes: null,
       success: null,
       modal_file: null,
-      quillText: null,
+      quillText: '',
       fetch_err: null,
       msg: '',
-      noteExpand: false
+      noteTitle: '',
+      noteExpand: false,
+      arrowHide_note: true,
+      form_stat: null,
+      showEditor: false,
+      isShowingAddEditor: false
 
     }
 
@@ -25,17 +30,43 @@ class ProjectNotes extends React.Component {
     this.quillHandleChange = this.quillHandleChange.bind(this);
     this.modalBody = this.modalBody.bind(this);
     this.handleNoteExpand = this.handleNoteExpand.bind(this);
+    this.submitNote = this.submitNote.bind(this);
+    this.switchProjectEditor = this.switchProjectEditor.bind(this);
+    this.quillTitleHandle = this.quillTitleHandle.bind(this)
+    this.showEditNote = this.showEditNote.bind(this);
 
     this.fetchNotes = Fetch.getNotes.bind(this);
     this.editNoteFetch = Fetch.editNote.bind(this);
+    this.addNoteFetch = Fetch.submitNote.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps){
+    if(typeof nextProps.project._id != 'undefined'){
+      this.fetchNotes(nextProps.project._id);
+    }
   }
 
   handleNoteExpand(){
     this.setState({ noteExpand: !this.state.noteExpand })
   }
 
+
+  quillTitleHandle(event){
+    this.setState({ noteTitle: event.target.value })
+  }
+
+
+  submitNote(event){
+    event.preventDefault()
+    this.switchProjectEditor();
+    this.addNoteFetch(this.props.project._id, this.state.quillText, this.state.noteTitle);
+
+  }
+
   submitEdition(event){
     event.preventDefault();
+    this.switchProjectEditor();
+    this.props.toggleModal();
     this.editNoteFetch(this.props.project._id, this.state.modal_file._id, this.state.quillText);
   }
 
@@ -53,31 +84,97 @@ class ProjectNotes extends React.Component {
     this.setState({ quillText: value })
   }
 
-  componentWillReceiveProps(nextProps){
-    if(typeof nextProps.project._id != 'undefined'){
-      this.fetchNotes(nextProps.project._id);
-    }
+  switchProjectEditor(){
+    this.setState({
+      showEditor: !this.state.showEditor,
+      arrowHide_note: !this.state.arrowHide_note,
+    })
+  }
+
+  showEditNote(){
+    this.setState({
+      isShowingAddEditor: !this.state.isShowingAddEditor
+    })
   }
 
   render(){
-
-    if(this.props.isShowingAddEditor==true){
-      var editStyle = {
-        display: 'block'
+    if(this.props.userThis != true){
+      var userThisStyle = {
+        display: 'none'
       }
     }
     else {
-      var editStyle = {
+      var userThisStyle = {
+
+      }
+    }
+    if(this.state.showEditor == true){
+      var mainEditStyle = {
+        display: 'block',
+        position: 'fixed',
+        width: '85%',
+        height: '85%',
+        top: '100px',
+        left: '100px',
+        backgroundColor: 'white',
+        zIndex: '9999',
+        boxShadow: '2px 2px 2px #888888',
+        border: '1px solid black'
+      }
+      var myEditBackgroundStyle = {
+        display: 'block',
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100vw',
+        height: '100vh',
+        background: 'rgba(0, 0, 0, 0.3)',
+        zIndex: '4'
+
+      }
+    }
+    else if (this.state.showEditor == false) {
+      var mainEditStyle = {
+        display: 'none'
+      }
+      var myEditBackgroundStyle = {
         display: 'none'
       }
     }
 
-    var note_img_url = ""
-    var modal_exec = this.modalBody(this.state.modal_file)
+    if(this.state.arrowHide_note == true){
+      var rightArrowNoteStyle = {
+        display: 'block'
+      }
+      var downArrowNoteStyle = {
+        display: 'none'
+      }
+    }
+    else {
+      var rightArrowNoteStyle = {
+        display: 'none'
+      }
+      var downArrowNoteStyle = {
+        display: 'block'
+      }
+    }
 
-    if(!Convert.isArrEmpty(this.state.notes) == true){
-      var renderNotes;
-        var renderNotesMap = this.state.notes.map((note, i) => {
+    if(this.state.isShowingAddEditor == true){
+      var smallEditStyle = {
+        display: 'block'
+      }
+    }
+    else {
+      var smallEditStyle = {
+        display: 'none'
+      }
+    }
+
+    var modal_exec = this.modalBody(this.state.modal_file)
+    var notes = this.state.notes
+    if(!Convert.isArrEmpty(notes)){
+      notes = Convert.dateSort(notes, 'note')
+      var renderNotesMap = notes.map((note, i) => {
         return(
           <td
             className="note-tile"
@@ -86,39 +183,80 @@ class ProjectNotes extends React.Component {
             onClick={()=> {
               this.props.toggleModal();
               this.setState({
-                modal_file: this.state.notes[i]
+                modal_file: note
               })
             }}
             value={i}
             >
-            <img src={note_img_url} />
-            <span className="note-tile-name">
-              {note.title}
-            </span>
-            <span className="note-tile-date">
-              {Convert.prettifyDate(note.created)}
-            </span>
+              <img src="/assets/images/text-icon.jpg" />
+              <span className="note-tile-name">
+                {note.title}
+              </span>
           </td>
         )
       })
-      renderNotes = <table className="scrollbox">
-                      <tbody>
-                        <tr className="rendernotes-show">
-                          {renderNotesMap}
-                        </tr>
-                      </tbody>
-                    </table>
-
     }
     else{
-      var renderNotes = <div className="scrollbox"> No notes yet. </div>
+      var renderNotesMap = <td className="scrollbox"> No notes yet... </td>
     }
 
     return(
       <div className="projectnotes-show">
-        <span className="pfn-header no-select">Notes</span>
-        <span className="pfn-expander" onClick={this.handleNoteExpand}>Expand...</span>
-        {renderNotes}
+        <div className="pfiles-menu-container">
+          <div className="pfn-header no-select pfile-menu">Notes</div>
+          <div
+            className="anchor-container-notes pfile-menu"
+            onClick={this.switchProjectEditor}
+            style={{cursor: 'pointer'}}>
+            Add Note
+            <div style={rightArrowNoteStyle} className="arrow-right"></div>
+            <div style={downArrowNoteStyle} className="arrow-down"></div>
+          </div>
+          <div className="pfn-expander pfile-menu" onClick={this.handleNoteExpand}>Expand...</div>
+        </div>
+        <table className="scrollbox">
+          <tbody>
+            <tr className="rendernotes-show">
+              {renderNotesMap}
+            </tr>
+          </tbody>
+        </table>
+
+        <div className="project-add-note" >
+        <br />
+          <div
+           className="projecteditor-backdrop"
+           style={myEditBackgroundStyle}
+           onClick={this.switchProjectEditor}>
+           </div>
+          <div id="projecteditor-container" style={mainEditStyle}>
+            <form onSubmit={this.submitNote}>
+              <div className="note-title-box">
+                <label> Note Title </label>
+                <input
+                label="Note Title"
+                type="text"
+                value={this.state.noteTitle}
+                onChange={this.quillTitleHandle}
+                />
+              </div>
+              <div
+                className="quill-xout"
+                onClick={this.switchProjectEditor}
+                >
+              X
+              </div>
+              <ReactQuill
+              value={this.state.quillText}
+              onChange={this.quillHandleChange}
+              />
+
+              <button type="submit"> Save Note </button>
+            </form>
+          </div>
+        </div>
+
+
 
         <Modal
         show={this.props.isShowingModal}
@@ -128,8 +266,8 @@ class ProjectNotes extends React.Component {
         <div className="modal-internal">
           <div className="modal-body-holder" dangerouslySetInnerHTML={modal_exec} />
           <div className="editor-big">
-            <button onClick={this.props.toggleEdit}> Edit </button>
-            <div className="editor-window" style={editStyle}>
+            <button onClick={this.showEditNote}> Edit </button>
+            <div className="editor-window" style={smallEditStyle}>
               <form onSubmit={this.submitEdition}>
                 <ReactQuill
                   value={this.state.quillText}
@@ -148,6 +286,9 @@ class ProjectNotes extends React.Component {
         show={this.state.noteExpand}
         onClose={this.handleNoteExpand}
         container={this}
+        userThis={this.props.userThis}
+        project={this.props.project}
+        handleNoteExpand={this.handleNoteExpand}
         />
 
 

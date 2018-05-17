@@ -6,6 +6,7 @@ const File = require('../models/file');
 const Ping = require('../models/ping');
 const Conversation = require('../models/conversation');
 const Message = require('../models/message');
+const Chatbox = require('../models/chatbox');
 const stream = require('stream');
 const cors = require('cors');
 const fs = require('fs');
@@ -146,19 +147,16 @@ router.get('/search/projects/:params', (req, res) => {
   var url_array = req.url.split("/")[3]
   url_array = url_array.split("+")
   var searchparams = url_array.join(" ")
-  console.log(searchparams)
   Project.find({ $text: { $search: searchparams } },
                { score: { $meta: "textScore"  } })
   .sort({ score: { $meta: "textScore"}})
   .limit(30)
   .exec((err, projects) => {
-    console.log(projects)
     if(err){
       console.log(err)
       res.status(400).json({ err: err })
     }
     else if(projects.length == 0){
-      console.log(projects)
       res.status(200).json({ msg: "Sorry, we couldn't find any results for this query" })
     }
     else {
@@ -169,11 +167,9 @@ router.get('/search/projects/:params', (req, res) => {
 })
 
 router.get('/search/users/:params', (req, res) => {
-  var url_array = req.url.split("/").slice(3)
-  url_array = url_array.join("+")
-  console.log(url_array)
+  var url_array = req.url.split("/")[3]
+  url_array = url_array.split("+")
   var searchparams = url_array.join(" ")
-  console.log(searchparams)
   User.find({ $text: { $search: searchparams } },
             { score: { $meta: "textScore" } })
   .sort({ score: { $meta: "textScore"}})
@@ -243,7 +239,7 @@ router.get('/:id/projects', (req, res) => {
             }
           })
           .catch((err) => {
-            console.log('ping1')
+            console.log('pinging at error of addingNameToProject')
           })
         }
       })
@@ -266,8 +262,6 @@ router.get('/:id/projects', (req, res) => {
 //////////////////////////////////////////////////
 
 router.post('/projects', (req, res) => {
-    console.log(req.body.owner)
-    console.log(req.body)
     User.findOne({ name: req.body.owner }, (err, user) => {
       if (user){
         ///// PREPARING THE VARIABLES
@@ -346,14 +340,11 @@ router.post('/projects', (req, res) => {
 
 router.get('/project/:id', (req, res) => {
   var obj_id = req.url.split('/')[2]
-  console.log('ping 0 ')
   Project.findOne({ _id: obj_id}, (err, project) => {
-    console.log('ping 1')
     if (err) {
       res.send(err)
       console.log(err)
     }
-    console.log(project)
     if (isExist(project)){
       res.json({ message: 'project Fetch successful', project: project })
       console.log('sent project back to fetch')
@@ -371,62 +362,116 @@ router.get('/project/:id', (req, res) => {
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 
+router.patch('/project/:id/revoke', (req, res) => {
+  var _id = req.url.split('/')[2]
+  var username = req.body.username
+  User.findOne({ name: username }, (err, user) => {
+    var options = {
+      returnOriginal: false
+    }
+    Project.findOneAndUpdate({ _id: _id },
+      { $pull: { usernames: user.name, users: user._id }}, {new: true}, (err, project) => {
+      if(err){
+        console.log(err)
+        res.json({ msg: err })
+      }
+      console.log('this is to rmove a user')
+      console.log(project)
+      console.log('user has been removed?')
+      res.status(200).json({
+        msg: 'User revoked',
+        project: project,
+        form_stat: true,
+        field: 'user',
+        guest_usernames: project.usernames
+       })
+    })
+  })
+})
+
+router.get('/project/:id/gu', (req, res) => {
+  var _id = req.url.split('/')[2]
+  console.log(req.url)
+  Project.findOne({ _id: _id} , (err, project) => {
+    if(err){
+      console.log(err)
+    }
+    console.log(project)
+    res.json({ guest_usernames: project.guest_usernames})
+  })
+})
+
 router.patch('/project/:id', (req, res) => {
 
 ///// ADD A NEW USER TO THE PROJECT ////////
   if (req.body.new_user) {
     User.findOne({ name: req.body.new_user }, (err, user) => {
       if (user) {
-        Project.findOneAndUpdate({ _id: req.body._id}, { $push: { users: user, usernames: req.body.new_user } }, (err, project) => {
+        Project.findOneAndUpdate({ _id: req.body._id}, { $push: { users: user, usernames: req.body.new_user } }, {new: true}, (err, project) => {
           if (err) { res.send(err) };
-          project.save((err)=> {
-            if(err) { res.send(err) }
-            createPing(project.owner, project._id, (project.ownername + " has added a user to the project [" + project.title + "]"))
-            res.status(200).json({ user_message: 'User successfully added.', form_stat: true, project: project, field:'user' });
-          })
+          createPing(project.owner, project._id, (project.ownername + " has added a user to the project [" + project.title + "]"))
+          console.log('this is to add a user')
+          console.log(project)
+          console.log('user has been added?')
+          res.status(200).json({
+            user_message: 'User permitted',
+            form_stat: true,
+            project: project,
+            field: 'user',
+            guest_usernames: project.usernames
+          });
         })
       }
       else {
-        res.status(400).json({ user_message: 'Invalid user entry; check spacing / casing', form_stat: false, field:'user'});
+        res.status(400).json({
+          user_message: 'Invalid user entry; check spacing / casing',
+          form_stat: false,
+          field:'user'
+        });
       }
     })
   }
 
   else if (!req.body.new_user) {
     /////// THIS IS FOR ADDING FILES TO THE PROJECT / S3 ///////
-    const filedata = req.files.file.data
-    const filename = req.body.filename
-    const filetype = req.files.file.mimetype
-    ////// WE USE THIS CHUNK OF CODE
-    // TO UPLOAD FILE TO S3 AND THEN
-    // TO ADD RECORD TO DB BY WHICH TO RECALL IT
-    Project.findOneAndUpdate({ _id: req.body._id}, { $push: { documents: filename}}, (err, project) => {
-      // insert S3 Bucket Upload here
-      uploadFile(filedata, filename, filetype).then((result) => {
-        if (err) { res.send({err, form_stat: false }) };
-        //// SAVING THE FILE NAME INTO THE PROJECT
-        project.save((err) => {
-          if(err) { res.send(err) }
-          createPing(project.owner, project._id, (project.ownername + " has added a filename to the project [" + project.title + "]"))
+    try{
+      const filedata = req.files.file.data
+      const filename = req.body.filename
+      const filetype = req.files.file.mimetype
+      ////// WE USE THIS CHUNK OF CODE
+      // TO UPLOAD FILE TO S3 AND THEN
+      // TO ADD RECORD TO DB BY WHICH TO RECALL IT
+      Project.findOneAndUpdate({ _id: req.body._id}, { $push: { documents: filename}}, (err, project) => {
+        // insert S3 Bucket Upload here
+        uploadFile(filedata, filename, filetype).then((result) => {
+          if (err) { res.send({err, form_stat: false }) };
+          //// SAVING THE FILE NAME INTO THE PROJECT
+          project.save((err) => {
+            if(err) { res.send(err) }
+            createPing(project.owner, project._id, (project.ownername + " has added a filename to the project [" + project.title + "]"))
 
-          //// NOW SAVING THE FILE AS A DB ENTRY IN ITS OWN RIGHT
-          var fileparams = {
-            title: result.Key,
-            project: project._id,
-            body: `https://s3.amazonaws.com/rsearcherdockbucket/${result.Key}`
-          }
-          var newfile = new File(fileparams)
-          newfile.save().then(() => {
-            createPing(project.owner, project._id, (project.ownername + " has added a file to the project [" + project.title + "]"))
-            res.json({ doc_message: 'Document successfully added.', form_stat: true, project: project, field:'doc', file: newfile});
+            //// NOW SAVING THE FILE AS A DB ENTRY IN ITS OWN RIGHT
+            var fileparams = {
+              title: result.Key,
+              project: project._id,
+              body: `https://s3.amazonaws.com/rsearcherdockbucket/${result.Key}`
+            }
+            var newfile = new File(fileparams)
+            newfile.save().then(() => {
+              createPing(project.owner, project._id, (project.ownername + " has added a file to the project [" + project.title + "]"))
+              res.json({ doc_message: 'File successfully added.', form_stat: true, project: project, field:'doc', file: newfile});
+            })
           })
         })
+        .catch((err) => {
+          console.log('promise rejected')
+          console.log(err)
+        })
       })
-      .catch((err) => {
-        console.log('promise rejected')
-        console.log(err)
-      })
-    })
+    }
+    catch(error){
+      console.log(error)
+    }
   }
   else {
     res.send({
@@ -442,6 +487,42 @@ router.patch('/project/:id', (req, res) => {
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
+
+router.delete('/project/:id/files/:file_name', (req, res) => {
+  var _id = req.url.split('/')[2]
+  var file_name = req.url.split('/')[4]
+  File.remove({ title: file_name }, (err) => {
+    if(err){
+      console.log(err)
+      res.json({ msg: 'Failed to delete file ; ERROR'})
+    }
+    s3bucket.createBucket(() => {
+      var params = {
+        Bucket: BucketName,
+        Delete: {
+          Objects: [{
+            Key: file_name
+          }],
+          Quiet: false
+        }
+      }
+      s3bucket.deleteObjects(params, (err, data) => {
+        if(err){
+          console.log(err)
+        }
+        else {
+          Project.findOneAndUpdate({ _id: _id}, { $pull: { documents: file_name }}, {new: true}, (err, project) => {
+            if(err){
+              console.log(err)
+            }
+            console.log(data)
+            res.json({ msg: 'File deleted ', data: data, project: project })
+          })
+        }
+      })
+    })
+  })
+})
 
 router.get('/project/:id/files', (req, res) => {
   var obj_id = req.url.split('/')[2];
@@ -469,7 +550,6 @@ router.get('/project/:id/files', (req, res) => {
     return new Promise((resolve, reject) => {
       for ( var i = 0; i < server_doc_arr.length; i++ ){
         var filename_get = server_doc_arr[i]
-        console.log(filename_get)
         fetchFile(filename_get, res_files)
         .then((result) => {
           if (server_doc_arr.length == res_files.length) {
@@ -479,6 +559,7 @@ router.get('/project/:id/files', (req, res) => {
         .catch((err) => {
           console.log(err)
           console.log('error happened after fetch file')
+          res.send(err)
         })
       }
     })
@@ -497,7 +578,6 @@ router.get('/project/:id/files', (req, res) => {
       server_doc_arr.push(doc_title)
     }
     sortFiles().then((result) => {
-      console.log('success')
       res.send({ msg: 'files fetch successful', files: result })
     })
     .catch((err) => {
@@ -576,7 +656,6 @@ router.patch('/project/:id/note', (req, res) => {
     if (err) {
       console.log(err)
     }
-    console.log(project)
     res.send({ project: project })
   })
   // Exiting Project Callback Function
@@ -588,7 +667,6 @@ router.patch('/project/:id/note', (req, res) => {
 //////////////////////////////////////////////////
 
 router.get('/project/:id/notes', (req, res) => {
-  console.log('note get')
   var _id = req.url.split('/')[2]
   function fetchNotes(){
     return new Promise((resolve, reject) => {
@@ -598,19 +676,14 @@ router.get('/project/:id/notes', (req, res) => {
           reject(err)
         }
         var notes_arr = []
-        console.log('project found')
         if(isExist(project)){
-          console.log(project)
-          for (var i = 0; i < project.notes.length; i++){
-            Note.findOne({ title : project.notes[i] }, (err, note) => {
-              notes_arr.push(note)
-              console.log('at the if')
-              if(notes_arr.length == project.notes.length){
-                console.log('in the if')
-                resolve(notes_arr)
-              }
-            })
-          }
+          Note.find({ project: project._id }, (err, notes) => {
+            if(err){
+              console.log(err)
+              reject(err)
+            }
+            resolve(notes)
+          })
         }
         else {
           resolve('No notes')
@@ -618,9 +691,8 @@ router.get('/project/:id/notes', (req, res) => {
       })
     })
   }
-  fetchNotes().then((result) => {
-    console.log(result)
-    res.json({ msg: 'notes fetch successful', notes: result })
+  fetchNotes().then((notes) => {
+    res.json({ msg: 'notes fetch successful', notes: notes })
   })
   .catch((err) => {
     console.log(err)
@@ -636,17 +708,33 @@ router.get('/project/:id/notes', (req, res) => {
 router.patch('/project/:id/notes/:note_id', (req, res) => {
   var _id = req.url.split('/')[2]
   var note_id = req.url.split('/')[4]
-  Note.findOneAndUpdate({ _id: note_id },
-            {$set: { body: req.body.newtext }}, (err, note) => {
+  var bodyText = req.body.newtext
+  Note.findOneAndUpdate({ _id: note_id }, {$set: { body: bodyText }}, {new: true})
+  .populate('project')
+  .exec((err, note) => {
+    createPing(note.project.owner, note.project._id, (note.project.ownername + " has edited a note in the project [" + note.project.title + "]"))
     if(err){
       console.log(err)
       res.send(err)
     }
     res.send({ msg: 'note succesfully patched', note: note })
   })
-  .populate('project')
-  .exec((err, project) => {
-    createPing(project.owner, project._id, (project.ownername + " has edited a note in the project [" + project.title + "]"))
+})
+
+
+router.delete('/project/:id/notes/:note_id', (req, res) => {
+  var _id = req.url.split('/')[2]
+  var note_id = req.url.split('/')[4]
+  Note.findOne({ _id: note_id}, (err, note) => {
+    Project.findOneAndUpdate({ id: _id}, { $pull: { notes: note.title} }, (err)=> {
+      Note.remove({ _id: note_id}, (err, note) => {
+        if(err){
+          console.log(err)
+          res.json({msg: 'Failed to delete ; ERROR'})
+        }
+        res.json({ msg: 'Note deleted'})
+      })
+    })
   })
 })
 
@@ -660,31 +748,22 @@ router.patch('/project/:id/notes/:note_id', (req, res) => {
 
 router.get('/users/:id', cors(), (req, res) => {
   var _id = req.url.split("/")[2]
-  console.log('fetched to get user address')
-  console.log(_id)
   User.findOne({ _id: _id}, (err, user) => {
-    console.log('here')
     if(err){
       console.log(err)
-      console.log('if err')
     }
     if (!isArrEmpty(user.projects)){
-      console.log('user projects length is greater than  0')
       var promise1 = new Promise((resolve, reject) => {
-        console.log(user.name)
         Project.find({ ownername: user.name })
         .exec((err, owned_projects) => {
-          console.log('found owned projects by username')
           if(err){
             console.log(err)
             reject()
           }
           if(owned_projects.length > 0){
-            console.log('user owns projects - now pushing them in and setting to true')
             resolve(owned_projects)
           }
           else {
-            console.log('user is not an owner of any project')
             resolve( [] )
           }
         })
@@ -692,17 +771,14 @@ router.get('/users/:id', cors(), (req, res) => {
       var promise2 = new Promise((resolve, reject) => {
         Project.find({ usernames: user.name })
         .exec((err, guest_projects) => {
-          console.log('found guest projects by username')
           if(err){
             console.log(err)
             reject()
           }
           if(guest_projects.length > 0){
-            console.log('user is guest to projects - now pushing them in and setting to true')
             resolve(guest_projects)
           }
           else {
-            console.log('this user is not a guest to any project')
             resolve( [] )
           }
         })
@@ -710,25 +786,20 @@ router.get('/users/:id', cors(), (req, res) => {
 
       Promise.all([promise1, promise2]).then((results) => {
         var userObj = user.toObject();
-        console.log(results)
         if(isArrEmpty(results[0]) && isArrEmpty(results[1])){
-          console.log("User not currently working on any projects")
           res.json({ msg: "User not currently working on any projects", user: userObj })
         }
         else if (isArrEmpty(results[0])) {
           userObj.guest_projects = results[1]
-          console.log("User contributes to projects")
           res.json({ msg: "User contributes to projects", user: userObj })
         }
         else if (isArrEmpty(results[1])) {
           userObj.owned_projects = results[0]
-          console.log("User owns projects")
           res.json({ msg: "User owns projects", user: userObj })
         }
         else {
           userObj.owned_projects = results[0]
           userObj.guest_projects = results[1]
-          console.log("User owns projects and contributes to others")
           res.json({ msg: "User owns projects and contributes to others", user: userObj })
         }
       })
@@ -737,14 +808,12 @@ router.get('/users/:id', cors(), (req, res) => {
       })
     }
     else {
-      console.log('ping 12')
       res.json({ user: user })
     }
   })
 })
 
 router.patch('/users/:id', cors(), (req, res) => {
-  console.log(req)
   var _id = req.url.split("/")[2]
   if(isExist(req.files)){
     var edit;
@@ -807,7 +876,6 @@ router.get('/users', cors(), (req,res) => {
       res.status(404).send(err)
     }
     res.json({ users: users })
-    console.log('users fetched')
   })
 })
 
@@ -829,6 +897,65 @@ router.get('/users/:user_id/pings', (req, res) => {
       }
       res.status(200).json({ msg: 'pings fetched', pings: pings })
     })
+})
+
+router.get('/project/:id/pings', (req, res) => {
+  var _id = req.url.split('/')[2]
+  Ping.find({ projectId: _id})
+    .populate({
+      path: 'projectId'
+    })
+    .exec((err, pings) => {
+      if(err){
+        console.log('Error')
+        console.log(err)
+        res.status(400).json({
+          msg: "Error in finding project pings"
+        })
+      }
+      res.status(200).json({
+        msg: "Project pings fetched",
+        pings: pings
+      })
+    })
+
+})
+
+router.get('/project/:id/chatbox', (req, res) => {
+  var p_id = req.url.split('/')[2]
+  Chatbox.findOne({ project: p_id }, (err, chatbox) => {
+    if(err){
+      console.log(err)
+      res.status(400).send({ msg: 'Failed to fetch Chatbox' })
+    }
+    res.status(200).json({
+      msg: 'Successfully fetched chatbox',
+      chatbox: chatbox
+    })
+  })
+})
+
+router.patch('/project/:id/chatbox', (req, res) => {
+  var p_id = req.url.split('/')[2]
+  var req_messages = req.body.map((msg) => {
+    return(
+      msg.createdAt + " " + msg.username + ": " + msg.composedMessage
+    )
+  })
+  Chatbox.findOneAndUpdate(
+    { project: p_id },
+    { $set: { messages: req_messages }},
+    { upsert: true, new: true },
+    (err, chatbox) => {
+    if(err){
+      console.log('hit the err')
+      console.log(err)
+    }
+    res.status(200).json({
+      msg: 'Chatbox successfully updated / created',
+      chatbox: chatbox
+    })
+  })
 })
 
 module.exports = router;

@@ -37,7 +37,7 @@ class AdminPage extends React.Component{
       var msgStyle = {
         backgroundColor: 'green',
         color: 'white',
-        width: '20vw',
+        width: '50vw',
         height: '10vh',
         fontSize: '3em',
         position: 'absolute',

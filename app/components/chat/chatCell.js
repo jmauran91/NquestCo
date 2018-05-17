@@ -16,7 +16,8 @@ class ChatCell extends React.Component{
       message_objects: [],
       message: '',
       recipient: '',
-      check: null
+      check: null,
+      errormsg: ''
     }
 
     this.socket = this.props.socket;
@@ -56,6 +57,12 @@ class ChatCell extends React.Component{
   }
 
   componentWillReceiveProps(nextProps){
+    if(!Convert.isArrEmpty(nextProps.message_objects_old) && !Convert.isArrEmpty(this.state.message_objects)){
+      if(nextProps.message_objects_old[0].recipient != this.state.message_objects[0].recipient){
+        this.setState({ message_objects: nextProps.message_objects_old },
+          () => {  })
+      }
+    }
     if(this.state.message_objects.length < nextProps.message_objects_old.length){
       this.setState({ message_objects: nextProps.message_objects_old },
         () => {  })
@@ -122,24 +129,34 @@ class ChatCell extends React.Component{
     () => {
       this.persistConvo(this.props.current_user._id, obj)
       .then((res) => {
-        var convo_id = res.conversation._id
-        this.persistMessage(obj, convo_id)
-        .then((response) => {
-          var msg_pers = response
-          const convoObject = {
-            message_objects: this.state.message_objects,
-            convo_id: convo_id
-          }
-          this.props.socket.emit('enter conversation', convo_id)
-          this.props.socket.on('user joined', (room_name) => {
-            this.props.socket.emit('new message', convoObject)
+        if(res.error){
+          console.log(res)
+          this.setState({ errormsg: res.error })
+        }
+        else {
+          var convo_id = res.conversation._id
+          this.persistMessage(obj, convo_id)
+          .then((response) => {
+            var msg_pers = response
+            const convoObject = {
+              message_objects: this.state.message_objects,
+              convo_id: convo_id
+            }
+            this.props.socket.emit('enter conversation', convo_id)
+            this.props.socket.on('user joined', (room_name) => {
+              this.props.socket.emit('new message', convoObject)
+            })
+            this.props.convoSetter(convo_id)
+            this.setState({ message: '', errormsg: '' })
           })
-          this.props.convoSetter(convo_id)
-          this.setState({ message: '' })
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+          .catch((err) => {
+            console.log(err)
+          })
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        this.setState({ errormsg: err.msg })
       })
     })
   }
@@ -156,7 +173,7 @@ class ChatCell extends React.Component{
         }
       }
       else if(this.props.current_convo !== 'conv-list-new-message'){
-        if(this.state.message_objects.length != 0){
+        if(!Convert.isArrEmpty(this.state.message_objects)){
           let textindex = this.state.message_objects.length - 1
           let text = `Chatting with: ${this.state.message_objects[textindex].recipient}`
           message_objects = this.state.message_objects
@@ -168,16 +185,39 @@ class ChatCell extends React.Component{
         header = 'New Message';
         myStyle = {};
       }
+      if(Convert.isStrExist(this.state.errormsg)){
+        var errStyle = {
+          display: 'block',
+          position: 'absolute',
+          top: '40%',
+          left: '20%',
+          padding: '16px',
+          borderRadius: '8px',
+          backgroundColor: '#ff8080'
+        }
+      }
+      else {
+        var errStyle = {
+          display: 'none'
+        }
+      }
 
       if(this.props.current_convo !== 'conv-list-new-message'){
         return(
           <div className="chatcell-container">
+
             <div className="chatcell-header" style={myStyle}>
               <h5>
                 {header}
               </h5>
             </div>
             <div className="chatcell-messages">
+              <span className="chatcell-errormsg"
+              style={errStyle}
+              >
+              {this.state.errormsg}
+              </span>
+
               <Messages
               current_user={this.props.current_user}
               message_objects={message_objects}
@@ -204,6 +244,12 @@ class ChatCell extends React.Component{
               </h5>
             </div>
             <div className="chatcell-messages">
+              <div className="chatcell-errormsg"
+              style={errStyle}
+              >
+              {this.state.errormsg}
+              </div>
+
               <Messages
               current_user={this.props.current_user}
               message_objects={message_objects}
@@ -219,8 +265,6 @@ class ChatCell extends React.Component{
                 <Autosuggestor
                   recipCatcher={this.recipCatcher}
                   users={this.state.users}
-                  current_user={this.props.current_user}
-                  current_convo={this.props.current_convo}
                 />
                 <button type="submit"> Submit</button>
               </form>

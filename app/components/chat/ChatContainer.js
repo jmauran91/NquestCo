@@ -4,7 +4,9 @@ import ChatCell from './chatCell';
 import io from 'socket.io-client';
 import Auth from '../../modules/Auth';
 import Fetch from '../../modules/Fetch';
+import Convert from '../../modules/Convert';
 const socket = io( { rejectUnauthorized: false, 'transports': ['websockets', 'flashsocket', 'polling'] })
+
 
 
 class ChatContainer extends React.Component {
@@ -12,6 +14,10 @@ class ChatContainer extends React.Component {
     super(props);
 
     this.socket = socket;
+    this.socket.on('ping', (data) => {
+      this.socket.emit('pong', data);
+    })
+
     this.state = {
       current_convo: '',
       conversations: null,
@@ -20,10 +26,12 @@ class ChatContainer extends React.Component {
 
     this.convoSelector = this.convoSelector.bind(this);
     this.convoSetter = this.convoSetter.bind(this);
-    this.getConvos = Fetch.GetConvos.bind(this);
-    this.persistMessage = Fetch.PatchConvo.bind(this);
     this.convoMsgsSetter = this.convoMsgsSetter.bind(this);
     this.funcOnConvSelect = this.funcOnConvSelect.bind(this);
+
+    
+    this.getConvos = Fetch.GetConvos.bind(this);
+    this.persistMessage = Fetch.PatchConvo.bind(this);
   }
 
   componentDidMount(){
@@ -110,17 +118,16 @@ class ChatContainer extends React.Component {
       var chatCellStyle = {
         display: 'block'
       }
-      if(this.state.conversations){
-        if(this.state.conversations.length != 0){
-          if(this.state.conversations[0].length > 0){
-            this.state.conversations.forEach((conversation) => {
-              if(this.state.current_convo == conversation[0].conversationId){
-                var convo_user = conversation[0].author.firstName + " " + conversation[0].author.lastName;
-                if(this.state.current_convo_msgs[0].username){
+      if(!Convert.isArrEmpty(this.state.conversations)){
+        if(!Convert.isArrEmpty(this.state.conversations[0])){
+          this.state.conversations.forEach((conversation) => {
+            if(this.state.current_convo == conversation[0].conversationId){
+              var convo_user = conversation[0].author.name;
+                if(this.state.current_convo_msgs[0].username ){
                   var selected_convo_user = this.state.current_convo_msgs[0].username
                 }
                 else {
-                  var selected_convo_user = this.state.current_convo_msgs[0].author.firstName + " " + this.state.current_convo_msgs[0].author.lastName
+                  var selected_convo_user = this.state.current_convo_msgs[0].author.name;
                 }
                 if( selected_convo_user == convo_user ){
                   message_objects_old = this.state.current_convo_msgs;
@@ -128,10 +135,6 @@ class ChatContainer extends React.Component {
               }
             }, this)
           }
-          else {
-
-          }
-        }
         else {
           conversations = []
         }

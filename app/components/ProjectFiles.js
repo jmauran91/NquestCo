@@ -2,10 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Auth from '../modules/Auth';
 import Fetch from '../modules/Fetch';
+import Convert from '../modules/Convert';
 import FileViewer from 'react-file-viewer';
 import PDFviewer from './PDFviewer';
 import Modal from './Modal';
 import FileMatrix from './FileMatrix';
+import Dropzone from 'react-dropzone';
+
 
 class ProjectFiles extends React.Component{
   constructor(props){
@@ -13,23 +16,36 @@ class ProjectFiles extends React.Component{
     this.state = {
       files: [],
       name: '',
+      add_file: '',
       description: '',
       filetype: '',
+      file_message: '',
       project: {},
       msg: '',
       modal_file: {},
       isShowingModal: false,
-      fileExpand: false
+      fileExpand: false,
+      form_stat: null,
+      showAddFile: false,
+      arrowHide_file: true
     }
 
-    this.loadFiles = Fetch.loadFiles.bind(this);
-    this.loadProject = Fetch.loadProject.bind(this);
     this.fileTypeSwitcher = this.fileTypeSwitcher.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
     this.modalFileSet = this.modalFileSet.bind(this);
     this.modalSelector = this.modalSelector.bind(this);
     this.bigToggle = this.bigToggle.bind(this);
+    this.addFileToggle = this.addFileToggle.bind(this);
     this.handleFileExpand = this.handleFileExpand.bind(this);
+    this.clearFileForm = this.clearFileForm.bind(this);
+    this.changeClassName = this.changeClassName.bind(this);
+    this.changeFileHandler = this.changeFileHandler.bind(this);
+    this.addFileHandler = this.addFileHandler.bind(this);
+    this.onDrop = this.onDrop.bind(this);
+
+    this.loadFiles = Fetch.loadFiles.bind(this);
+    this.loadProject = Fetch.loadProject.bind(this);
+    this.addFileFetch = Fetch.addFileToProject.bind(this);
   }
 
   componentWillReceiveProps(nextProps){
@@ -78,6 +94,23 @@ class ProjectFiles extends React.Component{
     this.toggleModal();
   }
 
+  addFileToggle(){
+    this.setState({
+      showAddFile: !this.state.showAddFile,
+      arrowHide_file: !this.state.arrowHide_file
+    })
+  }
+
+  addFileHandler(event){
+    event.preventDefault()
+    this.addFileFetch(this.props.project._id, this.state.add_file);
+    this.setState({
+      showAddFile: !this.state.showAddFile,
+      arrowHide_file: !this.state.arrowHide_file
+    })
+  }
+
+
 
   modalSelector( imShow, file ){
 
@@ -116,12 +149,84 @@ class ProjectFiles extends React.Component{
     }
   }
 
+  clearFileForm(){
+    this.setState({ add_file: '' });
+  }
+
+
+  onDrop(files){
+    console.log(files)
+    var file = files[0]
+    this.setState({ add_file: file })
+  }
+
+  changeClassName(){
+    if (this.state.form_stat == true) {
+      return(`new-file-true`)
+    }
+    else if (this.state.form_stat == false) {
+      return(`new-file-false`)
+    }
+    else {
+      return(`new-file-null`)
+    }
+  }
+
+  changeFileHandler(event){
+    debugger
+    this.setState({ add_file: event.target.files[0]})
+  }
+
+
   render(){
+    if(this.props.userThis != true){
+      var userThisStyle = {
+        display: 'none'
+      }
+    }
+    else {
+      var userThisStyle = {
+
+      }
+    }
+    if(this.state.arrowHide_file == true){
+      var rightArrowFileStyle = {
+        display: 'block'
+      }
+      var downArrowFileStyle = {
+        display: 'none'
+      }
+    }
+    else {
+      var rightArrowFileStyle = {
+        display: 'none'
+      }
+      var downArrowFileStyle = {
+        display: 'block'
+      }
+    }
+    if(this.state.showAddFile == true){
+      var myAddFileStyle = {
+        display: 'block',
+        position: 'absolute',
+        top: '-200px',
+        left: '-20px',
+        backgroundColor: 'white',
+        zIndex: '5',
+        boxShadow: '2px 2px 2px #888888',
+        border: '1px solid black'
+      }
+    }
+    else {
+      var myAddFileStyle = {
+        display: 'none'
+      }
+    }
 
     var ren_modalSelector = this.modalSelector(this.state.isShowingModal, this.state.modal_file);
-
-    if(this.state.files){
-      var renderFiles = this.state.files.map((file, i) => {
+    if(!Convert.isArrEmpty(this.state.files)){
+      var sortedFiles = Convert.dateSort(this.state.files, 'file')
+      var renderFilesMap = sortedFiles.map((file, i) => {
         return(
           <td
             className="file-tile"
@@ -129,7 +234,7 @@ class ProjectFiles extends React.Component{
             key={i}
             onClick={() => {
               this.toggleModal();
-              var clicked_file = this.state.files[i]
+              var clicked_file = file
               this.setState({
                 modal_file: clicked_file
               })
@@ -148,20 +253,44 @@ class ProjectFiles extends React.Component{
       })
     }
     else {
-      var renderFiles = (<li className="file-tile no-select"> No files yet... </li>)
+       renderFilesMap = (<td className="scrollbox"> No files yet... </td>)
     }
 
     return(
       <div className="projectfiles-show">
-        <span className="pfn-header no-select" >Files</span>
-        <span className="pfn-expander" onClick={this.handleFileExpand}>Expand...</span>
+        <div className="pfiles-menu-container">
+          <div className="pfn-header no-select pfile-menu" >Files</div>
+          <div className="anchor-container-files pfile-menu" onClick={this.addFileToggle} style={{cursor: 'pointer'}}>
+            Add File
+            <div style={rightArrowFileStyle} className="arrow-right"></div>
+            <div style={downArrowFileStyle} className="arrow-down"></div>
+          </div>
+          <div className="pfn-expander pfile-menu" onClick={this.handleFileExpand}>Expand...</div>
+        </div>
         <table className="scrollbox">
           <tbody>
-              <tr className="renderfiles-show">
-                {renderFiles}
-              </tr>
+            <tr className="renderfiles-show">
+              {renderFilesMap}
+            </tr>
           </tbody>
         </table>
+
+        <div className="project-add-file">
+          <div
+          className={this.changeClassName()}
+          style={{}}>
+            <div>{this.state.file_message}</div>
+          </div>
+          <br />
+          <div className="project-add-file-form" style={myAddFileStyle}>
+            <form onSubmit={this.addFileHandler}>
+            <Dropzone onDrop={this.onDrop}>
+            <p> Drag file or click to upload </p>
+            </Dropzone>
+            <button type="submit">Save</button>
+            </form>
+          </div>
+        </div>
 
         <Modal
         show={this.state.isShowingModal}
@@ -176,6 +305,9 @@ class ProjectFiles extends React.Component{
         show={this.state.fileExpand}
         onClose={this.handleFileExpand}
         container={this}
+        userThis={this.props.userThis}
+        project={this.props.project}
+        handleFileExpand={this.handleFileExpand}
         />
 
       </div>

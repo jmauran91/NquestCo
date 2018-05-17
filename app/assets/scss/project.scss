@@ -15,11 +15,13 @@ $secondary_color: lightgrey;
 }
 
 .project-user-area{
+  position: relative;
   background-color: lighten($color, 50%);
   padding: 12px;
-  width: 15vw;
-  height: 40vh;
+  width: 20vw;
+  height: 400px;
   float: right;
+  overflow: hidden;
 }
 
 .project-header-container {
@@ -34,7 +36,9 @@ $secondary_color: lightgrey;
 }
 
 .project-add-user-form{
-  width: 90%;
+  position:absolute;
+  bottom: 0px;
+  width: 17vw;
   margin: 0 8px;
 }
 
@@ -83,20 +87,21 @@ $secondary_color: lightgrey;
 }
 
 .quill {
-  display: block;
+  display: flex;
+  flex-direction: column;
   width: 90%;
-  height: 100%;
+  height: 80%;
   margin: 0 auto;
+  overflow-y: hidden;
 }
 
 .ql-container {
-  height: 80%;
   background-color: white;
   color: black;
 }
 
 .ql-toolbar {
-  height: 20%;
+  height: 50px;
   background-color: lightgrey
 }
 
@@ -151,11 +156,9 @@ $secondary_color: lightgrey;
   text-decoration-color: blue;
 }
 
-.project-add-file-anchor,
-  .project-add-note-anchor {
-
-  margin-left: 20vw;
-
+.project-add-file-anchor, .project-add-note-anchor {
+    height: 100%;
+    width: 100%;
 }
 
 
@@ -170,9 +173,9 @@ $secondary_color: lightgrey;
 }
 
 .anchor-container-files, .anchor-container-notes {
-  display: flex;
-  flex: auto;
-  flex-direction: row;
+  padding-top: 8px;
+  display: inline;
+  text-align: center;
 }
 
 .projectfiles-show {
@@ -202,13 +205,15 @@ $secondary_color: lightgrey;
 }
 
 .pfn-header {
-  float: left;
+  padding-bottom: 8px;
 }
 
 .pfn-expander {
-  float: right;
   cursor: pointer;
   text-decoration: underline;
+  text-align: right;
+  padding-bottom: 8px;
+
 }
 
 #projectfiles-container, #projectnotes-container {
@@ -248,7 +253,9 @@ $secondary_color: lightgrey;
 //////////////////////////////////
 
 .arrow-right {
-  float: left;
+  position: absolute;
+  top: 8px;
+  right: 20%;
   width: 0;
   height: 0;
   border-top: 6px solid transparent;
@@ -264,7 +271,9 @@ $secondary_color: lightgrey;
 }
 
 .arrow-down {
-  float: left;
+  position: absolute;
+  top: 8px;
+  right: 24px;
   width: 0;
   height: 0;
   border-top: 6px solid black;
@@ -290,29 +299,48 @@ $secondary_color: lightgrey;
 //////////////////////////////////
 
 
-.new-doc-true, .new-doc-false, .new-doc-null, .new-user-true, .new-user-false, .new-user-null {
+.new-file-true, .new-file-false, .new-file-null, .new-user-true, .new-user-false, .new-user-null {
   margin: 5px 0px;
   padding:8px;
+  position: fixed;
+  top: 20%;
+  left: 40%;
+  -webkit-animation: fadeOut 2s forwards;
+  animation: fadeOut 2s forwards;
+  -webkit-animation-delay: 1s;
+  animation-delay: 1s;
+
 }
 
-.new-doc-true div, .new-doc-false div, .new-doc-null div, .new-user-true div, .new-user-false div, .new-user-null div {
+@-webkit-keyframes fadeOut {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+
+@keyframes fadeOut {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+
+
+.new-file-true div, .new-file-false div, .new-file-null div, .new-user-true div, .new-user-false div, .new-user-null div {
   margin:5px 11px;
   font-size:1.2em;
   vertical-align:middle;
 }
 
 
-.new-doc-true, .new-user-true {
+.new-file-true, .new-user-true {
   color: #4F8A10;
   background-color: #DFF2BF;
 }
 
-.new-doc-false, .new-user-false {
+.new-file-false, .new-user-false {
   color: #D8000C;
   background-color: #FFD2D2;
 }
 
-.new-doc-null, .new-user-null {
+.new-file-null, .new-user-null {
 
 }
 
@@ -326,6 +354,13 @@ $secondary_color: lightgrey;
 //////////////////////////////////
 //////////////////////////////////
 
+.project-user-area-users li {
+  list-style-type: none;
+}
+
+.project-user-area-users {
+  overflow-y: auto;
+}
 
 
 .quill-xout {
@@ -334,4 +369,108 @@ $secondary_color: lightgrey;
   right: 8px;
   color: black;
   cursor: pointer;
+}
+
+.add-user-autosuggest-container {
+  width: 100%;
+  height: 80px;
+  margin: 0 8px;
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+#react-autowhatever-1 {
+  z-index: 6;
+  display: block;
+  position: absolute;
+  top: 35px;
+  left: 5px;
+  overflow-y: visible;
+}
+
+.project-add-user-form button {
+  margin: 12px;
+  cursor: pointer;
+}
+
+.project-add-user-form button:focus {
+  outline: 0 !important;
+}
+
+.user-xout {
+  position: relative;
+  float: right;
+  color: red;
+  background-color: #ff8080;
+  padding: 12px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.user-xout:after{
+  position: absolute;
+  top: 3px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  content: "\274c";
+  text-align: center;
+}
+
+.permitted-user-tile {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 250px;
+  margin: 6px 0px;
+}
+
+.projectpage-pings{
+  padding: 8px;
+  margin: 24px 8px;
+  width: 1100px
+}
+
+.projping-list, .projping-list-full{
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  background-color: darken(white, 5%);
+}
+
+.projping-list-full{
+  overflow: scroll;
+}
+
+.projping-list li, .projping-list-full li {
+  list-style-type: none;
+  background-color: darken(white, 8%);
+  margin: 8px;
+  padding: 8px;
+}
+
+.ping-cell-empty {
+  list-style-type: none;
+}
+
+.seeall-projpings {
+  cursor: pointer;
+  text-decoration: underline;
+  color: blue;
+  font-weight: bold;
+
+}
+
+.react-autosuggest__suggestions-container--open {
+  width: 95% !important;
+}
+
+.pfile-menu {
+  width: 33%;
+  display: inline-block;
+  position: relative;
+}
+
+.pfiles-menu-container {
+
 }

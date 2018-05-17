@@ -27,11 +27,11 @@ const ProjectSchema = new mongoose.Schema({
     type: String,
   }],
   documents: [{ type: String }],
-  created: {
-    type: Date,
-    default: Date.now
-  }
-});
+},
+{
+  timestamps: true
+}
+);
 
 ProjectSchema.index({ description: 'text', title: 'text' })
 

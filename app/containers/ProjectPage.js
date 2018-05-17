@@ -1,12 +1,14 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Auth from '../modules/Auth';
 import Fetch from '../modules/Fetch';
 import Convert from '../modules/Convert';
 import {Button, ControlLabel, FormGroup, FormControl } from 'react-bootstrap';
-import Dropzone from 'react-dropzone';
 import PropTypes from 'prop-types';
 import ProjectFiles from '../components/ProjectFiles';
 import ProjectNotes from '../components/ProjectNotes';
+import ChatBox from '../components/chat/chatBox';
+import Autosuggestor from '../components/chat/AutoSuggest';
 import {Editor, EditorState, RichUtils } from 'draft-js';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -20,61 +22,61 @@ class ProjectPage extends React.Component{
       project: {},
       current_user: {},
       message: '',
+      users: [],
+      guest_usernames: [],
+      pings: [],
       form_stat: null,
       field: '',
-      add_user: '',
-      add_file: null,
+      user_autosugg: '',
       user_message: '',
-      doc_message: '',
       response_file: null,
-      showFiles: true,
       showEditor: false,
-      showNotes: true,
-      showAddFile: false,
-      quillText: '',
-      noteTitle: '',
-      arrowHide_file: true,
       arrowHide_note: true,
       XOut: false,
       isShowingModal: false,
       isShowingAddEditor: false,
+      isShowingAllPings: false
     }
 
-    this.onDrop = this.onDrop.bind(this);
+    this.addUserClassSwitcher = this.addUserClassSwitcher.bind(this);
     this.addUserHandler = this.addUserHandler.bind(this);
-    this.addDocumentHandler = this.addDocumentHandler.bind(this);
     this.changeUserHandler = this.changeUserHandler.bind(this);
-    this.changeDocumentHandler = this.changeDocumentHandler.bind(this);
     this.clearUserForm = this.clearUserForm.bind(this);
-    this.clearDocumentForm = this.clearDocumentForm.bind(this);
-    this.changeClassName = this.changeClassName.bind(this);
-    this.convertFileToB64 = this.convertFileToB64.bind(this);
-    this.switchProjectFiles = this.switchProjectFiles.bind(this);
-    this.switchProjectEditor = this.switchProjectEditor.bind(this);
-    this.switchProjectNotes = this.switchProjectNotes.bind(this);
-    this.addFileToggle = this.addFileToggle.bind(this);
-    this.quillHandleChange = this.quillHandleChange.bind(this);
-    this.quillTitleHandle = this.quillTitleHandle.bind(this);
-    this.submitNote = this.submitNote.bind(this);
+
     this.toggleModal = this.toggleModal.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
+    this.recipCatcher = this.recipCatcher.bind(this);
+    this.revokeUser = this.revokeUser.bind(this);
+    this.showAllPings = this.showAllPings.bind(this);
 
     this.loadProject = Fetch.loadProject.bind(this);
     this.addUserFetch = Fetch.AddUserToProject.bind(this);
-    this.addDocumentFetch = Fetch.addDocumentToProject.bind(this);
     this.addNoteFetch = Fetch.submitNote.bind(this);
     this.getCurrentUser = Fetch.GetCurrentUser.bind(this);
+    this.getUsers = Fetch.GetUsers.bind(this);
+    this.revokeUserFetch = Fetch.removeUserFromProject.bind(this);
+    this.getPings = Fetch.getProjectPings.bind(this);
   }
 
   componentDidMount(){
+    this.getUsers();
     const _id = this.props.match.params.id
     if(localStorage.getItem('token') == null){
       this.context.router.history.push('/')
     }
     else {
       this.loadProject(_id).then((projresponse) => {
+        var guest_usernames = projresponse.project.usernames
+        this.getPings(projresponse.project._id).then((res) => {
+          this.setState({ pings: res.pings })
+        })
+        .catch((err) => { console.log(err) })
         this.getCurrentUser().then((user) => {
-          this.setState({ current_user: user, project: projresponse.project }, () => {
+          var userThis = (user.name == projresponse.project.ownername) ? true : false
+          this.setState({ current_user: user,
+                          project: projresponse.project,
+                          guest_usernames: guest_usernames,
+                          userThis: userThis }, () => {
             if(this.state.current_user.name != this.state.project.ownername && !Convert.isInArr(this.state.current_user.name, this.state.project.usernames)){
               this.context.router.history.push(`/project/${this.state.project._id}/read`)
             }
@@ -90,84 +92,45 @@ class ProjectPage extends React.Component{
     }
   }
 
-  quillHandleChange(value){
-    this.setState({ quillText: value })
+  revokeUser(user){
+    this.revokeUserFetch(this.state.project._id, user)
   }
 
-  quillTitleHandle(event){
-    this.setState({ noteTitle: event.target.value })
+  addUserClassSwitcher(){
+    if(this.state.form_stat == true){
+      return `new-user-true`
+    }
+    else if (this.state.form_stat == false) {
+      return `new-user-false`
+    }
+    else {
+      return `new-user-null`
+    }
+  }
+
+  addUserHandler(event){
+    event.preventDefault()
+    this.addUserFetch(this.state.project._id, this.state.user_autosugg);
+  }
+
+
+
+  recipCatcher(value){
+    this.setState({ user_autosugg: value })
   }
 
   changeUserHandler(event){
     this.setState({ add_user: event.target.value })
   }
 
-  changeDocumentHandler(event){
-    this.setState({ add_file: event.target.files[0]})
-  }
-
-  addUserHandler(event){
-    event.preventDefault();
-    this.addUserFetch(this.state.project._id, this.state.add_user);
-  }
-
-  convertFileToB64(file){
-    var reader = new FileReader();
-    return new Promise ((resolve, reject) => {
-      reader.readAsDataURL(file);
-      reader.onload = () => { resolve(reader.result) }
-      reader.onerror = (error) => { reject(error) }
-    })
-  }
-
-  addDocumentHandler(event){
-    event.preventDefault();
-    this.addDocumentFetch(this.state.project._id, this.state.add_file);
-  }
-
-  submitNote(){
-    this.addNoteFetch(this.state.project._id, this.state.quillText, this.state.noteTitle);
-  }
-
   clearUserForm(){
     this.setState({ add_user: '' });
   }
 
-  clearDocumentForm(){
-    this.setState({ add_file: '' });
-  }
-
-  changeClassName(form_type){
-    if (this.state.field == form_type) {
-      if (this.state.form_stat == true) {
-        return(`new-${form_type}-true`)
-      }
-      else if (this.state.form_stat == false) {
-        return(`new-${form_type}-false`)
-      }
-      else {
-        return(`new-${form_type}-null`)
-      }
-    }
-  }
-
-  onDrop(files){
-    console.log(files)
-    var file = files[0]
-    this.setState({ add_file: file })
-  }
-
-  switchProjectFiles(){
-    if (this.state.showFiles == false) {
-      this.setState({ showFiles: true })
-    }
-    else {
-      this.setState({ showFiles: false })
-    }
-  }
-
   toggleEdit(){
     this.setState({
+      showEditor: !this.state.showEditor,
+      arrowHide_note: !this.state.arrowHide_note,
       isShowingAddEditor: !this.state.isShowingAddEditor
     })
   }
@@ -178,75 +141,63 @@ class ProjectPage extends React.Component{
     })
   }
 
-  switchProjectNotes(){
-    if(this.state.showNotes == false) {
-      this.setState({ showNotes: true })
-    }
-    else {
-      this.setState({ showNotes: false })
-    }
+  showAllPings(){
+    this.setState({
+       isShowingAllPings: !this.state.isShowingAllPings
+    })
   }
-
-  switchProjectEditor(){
-    if(this.state.showEditor == false) {
-      this.setState({ showEditor: true,
-                      arrowHide_note: false,
-                      isShowingAddEditor: true })
-    }
-    else {
-      this.setState({ showEditor: false,
-                      arrowHide_note: true,
-                      isShowingAddEditor: false})
-    }
-  }
-
-  addFileToggle(){
-    if(this.state.showAddFile == false){
-      this.setState({ showAddFile: true,
-                      arrowHide_file: false})
-    }
-    else {
-      this.setState({ showAddFile: false,
-                      arrowHide_file: true })
-    }
-  }
-
-
 
   render(){
-    if(this.state.showEditor == true){
-      var myEditStyle = {
-        display: 'block',
-        position: 'fixed',
-        width: '85%',
-        height: '85%',
-        top: '100px',
-        left: '100px',
-        backgroundColor: 'white',
-        zIndex: '5',
-        boxShadow: '2px 2px 2px #888888',
-        border: '1px solid black'
+    if(this.state.userThis){
+      var userThisStyle = {
+
       }
     }
-    else if (this.state.showEditor == false) {
-      var myEditStyle = {
+    else {
+      var userThisStyle = {
         display: 'none'
       }
     }
-    if(this.state.showAddFile == true){
-      var myAddFileStyle = {
+    if(this.state.isShowingAllPings){
+      var fullPingBackdrop = {
         display: 'block',
-        position: 'absolute',
-        top: '-200px',
-        left: '-20px',
+        position: 'fixed',
+        height: '100vh',
+        width: '100vw',
+        top: '50%',
+        left: '50%',
+        marginTop: '-50vh',
+        marginLeft: '-50vw',
+        backgroundColor: 'black',
+        zIndex: '10'
+      }
+      var fullPingModal = {
+        display: 'block',
+        position: 'fixed',
+        height: '90vh',
+        width: '80vw',
+        top: '50%',
+        left: '50%',
+        marginTop: '-45vh',
+        marginLeft: '-40vw',
         backgroundColor: 'white',
-        zIndex: '5',
-        boxShadow: '2px 2px 2px #888888',
-        border: '1px solid black'
+        zIndex: '11',
+        overflow: 'auto'
+      }
+      var fullPing = {
+        display: 'block',
+        position: 'relative',
+        zIndex: '12'
       }
     }
     else {
-      var myAddFileStyle = {
+      var fullPingBackdrop = {
+        display: 'none'
+      }
+      var fullPing = {
+        display: 'none'
+      }
+      var fullPingModal = {
         display: 'none'
       }
     }
@@ -258,82 +209,66 @@ class ProjectPage extends React.Component{
 
     }
 
+    var revokeStyle = {
+      position: 'absolute',
+      right: '25px',
+      color: 'red',
+      backgroundColor: '#ff8080',
+      padding: '2px',
+      borderRadius: '2px',
+      cursor: 'pointer',
+      maxHeight: '26px',
+      textAlign: 'right'
 
-    if(this.state.showFiles == true){
-      var myFileStyle = {
-        display: 'block'
-      }
     }
-    else if (this.state.showFiles == false) {
-      var myFileStyle = {
-        display: 'none'
-      }
-    }
-    if(this.state.showNotes == true){
-      var myNoteStyle = {
-        display: 'block'
-      }
-    }
-    else {
-      var myNoteStyle = {
-        display: 'none'
-      }
-    }
-    if(this.state.arrowHide_file == true){
-      var rightArrowFileStyle = {
-        display: 'block'
-      }
-      var downArrowFileStyle = {
-        display: 'none'
-      }
+    if(!Convert.isArrEmpty(this.state.pings)){
+      var sortedPings = Convert.dateSort(this.state.pings, 'ping')
+      var renderProjPings = sortedPings.map((ping, i) => {
+        var date = Convert.prettifyDate(ping.createdAt)
+        return(
+          <li
+            key={i}
+            className="ping-cell"
+          >
+            <span>{ping.text}</span>
+            <span className="profile-ping-createdat">{date}</span>
+          </li>
+        )
+      })
+
+      var renderProjPingsShort = renderProjPings.slice(0, 14)
     }
     else {
-      var rightArrowFileStyle = {
-        display: 'none'
-      }
-      var downArrowFileStyle = {
-        display: 'block'
-      }
+      var date = new Date().toString().split(' ')
+      date = date[1] + '/' + date[2] + '/' + date[3]
+      var renderProjPings = (<li className="ping-cell-empty"><span> hasn't done anything yet </span><span className="empty-ping-date">{date}</span></li>)
     }
-    if(this.state.arrowHide_note == true){
-      var rightArrowNoteStyle = {
-        display: 'block'
-      }
-      var downArrowNoteStyle = {
-        display: 'none'
-      }
+    if(!Convert.isArrEmpty(this.state.guest_usernames)){
+      var print_users = this.state.guest_usernames.map((user, i) => {
+        return(
+          <li key={i} className="permitted-user-tile">
+             {user}
+             <span
+               style={revokeStyle}
+               onClick={ () => { this.revokeUser(user) }}>
+               &#10006;
+             </span>
+          </li>
+        )
+      })
     }
     else {
-      var rightArrowNoteStyle = {
-        display: 'none'
-      }
-      var downArrowNoteStyle = {
-        display: 'block'
-      }
+      var print_users = (<p> none </p>)
     }
-    if(Convert.isExist(this.state.project)){
-      if(!Convert.isArrEmpty(this.state.project.usernames)){
-        var print_users = this.state.project.usernames.map((user, i) => {
-          return(
-            <li key={i}>
-            {user}
-            </li>
-          )
-        })
-      }
-      else {
-        var print_users = (<p> none </p>)
-      }
+    if(!Convert.isArrEmpty(this.state.users)){
+      var users = this.state.users
+    }
+    else {
+      var users = [];
     }
 
     return(
-      <div className="project-show" onClick={() => {
-        if(this.state.isShowingAddEditor == true && this.state.isShowingModal == false){
-          this.setState({ isShowingAddEditor: !this.state.isShowingAddEditor,
-                          showEditor: !this.state.showEditor,
-                          arrowHide_note: !this.state.arrowHide_note })
-        }
-      }}>
+      <div className="project-show" >
         <div className="project-header-container">
           <h1 className="project-header ">
             {this.state.project.title}
@@ -356,22 +291,18 @@ class ProjectPage extends React.Component{
               {print_users}
             </ul>
           </div>
-          <div className="project-add-user-form">
-            <div className={this.changeClassName('user')}>
+          <div className="project-add-user-form" style={userThisStyle}>
+            <div className={this.addUserClassSwitcher()}>
               <div> {this.state.user_message}</div>
             </div>
             <form onSubmit={this.addUserHandler}>
-              <FormGroup>
-                <ControlLabel> New User </ControlLabel>
-                <ControlLabel> -- Name must be spelled precisely as it exists in database -- </ControlLabel>
-                <FormControl
-                  type="text"
-                  name="user"
-                  value={this.state.add_user}
-                  placeholder=""
-                  onChange={this.changeUserHandler}
-                />
-              </FormGroup>
+                <label> New User </label>
+                <div className="add-user-autosuggest-container" onChange={() => { }}>
+                  <Autosuggestor
+                  recipCatcher={this.recipCatcher}
+                  users={users}
+                  />
+                </div>
               <button type="submit"> Add user </button>
             </form>
           </div>
@@ -383,32 +314,13 @@ class ProjectPage extends React.Component{
         <div className="project-main-area">
           <div className="page-bisector"> </div>
           <div className="projectfiles-big-container">
-            <div id="projectfiles-container" style={myFileStyle} >
-              <div className="anchor-container-files">
-                <div className="project-add-file-anchor" onClick={this.addFileToggle}>
-                  <div className="project-add-file-anchor-text">Add File</div>
-                  <div style={rightArrowFileStyle} className="arrow-right"></div>
-                  <div style={downArrowFileStyle} className="arrow-down"></div>
-                </div>
-              </div>
+            <div id="projectfiles-container">
               <ProjectFiles
-              project={this.state.project}
-              fileExpand={this.state.fileExpand}
-              noteExpand={this.state.noteExpand}/>
-            </div>
-            <div className="project-add-file">
-              <div className={this.changeClassName('doc')}>
-                <div>{this.state.doc_message}</div>
-              </div>
-              <br />
-              <div className="project-add-file-form" style={myAddFileStyle}>
-                <form onSubmit={this.addDocumentHandler}>
-                <Dropzone onDrop={this.onDrop}>
-                <p> Drag file or click to upload </p>
-                </Dropzone>
-                <button type="submit">Save (add error handling)</button>
-                </form>
-              </div>
+                project={this.state.project}
+                fileExpand={this.state.fileExpand}
+                noteExpand={this.state.noteExpand}
+                userThis={this.state.userThis}
+              />
             </div>
           </div>
 
@@ -416,58 +328,45 @@ class ProjectPage extends React.Component{
 
 
           <div className="projectnotes-big-container">
-            <div id="projectnotes-container" style={myNoteStyle} >
-              <div className="anchor-container-notes">
-                <div className="project-add-note-anchor" onClick={this.switchProjectEditor}>
-                  <div className="project-add-note-anchor-text">Add Note</div>
-                  <div style={rightArrowNoteStyle} className="arrow-right"></div>
-                  <div style={downArrowNoteStyle} className="arrow-down"></div>
-                </div>
-              </div>
+            <div id="projectnotes-container">
               <ProjectNotes
                 project={this.state.project}
                 fileExpand={this.state.fileExpand}
                 noteExpand={this.state.noteExpand}
                 isShowingModal={this.state.isShowingModal}
                 toggleModal={this.toggleModal}
-                isShowingAddEditor={this.state.isShowingAddEditor}
-                toggleEdit={this.toggleEdit}
+                userThis={this.state.userThis}
               />
             </div>
-            <div className="project-add-note" >
-            <br />
-              <div id="projecteditor-container" style={myEditStyle}>
-                <form onSubmit={this.submitNote}>
-                  <div className="note-title-box">
-                    <label> Note Title </label>
-                    <input
-                    label="Note Title"
-                    type="text"
-                    value={this.state.noteTitle}
-                    onChange={this.quillTitleHandle}
-                    />
-                  </div>
-                  <div
-                    className="quill-xout"
-                    onClick={() => {
-                      this.setState({
-                        showEditor: !this.state.showEditor,
-                        arrowHide_note: !this.state.arrowHide_note,
-                        isShowingAddEditor: !this.state.isShowingAddEditor
-                      })
-                    }}
-                    >
-                  X
-                  </div>
-                  <ReactQuill
-                  value={this.state.quillText}
-                  onChange={this.quillHandleChange}
-                  />
+          </div>
 
-                  <button type="submit"> Save Note </button>
-                </form>
-              </div>
+          <div className="projectpage-chatbox">
+            <ChatBox
+              project={this.state.project}
+              current_user={this.state.current_user}
+            />
+          </div>
+
+          <div className="projectpage-pings">
+            <ol className="projping-list">
+              {renderProjPingsShort}
+            </ol>
+            <span onClick={this.showAllPings}
+            className="seeall-projpings no-select">See all...</span>
+
+            <div
+              style={fullPingBackdrop}
+              className="projping-full-backdrop"
+              onClick={this.showAllPings}
+            >
             </div>
+
+            <div style={fullPingModal} className="projping-full-modal">
+              <ol style={fullPing} className="projping-list-full">
+                {renderProjPings}
+              </ol>
+            </div>
+
           </div>
 
           <div className="project-main-area">

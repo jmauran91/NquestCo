@@ -1,6 +1,7 @@
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import Auth from '../../modules/Auth';
+import Convert from '../../modules/Convert';
 
 class Autosuggestor extends React.Component {
   constructor(props){
@@ -12,7 +13,7 @@ class Autosuggestor extends React.Component {
       value: ''
     }
 
-    this.users = this.props.users.map((user, i) => ({ user_id: user._id, user_name: user.firstName + " " + user.lastName, user_index: i }));
+
 
     this.changeHandler = this.changeHandler.bind(this);
     this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this);
@@ -20,10 +21,14 @@ class Autosuggestor extends React.Component {
     this.renderSuggestion = this.renderSuggestion.bind(this);
     this.getSuggestionValue = this.getSuggestionValue.bind(this);
     this.getSuggestions = this.getSuggestions.bind(this);
+    this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
   }
 
-  componentDidMount(){
-    this.setState({ users: this.users })
+  componentWillReceiveProps(nextProps){
+    if(!Convert.isArrEmpty(nextProps.users)){
+      var eat_this = nextProps.users.map((user, i) => ({ user_id: user._id, user_name: user.firstName + " " + user.lastName, user_index: i }));
+      this.setState({ users: eat_this })
+    }
   }
 
   getSuggestions(value){
@@ -44,15 +49,20 @@ class Autosuggestor extends React.Component {
     return newState
   }
 
+  onSuggestionSelected() {
+    this.setState({ value: '' })
+  };
+
   getSuggestionValue(suggestion){
     return suggestion.user_name
   }
 
   renderSuggestion(suggestion){
-    return( <span>{suggestion.user_name} </span>)
+    return( <span> {suggestion.user_name} </span>)
   }
 
-  changeHandler( event, { newValue } ){
+  changeHandler( event, { newValue, method } ){
+    if (method === 'enter') return;
     this.setState({ value: newValue })
     this.props.recipCatcher(newValue)
   }
@@ -69,16 +79,18 @@ class Autosuggestor extends React.Component {
     const { value, suggestions } = this.state;
 
     const inputProps = {
-      placeholder: ' send this to... ',
+      placeholder: '.. type user ..',
       value,
       onChange: this.changeHandler
     };
 
     return(
       <Autosuggest
+        ref="autosuggest"
         suggestions={this.state.suggestions}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+        onSuggestionSelected={this.onSuggestionSelected}
         getSuggestionValue={this.getSuggestionValue}
         renderSuggestion={this.renderSuggestion}
         inputProps={inputProps}

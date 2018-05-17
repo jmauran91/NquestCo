@@ -23,7 +23,22 @@
 
 .note-tile {
   cursor: pointer;
-  width: 180px;
+  width: 152px !important;
+  height: 168px !important;
   padding: 8px 16px;
   margin: 0 8px;
+  position: relative;
+  text-align: center;
+}
+
+.note-tile img {
+  width: 128px;
+  height: 128px;
+  padding: 8px 0px;
+  background-color: white;
+}
+
+.note-tile span {
+  margin: 0 auto;
+  width: 100%;
 }

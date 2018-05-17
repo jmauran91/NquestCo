@@ -161,18 +161,21 @@ class ProfilePage extends React.Component{
       var _id = this.state._user._id;
       var name = this.state._user.name;
       var email = this.state._user.email;
-      if(this.state.new_about){
+      if(Convert.isStrExist(this.state.new_about)){
         var aboutMe = this.state.new_about.replace(/<(?:.|\n)*?>/gm, '');
       }
-      else {
+      else if (Convert.isStrExist(this.state._user.about)){
         var aboutMe = this.state._user.about.replace(/<(?:.|\n)*?>/gm, '');
+      }
+      else {
+        var aboutMe = ''
       }
     }
     else {
       var _id, name, email = "";
     }
     if(!Convert.isArrEmpty(this.state.pings)){
-      var new_pingset = this.dateSort(this.state.pings);
+      var new_pingset = this.dateSort(this.state.pings, 'note');
       var render_pings = new_pingset.map((ping, i) => {
         var date = Convert.prettifyDate(ping.createdAt);
         return(

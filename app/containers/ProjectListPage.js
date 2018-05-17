@@ -1,13 +1,14 @@
 import React from 'react';
 import Auth from '../modules/Auth';
 import Fetch from '../modules/Fetch';
+import Convert from '../modules/Convert';
 
 class ProjectListPage extends React.Component{
   constructor(props){
     super(props);
     this.state = {
       projects: [],
-      no_project: ''
+      no_project: '...you currently have no projects...'
     }
 
       this.getProjects = Fetch.getProjects.bind(this);
@@ -20,17 +21,10 @@ class ProjectListPage extends React.Component{
 
   render(){
     let projectList;
-    if (this.state.projects.length == 0 ){
-      projectList = (
-          <div className="no-projects-text">
-            {this.state.no_project}
-          </div>
-        )
-    }
-    else {
+    if(!Convert.isArrEmpty(this.state.projects)) {
       projectList = this.state.projects.map((project, index) => {
         var url =`/project/${project._id}`
-        var docPrint = this.state.projects.length.toString();
+        var docPrint = project.documents.length.toString();
         return(
           <div className="project-holder" key={index}>
           <div className="project-element"><a href={url}> {project.title} </a></div>
@@ -40,6 +34,15 @@ class ProjectListPage extends React.Component{
           </div>
         )
       })
+    }
+    else {
+      setTimeout(() => {
+        projectList = (
+          <div className="no-projects-text">
+            {this.state.no_project}
+          </div>
+        )
+      }, 500)
     }
     return(
       <div className="project-matrix">

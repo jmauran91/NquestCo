@@ -1,7 +1,6 @@
 
 .profile-container {
   padding: 10px 60px;
-  height: 900px;
   overflow: auto;
   display: flex;
   flex-flow: column;
@@ -15,7 +14,9 @@
 }
 
 .profile-body {
+  position: relative;
   width: 90%;
+  height: 50vh ;
   padding: 8px;
   display: flex;
   flex-flow: row;
@@ -156,7 +157,7 @@
 .profile-aboutme-editor {
   position: absolute;
   display: block;
-  top: 40%;
+  top: 35%;
   left: 15%;
   height: 35vh;
   width: 50vw;
@@ -168,7 +169,7 @@
 
 .profile-aboutme-editor form {
   display: block;
-  height: 200px;
+  height: 100% !important;
   max-height: 200px;
   width: 100%;
 }
