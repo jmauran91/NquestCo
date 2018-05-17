@@ -12,17 +12,17 @@ function validateSignupForm(payload){
 
   if (!payload || typeof payload.email !== 'string' || !validator.isEmail(payload.email)) {
     isFormValid = false;
-    errors.email = 'Please provide a correct email address.';
+    errors.summary = 'Please provide a correct email address.';
   }
 
   if (!payload || typeof payload.password !== 'string' || payload.password.trim().length < 8) {
     isFormValid = false;
-    errors.password = 'Password must have at least 8 characters.';
+    errors.summary = 'Password must have at least 8 characters.';
   }
 
   if (!payload || typeof payload.name !== 'string' || payload.name.trim().length === 0) {
     isFormValid = false;
-    errors.name = 'Please provide your name.';
+    errors.summary = 'Please provide your name.';
   }
 
   if (!isFormValid) {
@@ -43,12 +43,12 @@ function validateLoginForm(payload) {
 
   if (!payload || typeof payload.email !== 'string' || payload.email.trim().length === 0) {
     isFormValid = false;
-    errors.email = 'Please provide your email address.';
+    errors.summary = 'Please provide your email address.';
   }
 
   if (!payload || typeof payload.password !== 'string' || payload.password.trim().length === 0) {
     isFormValid = false;
-    errors.password = 'Please provide your password.';
+    errors.summary = 'Please provide your password.';
   }
 
   if (!isFormValid) {
@@ -122,7 +122,7 @@ router.post('/login', (req, res, next) => {
         error: err.message
       });
     }
-
+    console.log(userData)
     return res.json({
       success: true,
       message: 'You have successfully logged in!',

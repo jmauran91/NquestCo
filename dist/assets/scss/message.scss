@@ -1,0 +1,47 @@
+.messages {
+  position: absolute;
+  height: 90%;
+  width: 100%;
+  overflow: scroll;
+}
+
+.message {
+  display: block;
+  box-sizing: border-box;
+  max-width:300px;
+  width: auto;
+  outline: none;
+  margin: 2px 8px;
+  padding: 8px;
+  position: relative;
+  background-color: lighten(grey, 30%);
+  border-radius: 1.3em;
+  clear: left;
+  float: left;
+
+  user-select: none;
+
+}
+
+.from-me {
+  background-color: lighten(#18a29a, 6%);
+  clear: right;
+  float: right;
+}
+
+.message-body {
+  margin: 0 4px;
+  position: relative;
+  text-align: left;
+  max-width: 90%;
+  width: auto;
+  overflow: auto;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.28;
+  color: black;
+}
+
+.from-me span {
+  color: white;
+}

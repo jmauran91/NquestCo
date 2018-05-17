@@ -13,4 +13,10 @@ module.exports.connect = (uri) => {
 
   require('./user');
   require('./project');
+  require('./note');
+  require('./message');
+  require('./file');
+  require('./ping');
+  require('./conversation');
+  require('./chatbox');
 }

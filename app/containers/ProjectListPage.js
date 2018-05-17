@@ -1,45 +1,49 @@
 import React from 'react';
 import Auth from '../modules/Auth';
+import Fetch from '../modules/Fetch';
+import Convert from '../modules/Convert';
 
 class ProjectListPage extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      projects: []
+      projects: [],
+      no_project: '...you currently have no projects...'
     }
 
+      this.getProjects = Fetch.getProjects.bind(this);
   }
 
+
   componentDidMount(){
-    let url = 'http://localhost:3000/api/projects'
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `bearer ${Auth.getToken()}`
-      }
-    })
-    .then( response => response.json())
-    .then((response) => {
-      console.log(response)
-      this.setState({ projects: response['projects'] })
-    })
-    .catch((error) => {
-      console.log("Error: " + error)
-    })
+    this.getProjects(this.props.url)
   }
 
   render(){
-    let projectList = this.state.projects.map((project, index) => {
-      return(
-        <div className="project-holder" key={index}>
-          <div className="project-element"><a href={'/project/' + (index+1)}> Title: {project.title} </a></div>
-          <div className="project-element"> Owner: {project.owner} </div>
+    let projectList;
+    if(!Convert.isArrEmpty(this.state.projects)) {
+      projectList = this.state.projects.map((project, index) => {
+        var url =`/project/${project._id}`
+        var docPrint = project.documents.length.toString();
+        return(
+          <div className="project-holder" key={index}>
+          <div className="project-element"><a href={url}> {project.title} </a></div>
+          <div className="project-element"> Owner: {project.ownername} </div>
           <div className="project-element"> Description: {project.description} </div>
-          <div className="project-element"> Document: {project.documents} </div>
-        </div>
-      )
-    })
+          <div className="project-element"> Files: {docPrint} </div>
+          </div>
+        )
+      })
+    }
+    else {
+      setTimeout(() => {
+        projectList = (
+          <div className="no-projects-text">
+            {this.state.no_project}
+          </div>
+        )
+      }, 500)
+    }
     return(
       <div className="project-matrix">
         {projectList}

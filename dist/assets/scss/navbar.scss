@@ -1,0 +1,104 @@
+$color: lighten(#18a29a, 6%);
+$secondary_color: lightgrey;
+@import url('//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+
+
+
+/* Navbar */
+/* ================================================ */
+
+#navbar {
+  top: 0;
+  background-color: lighten(#18a29a, 6%);
+  /* #3EC8C0 */
+  margin-bottom: 0 !important;
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  margin-right: 0;
+  margin-left: 0;
+  width: 100%;
+}
+
+@media screen and (min-width: 1200px){
+  .container {
+    max-width: 1800px !important;
+  }
+}
+
+
+
+.navswitcher{
+  top: 0;
+  position: fixed;
+  width: 100%;
+  z-index: 1;
+}
+
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.NavbarBrand{
+  margin: 0;
+  padding: 0;
+  margin-bottom: 6px;
+}
+
+.form-control {
+  margin: 0 12px;
+}
+
+.nav-right form {
+
+}
+
+.nav-right {
+  float: right;
+  padding-top: 12px;
+}
+
+.control-label {
+  padding-top: 6px;
+}
+
+.nav-right li {
+  margin: 0 8px;
+  padding: 4px 6px;
+  border-radius: 16px;
+  background-color: white;
+  float: right;
+}
+
+.nav-right li:hover{
+  background-color: darken(white, 15%);
+}
+
+.nav-right a {
+  color: black;
+}
+
+.nav-right a:hover{
+  text-decoration: none !important;
+}
+
+
+.login-error-msg {
+  display: inline;
+  padding: 8px;
+  margin: 0 8px;
+  background-color: lighten(red, 40%);
+  border: 1 solid red;
+}
+
+/*
+.sticky + .content {
+  padding-top: 60px;
+}
+*/
