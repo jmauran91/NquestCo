@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import LoginForm from '../components/LoginForm';
 import Auth from '../modules/Auth';
+import fetch from "isomorphic-fetch";
+
 
 class LoginPage extends React.Component {
   constructor(props) {

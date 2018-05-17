@@ -6,6 +6,8 @@ import { Navbar, Nav, NavItem, Button, ControlLabel, FormGroup, FormControl } fr
 import Auth from '../../modules/Auth';
 import Fetch from '../../modules/Fetch';
 import ScrollEvent from 'react-onscroll';
+import fetch from "isomorphic-fetch";
+
 
 
 class LogBase extends React.Component {

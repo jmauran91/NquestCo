@@ -1,4 +1,6 @@
 import Auth from './Auth';
+import fetch from "isomorphic-fetch";
+
 
 class Fetch {
 

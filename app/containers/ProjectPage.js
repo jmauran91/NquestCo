@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import Auth from '../modules/Auth';
 import Fetch from '../modules/Fetch';
 import Convert from '../modules/Convert';
+import fetch from "isomorphic-fetch";
+
 import {Button, ControlLabel, FormGroup, FormControl } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import ProjectFiles from '../components/ProjectFiles';

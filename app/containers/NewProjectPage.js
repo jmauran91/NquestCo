@@ -3,6 +3,8 @@ import update from 'react-addons-update';
 import PropTypes from 'prop-types';
 import Auth from '../modules/Auth';
 import Dropzone from 'react-dropzone';
+import fetch from "isomorphic-fetch";
+
 
 class NewProjectPage extends React.Component{
   constructor(props){
