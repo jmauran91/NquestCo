@@ -150,7 +150,12 @@ class Dashboard extends React.Component {
         var searchText = this.state.searchUsrReturns.map((user, i) => {
           var date = Convert.prettifyDate(user.createdAt)
           var url = `/profile/${user._id}`
-          var about = user.about.replace(/<(?:.|\n)*?>/gm, '')
+          if(Convert.isStrExist(user.about)){
+            var about = user.about.replace(/<(?:.|\n)*?>/gm, '')
+          }
+          else {
+            var about = ""
+          }
           return(
             <li
               className='search-result-tile'
