@@ -64,7 +64,7 @@ class SignUpPage extends React.Component {
     const email = encodeURIComponent(this.state.user.email);
     const password = encodeURIComponent(this.state.user.password);
     const formData = `name=${name}&email=${email}&password=${password}`;
-    const url = "http://localhost:3000/auth/signup";
+    const url = "/auth/signup";
 
     fetch(url, {
       method: 'POST',

@@ -30,7 +30,7 @@ class NewProjectPage extends React.Component{
     data.append('description', this.state.description)
     data.append('file', this.state.documents)
     data.append('filename', this.state.documents.name)
-    const url = 'http://localhost:3000/api/projects';
+    const url = '/api/projects';
     fetch(url, {
       method: 'POST',
       headers: {

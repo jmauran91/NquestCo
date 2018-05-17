@@ -61,7 +61,7 @@ class ProjectFiles extends React.Component{
   fileTypeSwitcher(file, i){
     var img_selector = file.name
     var img_filepath = `https://rsearcherdockbucket.s3.amazonaws.com/${img_selector}`;
-    var pdf_filepath = "http://localhost:3000/assets/images/pdf_thumbnail.png"
+    var pdf_filepath = "/assets/images/pdf_thumbnail.png"
 
     if ( file["ContentType"] == "image/jpeg" || file["ContentType"] == "image/png"){
       return( <img src={img_filepath} />)

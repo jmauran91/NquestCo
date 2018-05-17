@@ -10,7 +10,7 @@ class Fetch {
 
   static GetPings(){
     var u_id = this.context.router.history.location.pathname.split('/')[2]
-    var url = "http://localhost:3000/api/users/" + u_id + "/pings"
+    var url = "/api/users/" + u_id + "/pings"
     return fetch(url, {
       method: 'GET',
       headers: {
@@ -28,7 +28,7 @@ class Fetch {
   }
 
   static getProjectPings(_id){
-    var url = "http://localhost:3000/api/project/" + _id + "/pings"
+    var url = "/api/project/" + _id + "/pings"
     return fetch(url, {
       method: 'GET',
       headers: {
@@ -53,7 +53,7 @@ class Fetch {
 
 
   static deleteConvosForUser(_id){
-    var url = "http://localhost:3000/admin/users/" + _id + "/conversations"
+    var url = "/admin/users/" + _id + "/conversations"
     fetch(url, {
       method: 'DELETE',
       headers: {
@@ -71,7 +71,7 @@ class Fetch {
 
   static GetConvos(){
     var _id = this.props.current_user._id
-    var url = "http://localhost:3000/chat/users/" + _id + "/conversations"
+    var url = "/chat/users/" + _id + "/conversations"
     fetch(url, {
       method: 'GET',
       headers: {
@@ -98,7 +98,7 @@ class Fetch {
 
   static PostToConvos(user_id, obj){
     var data = JSON.stringify(obj)
-    var url = "http://localhost:3000/chat/users/" + user_id + "/conversations"
+    var url = "/chat/users/" + user_id + "/conversations"
     return fetch(url, {
       method: 'POST',
       headers: {
@@ -123,7 +123,7 @@ class Fetch {
   static PatchConvo(obj, convo_id = this.props.current_convo){
     var user_id = this.props.current_user._id
     var data = JSON.stringify(obj)
-    var url = "http://localhost:3000/chat/users/" + user_id + "/conversations/" + convo_id
+    var url = "/chat/users/" + user_id + "/conversations/" + convo_id
     return fetch(url, {
       method: 'PATCH',
       headers: {
@@ -152,7 +152,7 @@ class Fetch {
 
 
   static GetUsers(){
-    let users_url = "http://localhost:3000/api/users"
+    let users_url = "/api/users"
     fetch(users_url, {
       method: 'GET',
       headers: {
@@ -169,7 +169,7 @@ class Fetch {
   }
 
   static GetUser(_id){
-    let url = "http://localhost:3000/api/users/" + _id
+    let url = "/api/users/" + _id
     return fetch(url, {
       method: 'GET',
       headers: {
@@ -194,7 +194,7 @@ class Fetch {
       var token_props = JSON.parse(window.atob(base64));
       var user_finder_id = token_props['sub'].toString();
       //
-      const url = "http://localhost:3000/api/users/" + user_finder_id
+      const url = "/api/users/" + user_finder_id
       return fetch(url, {
         method: 'GET',
         mode: 'cors',
@@ -221,7 +221,7 @@ class Fetch {
   }
 
   static GetUsersByProject(_id){
-    var url = "http://localhost:3000/api/project/" + _id + "/userpool"
+    var url = "/api/project/" + _id + "/userpool"
     return fetch(url, {
       method: 'GET',
       headers: {
@@ -243,7 +243,7 @@ class Fetch {
   }
 
   static uploadAvatar(u_id, file){
-    var url = "http://localhost:3000/api/users/" + u_id;
+    var url = "/api/users/" + u_id;
     const data = new FormData();
     data.append('file', file)
     data.append('filename', file.name)
@@ -271,7 +271,7 @@ class Fetch {
   }
 
   static editUser(u_id, new_about){
-    var url = "http://localhost:3000/api/users/" + u_id;
+    var url = "/api/users/" + u_id;
     const data = new FormData();
     data.append('about', new_about)
     fetch(url, {
@@ -300,7 +300,7 @@ class Fetch {
 
   static removeUserFromProject(_id, username){
     console.log('revoke user to project fetch called')
-    var url = "http://localhost:3000/api/project/" + _id + "/revoke"
+    var url = "/api/project/" + _id + "/revoke"
     var data = new FormData()
     data.append('username', username)
     fetch(url, {
@@ -345,7 +345,7 @@ class Fetch {
 
   static AddUserToProject(proj_id, new_user){
     console.log('add user to project fetch called')
-    var url = "http://localhost:3000/api/project/" + proj_id
+    var url = "/api/project/" + proj_id
     var formData = new FormData();
     formData.append('_id', proj_id)
     formData.append('new_user', new_user)
@@ -392,7 +392,7 @@ class Fetch {
 
 
   static addFileToProject(_id, new_file){
-    var url = "http://localhost:3000/api/project/" + _id
+    var url = "/api/project/" + _id
     var data = new FormData();
     try{
       data.append('file', new_file)
@@ -427,7 +427,7 @@ class Fetch {
   }
 
   static getProjects(_id){
-    var url = "http://localhost:3000/api/" + _id + "/projects"
+    var url = "/api/" + _id + "/projects"
     fetch(url, {
       method: 'GET',
       headers: {
@@ -455,7 +455,7 @@ class Fetch {
 
 
   static loadProject(_id){
-    var url = 'http://localhost:3000/api/project/' + _id
+    var url = '/api/project/' + _id
     return fetch(url, {
       method: 'GET',
       headers: {
@@ -487,7 +487,7 @@ class Fetch {
         searchParams += term
       }
     })
-    var url = "http://localhost:3000/api/search/users/" + searchParams
+    var url = "/api/search/users/" + searchParams
     fetch(url, {
       method: 'GET',
       headers: {
@@ -521,7 +521,7 @@ class Fetch {
         searchParams += term
       }
     })
-    var url = "http://localhost:3000/api/search/projects/" + searchParams
+    var url = "/api/search/projects/" + searchParams
     fetch(url, {
       method: 'GET',
       headers: {
@@ -556,7 +556,7 @@ class Fetch {
 
 
   static deleteFile(proj_id, name){
-    var url = 'http://localhost:3000/api/project/' + proj_id + '/files/' + name;
+    var url = '/api/project/' + proj_id + '/files/' + name;
     fetch(url, {
       method: 'DELETE',
       headers: {
@@ -574,7 +574,7 @@ class Fetch {
 
   static loadFiles(_id){
 
-    var url = 'http://localhost:3000/api/project/' + _id + '/files';
+    var url = '/api/project/' + _id + '/files';
     fetch(url, {
       method: 'GET',
       headers: {
@@ -603,7 +603,7 @@ class Fetch {
 
 
   static deleteNote(proj_id, _id){
-    var url = "http://localhost:3000/api/project/" + proj_id + "/notes/" + _id
+    var url = "/api/project/" + proj_id + "/notes/" + _id
     fetch(url, {
       method: 'DELETE',
       headers: {
@@ -621,7 +621,7 @@ class Fetch {
   }
 
   static submitNote(proj_id, note_text, note_title){
-    var url = "http://localhost:3000/api/project/" + proj_id + "/note"
+    var url = "/api/project/" + proj_id + "/note"
     var formData = new FormData();
     formData.append('note', note_text)
     formData.append('title', note_title)
@@ -646,7 +646,7 @@ class Fetch {
   }
 
   static editNote(_id, note_id, text){
-    var url = "http://localhost:3000/api/project/" + _id + "/notes/" + note_id
+    var url = "/api/project/" + _id + "/notes/" + note_id
     var formData = new FormData();
     formData.append('newtext', text)
     fetch(url, {
@@ -675,7 +675,7 @@ class Fetch {
   }
 
   static getNotes(_id){
-    var url = 'http://localhost:3000/api/project/' + _id + '/notes'
+    var url = '/api/project/' + _id + '/notes'
     fetch(url, {
       method: 'GET',
       headers: {
@@ -712,7 +712,7 @@ class Fetch {
 
 
   static deleteNotes(){
-    var url = "http://localhost:3000/admin/notes"
+    var url = "/admin/notes"
     fetch(url, {
       method: 'DELETE',
       headers: {
@@ -731,7 +731,7 @@ class Fetch {
   }
 
   static deleteFiles(){
-    var url = "http://localhost:3000/admin/files"
+    var url = "/admin/files"
     fetch(url, {
       method: 'DELETE',
       headers: {
@@ -750,7 +750,7 @@ class Fetch {
   }
 
   static deleteProjects(){
-    var url = "http://localhost:3000/admin/projects"
+    var url = "/admin/projects"
     fetch(url, {
       method: 'DELETE',
       headers: {
@@ -770,7 +770,7 @@ class Fetch {
   }
 
   static deleteUsers(){
-    let users_url = "http://localhost:3000/admin/users"
+    let users_url = "/admin/users"
     fetch(users_url, {
       method: 'DELETE',
       headers: {
@@ -788,7 +788,7 @@ class Fetch {
   }
 
   static deleteConvos(){
-    var url = "http://localhost:3000/admin/convos"
+    var url = "/admin/convos"
     fetch(url, {
       method: 'DELETE',
       headers: {
@@ -807,7 +807,7 @@ class Fetch {
   }
 
   static deletePings(){
-    var url = "http://localhost:3000/admin/pings"
+    var url = "/admin/pings"
     fetch(url, {
       method: 'DELETE',
       headers: {
@@ -826,7 +826,7 @@ class Fetch {
   }
 
   static deleteMessages(){
-    var url = "http://localhost:3000/admin/messages"
+    var url = "/admin/messages"
     fetch(url, {
       method: 'DELETE',
       headers: {
@@ -856,7 +856,7 @@ class Fetch {
   ///////////////////////////////////////////////////////////////
 
   static getChatbox(_id){
-    var url = "http://localhost:3000/api/project/" + _id + "/chatbox"
+    var url = "/api/project/" + _id + "/chatbox"
     return fetch(url, {
       method: 'GET',
       headers: {
@@ -875,7 +875,7 @@ class Fetch {
   static updateChatbox(_id, messages){
 
     var data = JSON.stringify(messages)
-    var url = "http://localhost:3000/api/project/" + _id + "/chatbox"
+    var url = "/api/project/" + _id + "/chatbox"
     return fetch(url, {
       method: 'PATCH',
       headers: {

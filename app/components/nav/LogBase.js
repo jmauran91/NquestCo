@@ -48,7 +48,7 @@ class LogBase extends React.Component {
       const email = encodeURIComponent(this.state.email);
       const password = encodeURIComponent(this.state.password);
       const formData = `email=${email}&password=${password}`;
-      const url = "http://localhost:3000/auth/login";
+      const url = "/auth/login";
       fetch(url, {
         method: 'POST',
         headers: {
@@ -93,7 +93,7 @@ class LogBase extends React.Component {
         <Navbar.Header>
           <Navbar.Brand className="NavbarBrand">
             <a href="/">
-            <img src="http://localhost:3000/assets/images/eA9ILzv.png"
+            <img src="/assets/images/eA9ILzv.png"
                 height="60" width="60" />
             </a>
           </Navbar.Brand>

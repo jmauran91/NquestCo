@@ -53,7 +53,7 @@ class Base extends React.Component {
             <Navbar.Header>
               <Navbar.Brand className="NavbarBrand">
                 <a href="/">
-                <img src="http://localhost:3000/assets/images/eA9ILzv.png"
+                <img src="/assets/images/eA9ILzv.png"
                     height="60" width="60" />
                 </a>
               </Navbar.Brand>
