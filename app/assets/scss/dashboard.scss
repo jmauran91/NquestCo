@@ -28,7 +28,7 @@ $secondary_color: lightgrey;
 
 .dash-slideshow {
   position: absolute;
-  top: -100px;
+  top: 0;
   left: 0;
   overflow: hidden;
   overflow-x: hidden;
@@ -54,7 +54,7 @@ $secondary_color: lightgrey;
   float: left;
   width: 100%;
   height: 100%;
-
+  margin: -100px 0;
 }
 
 .dash-first-img {
