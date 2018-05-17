@@ -8,38 +8,39 @@ const SignUpForm = ({
   onChange,
   errors,
   user,
+  errStyleCont,
+  errStyleText
 }) => (
-  <div className="container">
+  <div className="signup-form">
     <form action="/" onSubmit={onSubmit}>
-      <h2 className="card-heading">Sign Up</h2>
 
-      {errors.summary && <p className="error-message">{errors.summary}</p>}
+      {errors.summary && <div className="error-container" style={errStyleCont}><p className="error-message" style={errStyleText}>{errors.summary}</p></div>}
 
       <div className="field-line">
-      <label> Name:    </label>
         <input
           name="name"
           onChange={onChange}
           value={user.name}
+          placeholder="Name..."
         />
       </div>
 
       <div className="field-line">
-      <label> Email:    </label>
         <input
           name="email"
           onChange={onChange}
           value={user.email}
+          placeholder="Email..."
         />
       </div>
 
       <div className="field-line">
-      <label> Password:   </label>
         <input
-          type="text"
+          type="password"
           name="password"
           onChange={onChange}
           value={user.password}
+          placeholder="Password..."
         />
       </div>
 
@@ -49,6 +50,7 @@ const SignUpForm = ({
 
       <span>Already have an account? <Link to={'/login'}>Log in</Link></span>
     </form>
+
   </div>
 );
 

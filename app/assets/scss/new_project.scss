@@ -1,0 +1,63 @@
+
+.file-input {
+  margin-bottom: 6px;
+}
+
+.dash-form-container li {
+  list-style-type: none;
+  text-align: center;
+}
+
+.dash-form-container button {
+  display: block;
+  text-align: center;
+  margin: 0 auto;
+
+}
+
+.dash-form-container input{
+  padding: 8px;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  border-radius: 8px;
+  border-style: none;
+  width: 50vw;
+}
+
+.dash-form-container button:hover {
+  background-color: darken(white, 10%);
+  cursor: pointer;
+}
+
+.dash-form-container {
+  margin: 16px;
+  padding: 16px;
+  background-color: lightgrey;
+  border-radius: 16px;
+}
+
+.new-project-drop-dropzone {
+  display: block;
+  height: 5vh;
+  width: 100%;
+  padding: 8px;
+  margin: 0 auto;
+}
+
+.new-project-drop label {
+  width: 100%;
+  text-align: center;
+  font-family: 'Helvetica', sans-serif;
+  font-size: 70%;
+  font-style: italic;
+  font-weight: 200;
+}
+
+.dash-form-return-msg {
+  text-align: center;
+  margin: 12px auto;
+  border-radius: 8px;
+}
+
+.dash-form-list-holder {
+  padding-left: 0 !important;
+}

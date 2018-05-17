@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Link, IndexLink } from 'react-router-dom';
 import { Navbar, Nav, NavItem, Button, ControlLabel, FormGroup, FormControl } from 'react-bootstrap';
 import Auth from '../../modules/Auth';
+import Fetch from '../../modules/Fetch';
 import ScrollEvent from 'react-onscroll';
 
 
@@ -13,14 +14,15 @@ class LogBase extends React.Component {
     this.state = {
       email: '',
       password: '',
-      errors: {}
+      errors: {},
+      current_user: {},
+      success: true
     };
 
     this.handleScrollCallback = this.handleScrollCallback.bind(this);
-    this.handleLogIn = this.handleLogIn.bind(this);
+    this.submitLogIn = this.submitLogIn.bind(this);
     this.handleFieldChangeEmail = this.handleFieldChangeEmail.bind(this);
     this.handleFieldChangePword = this.handleFieldChangePword.bind(this);
-
   }
 
     handleScrollCallback(){
@@ -41,13 +43,12 @@ class LogBase extends React.Component {
       this.setState({ password: event.target.value })
     }
 
-    handleLogIn(event){
+    submitLogIn(event){
       event.preventDefault();
       const email = encodeURIComponent(this.state.email);
       const password = encodeURIComponent(this.state.password);
       const formData = `email=${email}&password=${password}`;
       const url = "http://localhost:3000/auth/login";
-
       fetch(url, {
         method: 'POST',
         headers: {
@@ -57,9 +58,14 @@ class LogBase extends React.Component {
       })
       .then(response => response.json())
       .then((response) => {
-        console.log(response);
-        Auth.authenticateUser(response.token);
-        this.context.router.history.push('/');
+        if(response.success){
+          console.log(response);
+          Auth.authenticateUser(response.token);
+          this.context.router.history.push(`/${response.user._id}`);
+        }
+        else {
+          this.setState({ success: false, email: '', password: '' })
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -70,6 +76,16 @@ class LogBase extends React.Component {
     }
 
   render(){
+    if(this.state.success == false){
+      var errMsgStyle = {
+        display: 'inline'
+      }
+    }
+    else {
+      var errMsgStyle = {
+        display: 'none'
+      }
+    }
     return(
       <div>
       <Navbar id="navbar">
@@ -77,11 +93,15 @@ class LogBase extends React.Component {
         <Navbar.Header>
           <Navbar.Brand className="NavbarBrand">
             <a href="/">
-            <img src="../assets/images/eA9ILzv.png"
+            <img src="http://localhost:3000/assets/images/eA9ILzv.png"
                 height="60" width="60" />
             </a>
           </Navbar.Brand>
         </Navbar.Header>
+        <div className="login-error-msg" style={errMsgStyle}>
+        ! Invalid Login Credentials !
+        </div>
+
         {Auth.isUserAuthenticated()? (
           <Nav pullRight className="nav-right">
               <NavItem href="/logout">
@@ -89,9 +109,9 @@ class LogBase extends React.Component {
               </NavItem>
           </Nav>
         ) : (
-          <Navbar.Form pullRight>
-            <form onSubmit={this.handleLogIn}>
-              <FormGroup>
+          <Navbar.Form pullRight className="nav-right">
+            <form onSubmit={this.submitLogIn}>
+              <FormGroup className="form-inline">
                 <ControlLabel> Email </ControlLabel>
                 <FormControl
                  type="text"
@@ -108,8 +128,8 @@ class LogBase extends React.Component {
                   placeholder=""
                   onChange={this.handleFieldChangePword}
                 />
+                <Button type="submit" >Log In</Button>
               </FormGroup>
-              <Button type="submit" >Log In</Button>
             </form>
           </Navbar.Form>
         )}

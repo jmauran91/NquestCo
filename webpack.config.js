@@ -21,6 +21,9 @@ const config = {
     filename: 'bundle.js',
     path: resolve(__dirname, 'dist'),
     publicPath: '/',
+    hotUpdateChunkFilename: 'hot/hot-update.js',
+    hotUpdateMainFilename: 'hot/hot-update.json'
+
   },
 
   context: resolve(__dirname, 'app'),
@@ -58,6 +61,12 @@ const config = {
           ],
           publicPath: '../'
         }),
+      },
+      {
+        test: /\.css$/,
+        loaders: [
+          'css-loader',
+        ]
       },
       {
         test: /\.(png|jpg|gif)$/,

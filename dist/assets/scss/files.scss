@@ -1,0 +1,42 @@
+$color: lighten(#18a29a, 6%);
+$secondary_color: lightgrey;
+@import url('//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+
+
+/* PROJECT ID FILES */
+
+/* ====================================*/
+
+.projectfile-form-container{
+  display: flex;
+  flex-direction: column;
+}
+
+.renderfiles-show, .rendernotes-show {
+  display: flex;
+  flex-flow: row;
+  flex-direction: row;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+
+}
+
+.renderfiles-show li {
+
+}
+
+.file-tile img {
+  height: 128px;
+  width: 128px;
+}
+
+.file-tile {
+  width: 152px !important;
+  overflow: hidden;
+  margin: 12px 12px;
+  list-style-type: none;
+  cursor: pointer;
+}
+
+/* ================================ */

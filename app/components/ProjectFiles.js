@@ -1,4 +1,14 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
+import Auth from '../modules/Auth';
+import Fetch from '../modules/Fetch';
+import Convert from '../modules/Convert';
+import FileViewer from 'react-file-viewer';
+import PDFviewer from './PDFviewer';
+import Modal from './Modal';
+import FileMatrix from './FileMatrix';
+import Dropzone from 'react-dropzone';
+
 
 class ProjectFiles extends React.Component{
   constructor(props){
@@ -6,73 +16,300 @@ class ProjectFiles extends React.Component{
     this.state = {
       files: [],
       name: '',
+      add_file: '',
       description: '',
       filetype: '',
-      project: ''
+      file_message: '',
+      project: {},
+      msg: '',
+      modal_file: {},
+      isShowingModal: false,
+      fileExpand: false,
+      form_stat: null,
+      showAddFile: false,
+      arrowHide_file: true
     }
 
-    this.loadFiles = this.loadFiles.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.submitFile = this.submitFile.bind(this);
+    this.fileTypeSwitcher = this.fileTypeSwitcher.bind(this);
+    this.toggleModal = this.toggleModal.bind(this);
+    this.modalFileSet = this.modalFileSet.bind(this);
+    this.modalSelector = this.modalSelector.bind(this);
+    this.bigToggle = this.bigToggle.bind(this);
+    this.addFileToggle = this.addFileToggle.bind(this);
+    this.handleFileExpand = this.handleFileExpand.bind(this);
+    this.clearFileForm = this.clearFileForm.bind(this);
+    this.changeClassName = this.changeClassName.bind(this);
+    this.changeFileHandler = this.changeFileHandler.bind(this);
+    this.addFileHandler = this.addFileHandler.bind(this);
+    this.onDrop = this.onDrop.bind(this);
+
+    this.loadFiles = Fetch.loadFiles.bind(this);
+    this.loadProject = Fetch.loadProject.bind(this);
+    this.addFileFetch = Fetch.addFileToProject.bind(this);
   }
 
-  handleChange(event){
-    var key = event.target.name;
-    var val = event.target.value
-    var obj = {}
-    obj[key] = val
-    this.setState( obj );
-
+  componentWillReceiveProps(nextProps){
+    if(typeof nextProps.project._id != 'undefined'){
+      this.loadFiles(nextProps.project._id);
+    }
   }
 
-  submitFile(){
-    var name = this.state.name
-    var description = this.state.description
-    var filetype = this.state.filetype
-    var project = this
-    var payload = `name=${name}&description=${description}&filetype=${filetype}`;
-    var bucketname = "rsearcherdockbucket";
-    var url = `https://localhost:3000/api/projects/${this.props.match.params.id}`
+  handleFileExpand(){
+    this.setState({ fileExpand: !this.state.fileExpand })
   }
 
-  loadFiles(){
-    var url = `https://rsearcherdockbucket.s3.amazonaws.com`
+  fileTypeSwitcher(file, i){
+    var img_selector = file.name
+    var img_filepath = `https://rsearcherdockbucket.s3.amazonaws.com/${img_selector}`;
+    var pdf_filepath = "http://localhost:3000/assets/images/pdf_thumbnail.png"
+
+    if ( file["ContentType"] == "image/jpeg" || file["ContentType"] == "image/png"){
+      return( <img src={img_filepath} />)
+    }
+    else if ( file["ContentType"] == "application/pdf" ){
+      return( <img src={pdf_filepath} />)
+    }
+    else {
+      return null
+    }
   }
 
-  componentDidMount(){
-    this.loadFiles();
+  toggleModal(){
+    this.setState({
+      isShowingModal: !this.state.isShowingModal,
+    })
   }
+
+  modalFileSet(event){
+
+    var ftile = ReactDOM.findDOMNode(this.refs.ftile)
+    var i = ftile.value;
+    this.setState({
+      modal_file: this.state.files[i]
+    })
+  }
+
+  bigToggle(){
+    this.modalFileSet(event);
+    this.toggleModal();
+  }
+
+  addFileToggle(){
+    this.setState({
+      showAddFile: !this.state.showAddFile,
+      arrowHide_file: !this.state.arrowHide_file
+    })
+  }
+
+  addFileHandler(event){
+    event.preventDefault()
+    this.addFileFetch(this.props.project._id, this.state.add_file);
+    this.setState({
+      showAddFile: !this.state.showAddFile,
+      arrowHide_file: !this.state.arrowHide_file
+    })
+  }
+
+
+
+  modalSelector( imShow, file ){
+
+    function arrayBufferToBase64(buffer) {
+        var binary = '';
+        var bytes = new Uint8Array( buffer );
+        var len = bytes.byteLength;
+        for (var i = 0; i < len; i++) {
+            binary += String.fromCharCode( bytes[ i ] );
+        }
+        return window.btoa( binary );
+    }
+
+    if( imShow) {
+      if( file.ContentType == "application/pdf"){
+
+        var arrayBuffer = file.Body.data
+        var pdf64 = arrayBufferToBase64(arrayBuffer)
+        var pdf_src = `data:application/pdf;base64,${pdf64}`;
+        return(
+          <div className="iframe_pdf_div" style={{textAlign: 'center'}}>
+            <iframe id="iframe_pdf" src={pdf_src}></iframe>
+          </div>
+        )
+      }
+      else {
+        var arrayBuffer = file.Body.data
+        var jpg64 = arrayBufferToBase64(arrayBuffer)
+        var jpg_src = `data:image/jpg;base64,${jpg64}`
+        return(
+          <div className="iframe_jpg_div" style={{textAlign: 'center'}}>
+            <img id="iframe_jpg" src={jpg_src} />
+          </div>
+        )
+      }
+    }
+  }
+
+  clearFileForm(){
+    this.setState({ add_file: '' });
+  }
+
+
+  onDrop(files){
+    console.log(files)
+    var file = files[0]
+    this.setState({ add_file: file })
+  }
+
+  changeClassName(){
+    if (this.state.form_stat == true) {
+      return(`new-file-true`)
+    }
+    else if (this.state.form_stat == false) {
+      return(`new-file-false`)
+    }
+    else {
+      return(`new-file-null`)
+    }
+  }
+
+  changeFileHandler(event){
+    debugger
+    this.setState({ add_file: event.target.files[0]})
+  }
+
 
   render(){
+    if(this.props.userThis != true){
+      var userThisStyle = {
+        display: 'none'
+      }
+    }
+    else {
+      var userThisStyle = {
 
-    var renderFiles = this.state.files.map((file, i) => {
-      return(
-        <div className="file-tile" key={i}>
-          <img src=""/>
-          <div className="file-tile-name"> </div>
-          <div className="file-tile-desc"> </div>
-          <div className="file-tile-users"> </div>
-        </div>
-      )
-    })
+      }
+    }
+    if(this.state.arrowHide_file == true){
+      var rightArrowFileStyle = {
+        display: 'block'
+      }
+      var downArrowFileStyle = {
+        display: 'none'
+      }
+    }
+    else {
+      var rightArrowFileStyle = {
+        display: 'none'
+      }
+      var downArrowFileStyle = {
+        display: 'block'
+      }
+    }
+    if(this.state.showAddFile == true){
+      var myAddFileStyle = {
+        display: 'block',
+        position: 'absolute',
+        top: '-200px',
+        left: '-20px',
+        backgroundColor: 'white',
+        zIndex: '5',
+        boxShadow: '2px 2px 2px #888888',
+        border: '1px solid black'
+      }
+    }
+    else {
+      var myAddFileStyle = {
+        display: 'none'
+      }
+    }
+
+    var ren_modalSelector = this.modalSelector(this.state.isShowingModal, this.state.modal_file);
+    if(!Convert.isArrEmpty(this.state.files)){
+      var sortedFiles = Convert.dateSort(this.state.files, 'file')
+      var renderFilesMap = sortedFiles.map((file, i) => {
+        return(
+          <td
+            className="file-tile"
+            ref="ftile"
+            key={i}
+            onClick={() => {
+              this.toggleModal();
+              var clicked_file = file
+              this.setState({
+                modal_file: clicked_file
+              })
+              window.scrollTo(0, 0)
+            }}
+            style={{width: '152px', overflow: 'hidden'}}
+            value={i}
+            >
+
+            {this.fileTypeSwitcher(file, i)}
+            <div className="file-tile-name no-select">
+            {file.name}
+            </div>
+          </td>
+        )
+      })
+    }
+    else {
+       renderFilesMap = (<td className="scrollbox"> No files yet... </td>)
+    }
+
     return(
       <div className="projectfiles-show">
-        <div>
-          <form onSubmit={this.submitFile}>
-          <label> Select file </label>
-            <input name="myFile" type="file"/>
-          <label> Name </label>
-            <input name="name" type="text" onChange={this.handleChange} />
-          <label> Description </label>
-            <input name="description" type="text" onChange={this.handleChange} />
-          <label> Filetype </label>
-            <input name="filetype" type="text" onChange={this.handleChange} />
-          <button type="submit"> Add File </button>
-          </form>
+        <div className="pfiles-menu-container">
+          <div className="pfn-header no-select pfile-menu" >Files</div>
+          <div className="anchor-container-files pfile-menu" onClick={this.addFileToggle} style={{cursor: 'pointer'}}>
+            Add File
+            <div style={rightArrowFileStyle} className="arrow-right"></div>
+            <div style={downArrowFileStyle} className="arrow-down"></div>
+          </div>
+          <div className="pfn-expander pfile-menu" onClick={this.handleFileExpand}>Expand...</div>
         </div>
-        <div className="renderfiles-show">
-          {renderFiles}
+        <table className="scrollbox">
+          <tbody>
+            <tr className="renderfiles-show">
+              {renderFilesMap}
+            </tr>
+          </tbody>
+        </table>
+
+        <div className="project-add-file">
+          <div
+          className={this.changeClassName()}
+          style={{}}>
+            <div>{this.state.file_message}</div>
+          </div>
+          <br />
+          <div className="project-add-file-form" style={myAddFileStyle}>
+            <form onSubmit={this.addFileHandler}>
+            <Dropzone onDrop={this.onDrop}>
+            <p> Drag file or click to upload </p>
+            </Dropzone>
+            <button type="submit">Save</button>
+            </form>
+          </div>
         </div>
+
+        <Modal
+        show={this.state.isShowingModal}
+        onClose={this.toggleModal}
+        container={this}
+        >
+        {ren_modalSelector}
+        </Modal>
+
+        <FileMatrix
+        files={this.state.files}
+        show={this.state.fileExpand}
+        onClose={this.handleFileExpand}
+        container={this}
+        userThis={this.props.userThis}
+        project={this.props.project}
+        handleFileExpand={this.handleFileExpand}
+        />
+
       </div>
     )
   }

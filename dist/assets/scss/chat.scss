@@ -1,0 +1,123 @@
+.convo-tile:hover, .conv-list-new-message:hover {
+  cursor: pointer;
+  background-color: darken(white, 15%);
+
+}
+
+.convo-tile, .convo-tile-no-convos, .conv-list-new-message {
+  list-style-type: none;
+}
+
+.convo-tile img {
+  border-radius: 50%;
+}
+
+.chatcontainer {
+  height: 100%;
+  display: flex;
+  flex-flow: row;
+}
+
+.chatlist {
+  width: 40%;
+  float: left;
+  height: 100%;
+  border-right: 2px solid gray;
+  padding-top: 4vh;
+}
+
+.chatcell {
+
+  position: relative;
+  float: right;
+  height: 100%;
+  width: 60%;
+  padding: 4px 12px;
+  padding-top: 4vh;
+}
+
+.chatlist ul {
+  padding: 0;
+}
+
+.conv-list li {
+  display: block;
+  list-style-type: none;
+  width: 100%;
+  height: 80px;
+  padding: 24px 12px;
+  border-bottom: 1px solid gray;
+}
+
+
+.chatcell-container {
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+  height: 100%;
+}
+
+.chatcell-header {
+  position: relative;
+  display: block;
+  top: 0;
+  padding: 10px 10px !important;
+  margin: 10 auto !important;
+  height: 60px;
+  width: 100%;
+  border-bottom: 1px solid black;
+  justify-content: center;
+}
+
+.chatcell-header h5 {
+  text-align: center;
+}
+
+.chatcell-messages {
+  position: relative;
+  display: block;
+  margin: 2px;
+  width: 100%;
+  height: 75%;
+  padding-top: 10px;
+}
+
+.chat-input-holder{
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  width: 90%;
+}
+
+.chat-input {
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+}
+
+.chat-input input {
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid #aaa;
+  font-family: Helvetica, sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  padding: 20px 10px;
+  height: 30px;
+}
+
+.react-autosuggest__suggestions-list {
+
+}
+
+.react-autosuggest__suggestions-list li {
+  list-style-type: none;
+
+}
+
+.notification-ticker {
+  height: 25px;
+  width: 25px;
+  background-color: red;
+
+}

@@ -7,8 +7,8 @@ class NavSwitcher extends React.Component{
 
   render(){
     return(
-      <div>
-      {this.context.router.history.location.pathname == "/" ? <LogBase /> : <Base /> }
+      <div className="navswitcher">
+        {this.context.router.history.location.pathname == "/" ? <LogBase /> : <Base /> }
       </div>
     )
   }
