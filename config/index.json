@@ -1,4 +1,10 @@
 {
-  "dbUri": "mongodb://localhost/react_app",
+  "dbUri": "mongodb://heroku_96hv4q7p:farrda3vhftfmfqa29vb71bjuu@ds127490.mlab.com:27490/heroku_96hv4q7p",
   "jwtSecret": "a secret phrase!!"
 }
+
+
+
+/*
+"dbUri": "mongodb://localhost/react_app",
+ */
