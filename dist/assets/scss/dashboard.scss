@@ -123,6 +123,7 @@ $secondary_color: lightgrey;
   display: flex;
   flex-flow: row;
   z-index: 1;
+  overflow-x: hidden;
 }
 
 .dash-banner-searchbar {
