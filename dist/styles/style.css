@@ -1051,13 +1051,12 @@
   height: 100%;
   margin: 0 auto; }
 
-#iframe_pdf, .iframe_doc_div {
+#iframe_pdf, #iframe_doc {
   border: none;
   display: block;
   padding-left: 4vw;
   height: 100%;
-  margin-left: auto;
-  margin-right: auto; }
+  width: 100%; }
 
 .iframe_jpg_div {
   background-color: black;
@@ -1068,9 +1067,7 @@
   border: none;
   display: block;
   padding-left: 4vw;
-  height: 100%;
-  margin-left: auto;
-  margin-right: auto; }
+  height: 100%; }
 
 .matrix-list {
   display: flex;
