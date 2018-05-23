@@ -531,6 +531,9 @@ router.get('/project/:id/files', (req, res) => {
 
   function fetchFile(file, res_files){
     return new Promise((resolve, reject) => {
+      if(file.indexOf("%") > -1){
+        file = decodeURIComponent(file)
+      }
       var params = {
         Bucket: BucketName,
         Key: file,
@@ -538,7 +541,6 @@ router.get('/project/:id/files', (req, res) => {
       s3bucket.getObject(params, (err, obj) => {
         if (err) { reject(err); }
         if (obj) {
-          console.log(obj)
           console.log(file)
           obj["name"] = file
           res_files.push(obj)
