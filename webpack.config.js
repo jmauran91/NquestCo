@@ -39,11 +39,15 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.jsx?$/,
         loaders: [
           'babel-loader',
         ],
         exclude: /node_modules/,
+      },
+      {
+        test: /\.jsx$/,
+        loader: 'babel-loader'
       },
       {
         test: /\.scss$/,

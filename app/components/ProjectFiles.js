@@ -5,9 +5,12 @@ import Fetch from '../modules/Fetch';
 import Convert from '../modules/Convert';
 import FileViewer from 'react-file-viewer';
 import PDFviewer from './PDFviewer';
+import Viewer from 'react-viewer';
 import Modal from './Modal';
 import FileMatrix from './FileMatrix';
 import Dropzone from 'react-dropzone';
+import 'react-viewer/dist/index.css';
+
 
 
 class ProjectFiles extends React.Component{
@@ -62,7 +65,7 @@ class ProjectFiles extends React.Component{
     var img_selector = file.name
     var img_filepath = `https://rsearcherdockbucket.s3.amazonaws.com/${img_selector}`;
     var pdf_filepath = "/assets/images/pdf_thumbnail.png"
-    var doc_filepath = ""
+    var doc_filepath = "/assets/images/Microsoft_Word_doc_logo.svg"
 
     if ( file["ContentType"] == "image/jpeg" || file["ContentType"] == "image/png"){
       return( <img src={img_filepath} />)
@@ -70,7 +73,9 @@ class ProjectFiles extends React.Component{
     else if ( file["ContentType"] == "application/pdf" ){
       return( <img src={pdf_filepath} />)
     }
-    else if (file["ContentType"] == "application/doc"){
+    else if (file.ContentType == "application/msword" ||
+             file.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+             file.ContentType == "application/vnd.oasis.opendocument.text"){
       return( <img src={doc_filepath} /> )
     }
     else {
@@ -140,12 +145,24 @@ class ProjectFiles extends React.Component{
           </div>
         )
       }
-      else if (file.ContentType == "application/doc") {
-        var doc_src = `http://docs.google.com/gview?url=https://s3.amazonaws.com/rsearcherdockbucket/${file.name}`
+      else if (file.ContentType == "application/msword" ||
+               file.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ) {
+
+        let doc_src = `http://view.officeapps.live.com/op/view.aspx?src=<span style="color: #3366ff;">https://s3.amazonaws.com/rsearcherdockbucket/${file.name}</span>`
         return(
           <div className="iframe_doc_div" style={{textAlign: 'center'}}>
-            <iframe id="iframe_doc" src={doc_src}></iframe>
+            <iframe id="iframe_doc" src={doc_src}> </iframe>
           </div>
+        )
+      }
+      else if (file.ContentType == "application/vnd.oasis.opendocument.text"){
+        let doc_src = `https://s3.amazonaws.com/rsearcherdockbucket/${file.name}`
+        return(
+          <Viewer
+            style={{position: 'absolute', top: '0px'}}
+            visible={true}
+            images={[{src: doc_src}]}
+          />
         )
       }
       else {

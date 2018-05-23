@@ -13,6 +13,8 @@ $secondary_color: lightgrey;
   flex-wrap: wrap;
   margin: 4vh 4vw;
   background-color: white;
+  border: 1px solid gray;
+  min-height: 50vh;
 }
 
 .project-holder {
@@ -21,6 +23,8 @@ $secondary_color: lightgrey;
   width: 24vw;
   margin: 8px 8px;
   padding: 16px;
+  height: 220px !important;
+
 }
 
 .project-element {

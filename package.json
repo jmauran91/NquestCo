@@ -57,6 +57,7 @@
     "history": "^4.7.2",
     "http": "0.0.0",
     "isomorphic-fetch": "^2.2.1",
+    "itsa-react-docviewer": "^16.0.6",
     "jsonwebtoken": "^8.1.0",
     "material-ui": "^1.0.0-beta.29",
     "mongoose": "^5.0.0",
@@ -83,10 +84,12 @@
     "react-router-dom": "^4.2.2",
     "react-scroll": "^1.7.9",
     "react-tap-event-plugin": "^3.0.2",
+    "react-viewer": "^2.4.0",
     "s3fs": "git+https://github.com/RiptideElements/s3fs.git",
     "socket.io": "^2.1.0",
     "socket.io-client": "^2.1.0",
-    "validator": "^9.2.0"
+    "validator": "^9.2.0",
+    "viewerjs": "^1.0.1"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
