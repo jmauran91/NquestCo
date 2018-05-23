@@ -538,6 +538,8 @@ router.get('/project/:id/files', (req, res) => {
       s3bucket.getObject(params, (err, obj) => {
         if (err) { reject(err); }
         if (obj) {
+          console.log(obj)
+          console.log(file)
           obj["name"] = file
           res_files.push(obj)
         }

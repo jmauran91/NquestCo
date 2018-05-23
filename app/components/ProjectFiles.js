@@ -62,12 +62,16 @@ class ProjectFiles extends React.Component{
     var img_selector = file.name
     var img_filepath = `https://rsearcherdockbucket.s3.amazonaws.com/${img_selector}`;
     var pdf_filepath = "/assets/images/pdf_thumbnail.png"
+    var doc_filepath = ""
 
     if ( file["ContentType"] == "image/jpeg" || file["ContentType"] == "image/png"){
       return( <img src={img_filepath} />)
     }
     else if ( file["ContentType"] == "application/pdf" ){
       return( <img src={pdf_filepath} />)
+    }
+    else if (file["ContentType"] == "application/doc"){
+      return( <img src={doc_filepath} /> )
     }
     else {
       return null
@@ -136,6 +140,14 @@ class ProjectFiles extends React.Component{
           </div>
         )
       }
+      else if (file.ContentType == "application/doc") {
+        var doc_src = `http://docs.google.com/gview?url=https://s3.amazonaws.com/rsearcherdockbucket/${file.name}`
+        return(
+          <div className="iframe_doc_div" style={{textAlign: 'center'}}>
+            <iframe id="iframe_doc" src={doc_src}></iframe>
+          </div>
+        )
+      }
       else {
         var arrayBuffer = file.Body.data
         var jpg64 = arrayBufferToBase64(arrayBuffer)
@@ -173,7 +185,6 @@ class ProjectFiles extends React.Component{
   }
 
   changeFileHandler(event){
-    debugger
     this.setState({ add_file: event.target.files[0]})
   }
 

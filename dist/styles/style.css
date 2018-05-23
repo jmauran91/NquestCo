@@ -1046,12 +1046,12 @@
   padding: 84px;
   text-align: center; }
 
-.iframe_pdf_div {
+.iframe_pdf_div, .iframe_doc_div {
   background-color: black;
   height: 100%;
   margin: 0 auto; }
 
-#iframe_pdf {
+#iframe_pdf, .iframe_doc_div {
   border: none;
   display: block;
   padding-left: 4vw;
