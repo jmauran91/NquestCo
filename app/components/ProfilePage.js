@@ -17,7 +17,8 @@ class ProfilePage extends React.Component{
       add_file: '',
       isEditing: false,
       quillText: '',
-      new_about: null
+      new_about: null,
+      isShowingAllPings: false
     }
 
     this.picSubmit = this.picSubmit.bind(this);
@@ -27,6 +28,7 @@ class ProfilePage extends React.Component{
     this.quillHandleChange = this.quillHandleChange.bind(this);
     this.cancelAboutEdit = this.cancelAboutEdit.bind(this);
     this.dateSort = Convert.dateSort.bind(this);
+    this.showAllPings = this.showAllPings.bind(this);
 
 
     this.getUser = Fetch.GetUser.bind(this);
@@ -53,6 +55,12 @@ class ProfilePage extends React.Component{
 
   quillHandleChange(event){
     this.setState({ quillText: event })
+  }
+
+  showAllPings(){
+    this.setState({
+      isShowingAllPings: !this.state.isShowingAllPings
+    })
   }
 
 
@@ -84,6 +92,50 @@ class ProfilePage extends React.Component{
 
 
   render(){
+    if(this.state.isShowingAllPings){
+      var fullPingBackdrop = {
+        display: 'block',
+        position: 'fixed',
+        height: '100vh',
+        width: '100vw',
+        top: '50%',
+        left: '50%',
+        marginTop: '-50vh',
+        marginLeft: '-50vw',
+        backgroundColor: 'black',
+        zIndex: '10'
+      }
+      var fullPingModal = {
+        display: 'block',
+        position: 'fixed',
+        height: '90vh',
+        width: '80vw',
+        top: '50%',
+        left: '50%',
+        marginTop: '-45vh',
+        marginLeft: '-40vw',
+        backgroundColor: 'white',
+        zIndex: '11',
+        overflow: 'auto'
+      }
+      var fullPing = {
+        display: 'block',
+        position: 'relative',
+        zIndex: '12'
+      }
+    }
+    else {
+      var fullPingBackdrop = {
+        display: 'none'
+      }
+      var fullPing = {
+        display: 'none'
+      }
+      var fullPingModal = {
+        display: 'none'
+      }
+    }
+
 
     if( this.state.current_user._id == this.state._user._id ){
       var avStyle = {
@@ -188,6 +240,7 @@ class ProfilePage extends React.Component{
           </li>
         )
       })
+      var render_pings_short = render_pings.slice(0,14)
     }
     else {
       var date = new Date().toString().split(' ')
@@ -235,8 +288,23 @@ class ProfilePage extends React.Component{
         <div className="profile-events">
           <div className="events-header"> ACTIVITY FEED </div>
           <ul className="profile-event-pings">
-            {render_pings}
+            {render_pings_short}
           </ul>
+          <span onClick={this.showAllPings}
+          className="seeall-projpings no-select"> See all...</span>
+
+          <div
+          style={fullPingBackdrop}
+          className="projping-full-backdrop"
+          onClick={this.showAllPings}
+          >
+          </div>
+
+          <div style={fullPingModal} className="projping-full-modal">
+            <ol style={fullPing} className="projping-list-full">
+              {render_pings}
+            </ol>
+          </div>
         </div>
       </div>
     )
