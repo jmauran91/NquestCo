@@ -589,7 +589,7 @@ class Fetch {
          files: response.files,
          msg: response.msg
       })
-      console.log( response['msg'] )
+      console.log( response )
     })
     .catch((error) => {
       console.log(error)
