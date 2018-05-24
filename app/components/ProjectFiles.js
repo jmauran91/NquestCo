@@ -110,8 +110,8 @@ class ProjectFiles extends React.Component{
     })
   }
 
-  addFileHandler(event){
-    event.preventDefault()
+  addFileHandler(){
+
     this.addFileFetch(this.props.project._id, this.state.add_file);
     this.setState({
       showAddFile: !this.state.showAddFile,

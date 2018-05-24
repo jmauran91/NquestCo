@@ -56,15 +56,13 @@ class ProjectNotes extends React.Component {
   }
 
 
-  submitNote(event){
-    event.preventDefault()
+  submitNote(){
     this.switchProjectEditor();
     this.addNoteFetch(this.props.project._id, this.state.quillText, this.state.noteTitle);
 
   }
 
-  submitEdition(event){
-    event.preventDefault();
+  submitEdition(){
     this.switchProjectEditor();
     this.props.toggleModal();
     this.editNoteFetch(this.props.project._id, this.state.modal_file._id, this.state.quillText);

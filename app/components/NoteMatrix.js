@@ -18,9 +18,7 @@ class NoteMatrix extends React.Component{
     this.deleteNoteFetch = Fetch.deleteNote.bind(this);
   }
 
-  deleteNoteHandler(event, note){
-    debugger;
-    event.preventDefault()
+  deleteNoteHandler( note){
     this.props.handleNoteExpand();
     this.setState({ isViewing: false })
     this.deleteNoteFetch(this.props.project._id, note._id)

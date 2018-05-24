@@ -8,7 +8,8 @@ class FileMatrix extends React.Component{
     super(props)
     this.state = {
       viewFile: {},
-      isViewing: false
+      isViewing: false,
+      msg: ''
     }
 
     this.handleFileLiClick = this.handleFileLiClick.bind(this);
@@ -28,12 +29,16 @@ class FileMatrix extends React.Component{
     }
   }
 
-  deleteFileHandler(event, file){
-    debugger;
-    event.preventDefault();
-    this.props.handleFileExpand();
-    this.setState({ isViewing: false })
-    this.deleteFileFetch(this.props.project._id, file.name)
+  deleteFileHandler( file){
+    this.deleteFileFetch(this.props.project._id, file.name).then((resp) => {
+      console.log(resp)
+      this.props.handleFileExpand();
+      this.setState({ isViewing: false, msg: resp.msg })
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+
   }
 
   fileTypeSwitcher(file){
@@ -122,8 +127,8 @@ class FileMatrix extends React.Component{
 
             <img className="file-li-pic" src={this.fileTypeSwitcher(file)}/>
             <span className="file-li-title">{file.name}</span>
-            <span className="file-li-deleter" style={userThisStyle}
-             onClick={(event) => {this.deleteFileHandler(event, file)}}>&#10006;</span>
+            <button className="file-li-deleter" style={userThisStyle}
+             onClick={() => { this.deleteFileHandler(file) }}>&#10006;</button>
           </li>
         )
       })

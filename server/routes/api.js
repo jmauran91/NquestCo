@@ -491,7 +491,9 @@ router.patch('/project/:id', (req, res) => {
 router.delete('/project/:id/files/:file_name', (req, res) => {
   var _id = req.url.split('/')[2]
   var file_name = req.url.split('/')[4]
-  File.remove({ title: file_name }, (err) => {
+  console.log(req.url)
+  var file_n = decodeURIComponent(file_name)
+  File.remove({ title: file_n }, (err) => {
     if(err){
       console.log(err)
       res.json({ msg: 'Failed to delete file ; ERROR'})
@@ -511,7 +513,7 @@ router.delete('/project/:id/files/:file_name', (req, res) => {
           console.log(err)
         }
         else {
-          Project.findOneAndUpdate({ _id: _id}, { $pull: { documents: file_name }}, {new: true}, (err, project) => {
+          Project.findOneAndUpdate({ _id: _id}, { $pull: { documents: file_n }}, {new: true}, (err, project) => {
             if(err){
               console.log(err)
             }

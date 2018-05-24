@@ -558,8 +558,8 @@ class Fetch {
 
 
   static deleteFile(proj_id, name){
-    var url = '/api/project/' + proj_id + '/files/' + name;
-    fetch(url, {
+    var url = '/api/project/' + proj_id + '/files/' + encodeURIComponent(name);
+    return fetch(url, {
       method: 'DELETE',
       headers: {
         Authorization: "bearer " + Auth.getToken()
@@ -568,9 +568,11 @@ class Fetch {
     .then(response => response.json())
     .then((response) => {
       console.log(response)
+      return(response)
+
     })
     .catch((err) => {
-      console.log(err)
+      return(err)
     })
   }
 
