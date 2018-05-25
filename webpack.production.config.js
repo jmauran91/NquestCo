@@ -24,6 +24,7 @@ const config = {
     new webpack.optimize.ModuleConcatenationPlugin(),
     new HtmlWebpackPlugin({
       template: `${__dirname}/app/index.html`,
+      favicon: `${__dirname}/app/assets/images/favicon.ico`
       filename: 'index.html',
       inject: 'body',
     }),
