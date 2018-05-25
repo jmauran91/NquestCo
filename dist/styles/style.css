@@ -1443,7 +1443,7 @@
   flex-direction: column;
   margin: 0;
   border-radius: 50%;
-  width: 300px; }
+  min-width: 300px; }
 
 .prof-pic {
   height: 80%;
@@ -1451,7 +1451,7 @@
 
 .profile-body-text {
   margin-left: 32px;
-  width: 100%;
+  width: 70%;
   padding: 16px;
   display: flex;
   flex-flow: column;
