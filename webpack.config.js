@@ -145,6 +145,7 @@ const config = {
                            {from: 'assets', to: 'assets'}]),
     new HtmlWebpackPlugin({
       template: `${__dirname}/app/index.html`,
+      favicon: `${__dirname}/app/assets/images/favicon_index.ico`,
       filename: 'index.html',
       inject: 'body',
     }),
