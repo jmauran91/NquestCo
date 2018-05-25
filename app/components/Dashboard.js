@@ -257,6 +257,16 @@ class Dashboard extends React.Component {
         display: 'none'
       }
     }
+    var aboutTagStyle = {
+      display: 'block',
+      margin: '0 auto',
+      position: 'absolute',
+      bottom: '24px',
+      left: '48px',
+      right: '0',
+      margin: 'auto'
+
+    }
 
     return(
       <div className="dash-container">
@@ -317,6 +327,7 @@ class Dashboard extends React.Component {
                 </span>
               </li>
             </ul>
+            <a className="about-tag" style={aboutTagStyle} href="/about">About</a>
           </div>
           <div className="center-side-dash" style={centerSideStyle}>
             <div className="search-results-container" style={srchContainerStyle}>

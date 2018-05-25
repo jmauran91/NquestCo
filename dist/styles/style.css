@@ -1819,6 +1819,23 @@
   outline: none;
   background-color: #fff4e5; }
 
+.about-master {
+  margin: 0 auto;
+  margin-top: 180px;
+  position: relative;
+  width: 50%;
+  padding: 36px;
+  border: 1px solid grey;
+  background-color: #e0e0e0; }
+
+.about-master h1 {
+  margin: 0 auto;
+  display: block; }
+
+.about-master div {
+  margin: 0 auto;
+  display: block; }
+
 .dash-container, .profile-container, .project-show {
   margin-top: 80px; }
 

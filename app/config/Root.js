@@ -10,6 +10,7 @@ import ProjectGuestPage from '../containers/ProjectGuestPage';
 import ProfilePage from '../components/ProfilePage';
 import Dashboard from '../components/Dashboard';
 import AdminPage from '../components/AdminPage';
+import AboutPage from '../components/AboutPage';
 import Auth from '../modules/Auth';
 import history from '../history';
 
@@ -21,6 +22,7 @@ const Root = () => {
           <NavSwitcher />
           <Switch>
             <Route exact path="/login" component={LoginPage} />
+            <Route exact path="/about" component={AboutPage} />
             <Route exact path="/signup" component={SignUpPage} />
             <Route exact path="/logout" component={LogoutSwitcher}/>
             <Route exact path="/admin" component={AdminPage} />
