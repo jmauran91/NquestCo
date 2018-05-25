@@ -30,10 +30,11 @@ class FileMatrix extends React.Component{
   }
 
   deleteFileHandler( file){
+    this.props.handleFileExpand();
+    this.setState({ isViewing: false })
     this.deleteFileFetch(this.props.project._id, file.name).then((resp) => {
       console.log(resp)
-      this.props.handleFileExpand();
-      this.setState({ isViewing: false, msg: resp.msg })
+      this.props.clearFilesFromBelow(file)
     })
     .catch((err) => {
       console.log(err)
@@ -127,8 +128,8 @@ class FileMatrix extends React.Component{
 
             <img className="file-li-pic" src={this.fileTypeSwitcher(file)}/>
             <span className="file-li-title">{file.name}</span>
-            <button className="file-li-deleter" style={userThisStyle}
-             onClick={() => { this.deleteFileHandler(file) }}>&#10006;</button>
+            <button className="file-li-deleter" style={userThisStyle} type="submit"
+            onClick={() => { this.deleteFileHandler(file) }}>&#10006;</button>
           </li>
         )
       })

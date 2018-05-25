@@ -45,6 +45,8 @@ class ProjectFiles extends React.Component{
     this.changeFileHandler = this.changeFileHandler.bind(this);
     this.addFileHandler = this.addFileHandler.bind(this);
     this.onDrop = this.onDrop.bind(this);
+    this.clearFilesFromBelow = this.clearFilesFromBelow.bind(this);
+
 
     this.loadFiles = Fetch.loadFiles.bind(this);
     this.loadProject = Fetch.loadProject.bind(this);
@@ -81,6 +83,17 @@ class ProjectFiles extends React.Component{
     else {
       return null
     }
+  }
+
+  clearFilesFromBelow(file){
+    var newfiles = this.state.files.map((f) => {
+      if (f.title != file.title){
+        return(f)
+      }
+    })
+    this.setState({
+      files: newfiles
+    })
   }
 
   toggleModal(){
@@ -334,6 +347,7 @@ class ProjectFiles extends React.Component{
         onClose={this.handleFileExpand}
         container={this}
         userThis={this.props.userThis}
+        clearFilesFromBelow={this.clearFilesFromBelow}
         project={this.props.project}
         handleFileExpand={this.handleFileExpand}
         />
