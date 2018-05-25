@@ -291,7 +291,8 @@ class ProfilePage extends React.Component{
             {render_pings_short}
           </ul>
           <span onClick={this.showAllPings}
-          className="seeall-projpings no-select"> See all...</span>
+          className="seeall-projpings no-select"
+          style={{marginLeft: '12px', marginBottom: '4px'}}> See all...</span>
 
           <div
           style={fullPingBackdrop}
