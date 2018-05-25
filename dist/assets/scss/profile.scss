@@ -26,14 +26,14 @@
 }
 
 .prof-pic-container {
-  display: inline;
+  display: flex;
+  flex-direction: column;
   margin: 0;
   border-radius: 50%;
 }
 
 .prof-pic {
-  width: 300px;
-  height: 300px;
+  height: 80%;
   border-radius: 50%;
 }
 
