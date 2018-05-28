@@ -4,7 +4,7 @@
   "description": "Minimalistic ES6 React boilerplate",
   "main": "index.js",
   "scripts": {
-    "start": "node --use_strict index.js",
+    "start": "node index.js",
     "start:front": "cross-env npm run clean && webpack --config webpack.config.js --progress --watch",
     "clean": "rimraf dist",
     "production": "cross-env npm run clean && webpack --config webpack.production.config.js --progress --profile --colors",
