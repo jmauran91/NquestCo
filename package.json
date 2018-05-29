@@ -4,7 +4,7 @@
   "description": "Minimalistic ES6 React boilerplate",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "rm -rf node_modules && npm install && node index.js",
     "start:front": "cross-env npm run clean && webpack --config webpack.config.js --progress --watch",
     "clean": "rimraf dist",
     "production": "cross-env npm run clean && webpack --config webpack.production.config.js --progress --profile --colors",
@@ -40,7 +40,7 @@
     "async": "^2.6.0",
     "atob": "^2.0.3",
     "aws-sdk": "^2.192.0",
-    "bcrypt": "^1.0.3",
+    "bcrypt": "1.0.3",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "busboy": "^0.2.14",
