@@ -146,7 +146,6 @@ class SignUpPage extends React.Component {
             "Projects" or "Users" according to your search request. In order
             to view your own profile, click on the "Profile" at the upper-right
             corner of the page. That covers all the functionality of the site!
-
           </div>
         </div>
         <div className="signup-form-container">
