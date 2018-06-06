@@ -123,7 +123,7 @@ class SignUpPage extends React.Component {
       <div className="signup-container">
         <div className="signup-banner">
           <div className="signup-banner-opener">
-            What is this?
+            READ THIS
           </div>
           <div className="signup-banner-text">
             Nquest is an online collaborative workspace, a place for people to get
@@ -137,6 +137,16 @@ class SignUpPage extends React.Component {
             essentially aggregations of view-only files and
             online-editable notes. Users can add files and notes to their
             own projects and to those for which they've been given permissions.
+
+            After you log in, use the hamburger menu (three horizontal bars
+            that are stacked on top of each other) on the upper-left side of
+            the page in order to access the messenger, your projects, and
+            project creation. In order to view others' projects or profiles,
+            use the searchbar at the top of the page, and specify either
+            "Projects" or "Users" according to your search request. In order
+            to view your own profile, click on the "Profile" at the upper-right
+            corner of the page. That covers all the functionality of the site!
+
           </div>
         </div>
         <div className="signup-form-container">
