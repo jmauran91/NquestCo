@@ -1,0 +1,80 @@
+.feed-container {
+  width: 70vw;
+  height: 95%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-top: 1%;
+  margin-left: 15vw;
+  overflow-y: hidden;
+  background-color: white;
+  z-index: 3;
+  border: 1px solid lightgrey;
+}
+
+.feed-subcontainer {
+  background-color: white;
+  display: block;
+  margin: 0 auto;
+  width: 50vw;
+
+}
+
+.feed-banner {
+  font-style: italic;
+  font-size: 250%;
+  font-weight: 300;
+  font-weight: bold;
+  padding: 12px;
+  padding-left: 0px;
+  padding-top: 16px;
+
+}
+
+.feed-ul {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.feed-result-tile {
+  padding: 12px;
+  margin: 12px;
+  display: block;
+  position: relative;
+  width: 100%;
+}
+
+.feed-result-title {
+  font-family: 'Helvetica', sans-serif;
+  font-size: 160%;
+  font-weight: bold;
+  position: absolute;
+  top: 5%;
+  left: 2%
+
+}
+
+.feed-result-description {
+  display: block;
+  position: relative;
+  margin-top: 38px;
+  padding: 12px 6px;
+  background-color: darken(lightgrey, 5%);
+  width: 80%;
+
+}
+
+.feed-result-date {
+  position: absolute;
+  font-size: 70%;
+  top: 5%;
+  left: 80%;
+}
+
+.feed-result-owner {
+  position: absolute;
+  font-size: 70%;
+  bottom: 5%;
+  left: 80%;
+
+}

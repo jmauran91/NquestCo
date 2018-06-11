@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Auth from '../modules/Auth';
 import Dropzone from 'react-dropzone';
 import fetch from "isomorphic-fetch";
+import Select from 'react-select';
 
 
 class NewProjectPage extends React.Component{
@@ -13,12 +14,15 @@ class NewProjectPage extends React.Component{
         title: '',
         owner: '',
         description: '',
+        selectedCategory: '',
+        tags: '',
         documents: {},
         success: null
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleSelection = this.handleSelection.bind(this);
     this.clearForm = this.clearForm.bind(this);
     this.afterSubmission = this.afterSubmission.bind(this);
     this.onDrop = this.onDrop.bind(this);
@@ -30,6 +34,8 @@ class NewProjectPage extends React.Component{
     data.append('title', this.state.title)
     data.append('owner', this.props.owner_name)
     data.append('description', this.state.description)
+    data.append('tags', this.state.tags)
+    data.append('category', this.state.category)
     data.append('file', this.state.documents)
     data.append('filename', this.state.documents.name)
     const url = '/api/projects';
@@ -64,6 +70,10 @@ class NewProjectPage extends React.Component{
     this.setState( obj );
   }
 
+  handleSelection = (selectedCategory) => {
+    this.setState({ selectedCategory})
+  }
+
   afterSubmission(status){
     this.clearForm();
     this.postMessage(status);
@@ -74,6 +84,8 @@ class NewProjectPage extends React.Component{
       title: '',
       owner: '',
       description: '',
+      category: '',
+      tags: '',
       documents: {}
     })
   }
@@ -121,6 +133,8 @@ class NewProjectPage extends React.Component{
       var successStyle, successTextStyle, successMsg;
     }
 
+
+
     return(
       <div className = "dash-form-container">
         <div className="dash-form-return-msg" style={successStyle}>
@@ -146,6 +160,51 @@ class NewProjectPage extends React.Component{
                 placeholder="Description..."
               />
             </li>
+            <li>
+              <input
+                value={this.state.tags}
+                name="tags"
+                type="text"
+                onChange={this.handleChange}
+                placeholder="Tags... (separated by comma and space)"
+              />
+            </li>
+            <li id="categorySelect">
+              <Select
+                closeOnSelect={true}
+                clearable={true}
+                searchable={true}
+                name="category"
+                value={this.state.selectedCategory}
+                onChange={this.handleSelection}
+                options={[
+                  {value: 'artHistory', label: 'Art History'},
+                  {value: 'Archaeology', label: 'Archaeology'},
+                  {value: 'Anthropology', label: 'Anthropology'},
+                  {value: 'Biology', label: 'Biology'},
+                  {value: 'Business', label: 'Business'},
+                  {value: 'Chemistry', label: 'Chemistry'},
+                  {value: 'computerScience', label: 'Computer Science'},
+                  {value: 'Engineering', label: 'Engineering'},
+                  {value: 'Economics', label: 'Economics'},
+                  {value: 'Education', label: 'Education'},
+                  {value: 'Finance', label: 'Finance'},
+                  {value: 'Linguistics', label: 'Linguistics'},
+                  {value: 'History', label: 'History'},
+                  {value: 'Mathematics', label: 'Mathematics'},
+                  {value: 'Music', label: 'Music'},
+                  {value: 'Nutrition', label: 'Nutrition'},
+                  {value: 'Philosophy', label: 'Philosophy'},
+                  {value: 'Physics', label: 'Physics'},
+                  {value: 'politicalScience', label: 'Political Science'},
+                  {value: 'Psychology', label: 'Psychology'},
+                  {value: 'Religion', label: 'Religion'},
+                  {value: 'socialSciences', label: 'Social Sciences'},
+                  {value: 'Other', label: "Other..."},
+                ]}
+              />
+            </li>
+
             <li className="new-project-drop">
               <Dropzone onDrop={this.onDrop} className="new-project-drop-dropzone">
                 Drag file or click to upload

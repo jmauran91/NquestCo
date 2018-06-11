@@ -333,6 +333,125 @@ class Convert {
     return arrayToSort.reverse()
   }
 
+  static dateSortProjects(arrayToSort){
+    const month = (string) => {
+      let month = string.split("-")[1]
+      return parseInt(month)
+    }
+    const year = (string) => {
+      let year = string.split("-")[0]
+      return parseInt(year)
+
+    }
+    const day = (string) => {
+      let util = string.split("-")[2]
+      let day = util.split("T")[0]
+      return parseInt(day)
+    }
+    const hour = (string) => {
+      let util = string.split("-")[2]
+      let new_util = util.split("T")[1]
+      let hour = new_util.split(":")[0]
+      return parseInt(hour)
+    }
+    const minute = (string) => {
+      let util = string.split("-")[2]
+      let new_util = util.split("T")[1]
+      let minute = new_util.split(":")[1]
+      return parseInt(minute)
+    }
+    const second = (string) => {
+      let util = string.split("-")[2]
+      let new_util = util.split("T")[1]
+      let snd_util = new_util.split(":")[2]
+      let second = snd_util.split(".")[0]
+      return parseInt(second)
+    }
+    const millisecond = (string) => {
+      let util = string.split("-")[2]
+      let new_util = util.split("T")[1]
+      let snd_util = new_util.split(":")[2]
+      let millisecond = snd_util.split(".")[1]
+      let edited_millisecond = millisecond.split("Z")[0]
+      return parseInt(edited_millisecond)
+    }
+
+    function whichProjectIsOlder(obj1, obj2){
+      var a_file = obj1
+      var b_file = obj2
+      var a = a_file.updatedAt
+      var b = b_file.updatedAt
+      if( year(a) > year(b)){
+        return a_file
+      }
+      else if( year(b) > year(a)){
+        return b_file
+      }
+      else {
+        if(month(a) > month(b)){
+          return a_file
+        }
+        else if(month(b) > month(a)){
+          return b_file
+        }
+        else {
+          if(day(a) > day(b)){
+            return a_file
+          }
+          else if(day(b) > day(a)){
+            return b_file
+          }
+          else {
+            if(hour(a) > hour(b)){
+              return a_file
+            }
+            else if(hour(b) > hour(a)){
+              return b_file
+            }
+            else {
+              if(minute(a) > minute(b)){
+                return a_file
+              }
+              else if(minute(b) > minute(a)){
+                return b_file
+              }
+              else {
+                if(second(a) > second(b)){
+                  return a_file
+                }
+                else if(second(b) > second(a)){
+                  return b_file
+                }
+                else {
+                  if(millisecond(a) > millisecond(b)){
+                    return a_file
+                  }
+                  else {
+                    return b_file
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    for( var i = arrayToSort.length -1; i >= 0; i--){
+      for( var j = 1; j<=i; j++){
+        var older = whichProjectIsOlder(arrayToSort[j-1], arrayToSort[j])
+        if( older == arrayToSort[j-1] ){
+          arrayToSort[j-1] = arrayToSort[j]
+          arrayToSort[j] = older
+        }
+      }
+    }
+
+    return arrayToSort.reverse()
+
+
+
+  }
+
 
 
 }

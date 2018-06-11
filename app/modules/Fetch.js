@@ -898,6 +898,54 @@ class Fetch {
   }
 
 
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+
+
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+  ////////////////////      CATEGORIES      ////////////////////////
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////
+
+  static updateCategories(_id, categories){
+    var data = JSON.stringify(categories)
+    var url = "/api/profile/" + _id + "/categories"
+    return fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': "application/json",
+        Authorization: "bearer " + Auth.getToken()
+      }
+    })
+    .then(response => response.json())
+    .then((response) => {
+      return response
+    })
+    .catch((err) => {
+      return err
+    })
+  }
+
+  static getProjectsByCategory(category){
+    var url = "/api/categories/" + category
+    return fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: "bearer " + Auth.getToken()
+      }
+    })
+    .then(response => response.json())
+    .then((response) => {
+      return response
+    })
+    .catch((err) => {
+      return err
+    })
+  }
+
+
 }
 
 export default Fetch;

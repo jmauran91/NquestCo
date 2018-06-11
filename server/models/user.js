@@ -17,6 +17,12 @@ const UserSchema = new mongoose.Schema({
   lastName: {
     type: String,
   },
+  categories: [{
+    type: String,
+  }],
+  tags: [{
+    type: String,
+  }],
   about: {
     type: String
   },

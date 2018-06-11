@@ -963,4 +963,27 @@ router.patch('/project/:id/chatbox', (req, res) => {
   })
 })
 
+router.patch('/profile/:id/categories', (req, res) => {
+  var _id = req.url.split('/')[2]
+  var newCategories = req.body.categories
+  User.findOneAndUpdate({ _id: _id }, { $set: { categories: newCategories } }, {new: true}, (err, user) => {
+    if(err){
+      console.log('hit an err')
+      console.log(err)
+    }
+    res.status(200).json({ msg: 'successfully edited categories '})
+  })
+})
+
+router.get('/categories/:category', (req, res) => {
+  var _category = req.url.split('/')[2]
+  Project.find({ category: _category}, (err, projects) => {
+    if(err){
+      console.log('hit err')
+      console.log(err)
+    }
+    res.status(200).json({msg: 'successfully retrieved projects by category', projects: projects })
+  })
+})
+
 module.exports = router;

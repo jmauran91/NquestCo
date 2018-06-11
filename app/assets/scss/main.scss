@@ -17,6 +17,9 @@
 @import 'admin.scss';
 @import 'chatbox.scss';
 @import 'about.scss';
+@import 'feed.scss';
+@import url('../../../node_modules/react-select/dist/react-select.css');
+
 
 $color: lighten(#18a29a, 6%);
 $secondary_color: lightgrey;

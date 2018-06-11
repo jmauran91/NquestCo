@@ -16,9 +16,11 @@ class ProfilePage extends React.Component{
       pings: [],
       add_file: '',
       isEditing: false,
+      isCategories: false,
       quillText: '',
       new_about: null,
-      isShowingAllPings: false
+      isShowingAllPings: false,
+      categories: ''
     }
 
     this.picSubmit = this.picSubmit.bind(this);
@@ -29,6 +31,9 @@ class ProfilePage extends React.Component{
     this.cancelAboutEdit = this.cancelAboutEdit.bind(this);
     this.dateSort = Convert.dateSort.bind(this);
     this.showAllPings = this.showAllPings.bind(this);
+    this.editCategories = this.editCategories.bind(this);
+    this.cancelCtgEdit = this.cancelCtgEdit.bind(this);
+    this.handleSubmitCategories = this.handleSubmitCategories.bind(this);
 
 
     this.getUser = Fetch.GetUser.bind(this);
@@ -36,14 +41,30 @@ class ProfilePage extends React.Component{
     this.getPings = Fetch.GetPings.bind(this);
     this.uploadAvatarFetch = Fetch.uploadAvatar.bind(this);
     this.editUser = Fetch.editUser.bind(this);
+    this.updateCategories = Fetch.updateCategories.bind(this);
   }
 
   editProfileHandle(){
     this.setState({ isEditing: !this.state.isEditing })
   }
 
+  editCategories(){
+    this.setState({ isCategories: !this.state.isCategories })
+  }
 
-  cancelAboutEdit(){
+  cancelCtgEdit(event){
+    event.preventDefault();
+    this.setState({ isCategories: false })
+  }
+
+  handleSubmitCategories(){
+    var categ_arr = this.state.categories.split(', ')
+    this.updateCategories(this.state._user._id, categ_arr)
+  }
+
+
+  cancelAboutEdit(event){
+    event.preventDefault();
     this.setState({ isEditing: false })
   }
 
@@ -158,6 +179,17 @@ class ProfilePage extends React.Component{
       }
     }
 
+    if(this.state.isCategories){
+      var ctgStyle = {
+        display: 'block'
+      }
+    }
+    else {
+      var ctgStyle = {
+        display: 'none'
+      }
+    }
+
 
     if(!Convert.isArrEmpty(this.state._user.guest_projects)){
       var guestnames = this.state._user.guest_projects.map((pro, i) => {
@@ -213,6 +245,15 @@ class ProfilePage extends React.Component{
       var _id = this.state._user._id;
       var name = this.state._user.name;
       var email = this.state._user.email;
+      var categories = this.state._user.categories.map((category, i) => {
+        var catelink = `/categories/${category}`
+        if( (this.state._user.categories.length -1) - i == 0){
+           return(<a href={catelink}>{category}</a>)
+        }
+        else {
+           return(<a href={catelink}>{category}</a> + ", ")
+        }
+      })
       if(Convert.isStrExist(this.state.new_about)){
         var aboutMe = this.state.new_about.replace(/<(?:.|\n)*?>/gm, '');
       }
@@ -229,13 +270,20 @@ class ProfilePage extends React.Component{
     if(!Convert.isArrEmpty(this.state.pings)){
       var new_pingset = this.dateSort(this.state.pings, 'note');
       var render_pings = new_pingset.map((ping, i) => {
+        let titletxt = ping.text.split('[').pop().split(']').shift();
+        let txtsplit = ping.text.split(" has").pop().split("[")[0]
+        let usertxt = ping.text.split(' has')[0]
+        let p_id = ping.projectId._id.toString();
+        let u_id = ping.userId._id.toString();
+        let href_str = `/project/${p_id}`
+        let href_str_u = `/profile/${u_id}`
         var date = Convert.prettifyDate(ping.createdAt);
         return(
           <li
             key={i}
             className="ping-cell"
           >
-            <span>{ping.text}</span>
+            <span><a href={href_str_u}>{usertxt}</a> has{txtsplit} <a href={href_str}>[{titletxt}]</a></span>
             <span className="profile-ping-createdat">{date}</span>
           </li>
         )
@@ -247,68 +295,122 @@ class ProfilePage extends React.Component{
       date = date[1] + '/' + date[2] + '/' + date[3]
       var render_pings = (<li className="ping-cell-empty"> <span>{this.state._user.name} hasn't done anything yet </span><span className="empty-ping-date">{date}</span></li>)
     }
-    return(
-      <div className= "profile-container">
-        <div className="profile-body" >
-          <div className="prof-pic-container" >
-            <img className="prof-pic" src={this.state._user.profpic} />
-            <form className="avatar-upload" onSubmit={this.picSubmit} style={avStyle}>
-              <label className="upload-label"> Add / Edit Profile Picture </label>
-              <Dropzone className="dropzone" onDrop={this.onDrop}>
-                <p> Drag file or click to upload </p>
-              </Dropzone>
-              <button className="button" type="submit"> Upload </button>
-            </form>
-          </div>
-          <div className="profile-body-text">
-            <span
-            onClick={this.editProfileHandle}
-            className="profile-edit"
-            > Edit...
-            </span>
-            <p className="profile-name">{name}</p>
-            <p className="profile-email">{email}</p>
-            <p className="profile-projects"> Projects: {projnames}</p>
-            <p className="profile-guestprojects"> Contributing to: {guestnames} </p>
-            <p className="profile-about-me"> About: {aboutMe} </p>
-            <div className="profile-aboutme-editor" style={abtMeStyle}>
-              <form>
-                <ReactQuill
-
-                  value={this.state.quillText}
-                  onChange={this.quillHandleChange}
-                />
-                <button onClick={this.handleSubmitEdition}>Save</button>
-                <button onClick={this.cancelAboutEdit}> Cancel </button>
+    if(this.state._user._id == this.state.current_user._id){
+      return(
+        <div className= "profile-container">
+          <div className="profile-body" >
+            <div className="prof-pic-container" >
+              <img className="prof-pic" src={this.state._user.profpic} />
+              <form className="avatar-upload" onSubmit={this.picSubmit} style={avStyle}>
+                <label className="upload-label"> Add / Edit Profile Picture </label>
+                <Dropzone className="dropzone" onDrop={this.onDrop}>
+                  <p> Drag file or click to upload </p>
+                </Dropzone>
+                <button className="button" type="submit"> Upload </button>
               </form>
             </div>
-          </div>
-          <div className="clearer"></div>
-        </div>
-        <div className="profile-events">
-          <div className="events-header"> ACTIVITY FEED </div>
-          <ul className="profile-event-pings">
-            {render_pings_short}
-          </ul>
-          <span onClick={this.showAllPings}
-          className="seeall-projpings no-select"
-          style={{marginLeft: '12px', marginBottom: '4px'}}> See all...</span>
+            <div className="profile-body-text">
+              <p className="profile-name">{name}</p>
+              <p className="profile-email">{email}</p>
+              <p className="profile-categories"> {name} is interested in these topics: {categories} <span onClick={this.editCategories} className="categories-edit"> Edit... </span></p>
+              <div className="profile-categories-editor" style={ctgStyle}>
+                <form>
+                  <ReactQuill
 
-          <div
-          style={fullPingBackdrop}
-          className="projping-full-backdrop"
-          onClick={this.showAllPings}
-          >
-          </div>
+                    value={this.state.categories}
+                    onChange={this.handleCategoriesChange}
+                  />
+                <button onClick={this.handleSubmitCategories}>Save</button>
+                <button onClick={this.cancelCtgEdit}>Cancel</button>
+                </form>
+              </div>
+              <p className="profile-projects"> Projects: {projnames}</p>
+              <p className="profile-guestprojects"> Contributing to: {guestnames} </p>
+              <p className="profile-about-me"> About: {aboutMe} <span onClick={this.editProfileHandle} className="profile-edit"> Edit... </span> </p>
+              <div className="profile-aboutme-editor" style={abtMeStyle}>
+                <form>
+                  <ReactQuill
 
-          <div style={fullPingModal} className="projping-full-modal">
-            <ol style={fullPing} className="projping-list-full">
-              {render_pings}
-            </ol>
+                    value={this.state.quillText}
+                    onChange={this.quillHandleChange}
+                  />
+                  <button onClick={this.handleSubmitEdition}>Save</button>
+                  <button onClick={this.cancelAboutEdit}> Cancel </button>
+                </form>
+              </div>
+            </div>
+            <div className="clearer"></div>
+          </div>
+          <div className="profile-events">
+            <div className="events-header"> ACTIVITY FEED </div>
+            <ul className="profile-event-pings">
+              {render_pings_short}
+            </ul>
+            <span onClick={this.showAllPings}
+            className="seeall-projpings no-select"
+            style={{marginLeft: '12px', marginBottom: '4px'}}> See all...</span>
+
+            <div
+            style={fullPingBackdrop}
+            className="projping-full-backdrop"
+            onClick={this.showAllPings}
+            >
+            </div>
+
+            <div style={fullPingModal} className="projping-full-modal">
+              <ol style={fullPing} className="projping-list-full">
+                {render_pings}
+              </ol>
+            </div>
           </div>
         </div>
-      </div>
-    )
+      )
+    }
+    else {
+      return(
+        <div className= "profile-container">
+          <div className="profile-body" >
+            <div className="prof-pic-container" >
+              <img className="prof-pic" src={this.state._user.profpic} />
+            </div>
+            <div className="profile-body-text">
+              <p className="profile-name">{name}</p>
+              <p className="profile-email">{email}</p>
+              <p className="profile-categories"> {name} is interested in these topics: {categories} </p>
+              <p className="profile-projects"> Projects: {projnames}</p>
+              <p className="profile-guestprojects"> Contributing to: {guestnames} </p>
+              <p className="profile-about-me"> About: {aboutMe} </p>
+            </div>
+            <div className="clearer"></div>
+          </div>
+          <div className="profile-events">
+            <div className="events-header"> ACTIVITY FEED </div>
+              <ul className="profile-event-pings">
+                {render_pings_short}
+              </ul>
+              <span onClick={this.showAllPings}
+              className="seeall-projpings no-select"
+              style={{marginLeft: '12px', marginBottom: '4px'}}>
+                See all...
+              </span>
+
+              <div
+              style={fullPingBackdrop}
+              className="projping-full-backdrop"
+              onClick={this.showAllPings}
+              >
+              </div>
+
+              <div style={fullPingModal} className="projping-full-modal">
+                <ol style={fullPing} className="projping-list-full">
+                  {render_pings}
+                </ol>
+              </div>
+          </div>
+        </div>
+
+      )
+    }
   }
 }
 

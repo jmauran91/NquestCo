@@ -16,16 +16,19 @@ class SignUpPage extends React.Component {
     // set the initial component state
     this.state = {
       errors: {},
+      selectedCategory: '',
       user: {
         email: '',
         name: '',
-        password: ''
+        password: '',
+
       },
     };
 
     this.processForm = this.processForm.bind(this);
     this.changeUser = this.changeUser.bind(this);
     this.emptyForm = this.emptyForm.bind(this);
+    this.handleSelection = this.handleSelection.bind(this);
   }
 
   /**
@@ -48,9 +51,15 @@ class SignUpPage extends React.Component {
       user: {
         email: '',
         name: '',
-        password: ''
-      }
+        password: '',
+
+      },
+      selectedCategory: '',
     })
+  }
+
+  handleSelection = (selectedCategory) => {
+    this.setState({ selectedCategory: selectedCategory.value })
   }
 
   /**
@@ -65,7 +74,8 @@ class SignUpPage extends React.Component {
     const name = encodeURIComponent(this.state.user.name);
     const email = encodeURIComponent(this.state.user.email);
     const password = encodeURIComponent(this.state.user.password);
-    const formData = `name=${name}&email=${email}&password=${password}`;
+    const category = encodeURIComponent(this.state.selectedCategory);
+    const formData = `name=${name}&email=${email}&password=${password}&category=${category}`;
     const url = "/auth/signup";
 
     fetch(url, {
@@ -95,6 +105,7 @@ class SignUpPage extends React.Component {
     console.log('name:', this.state.user.name);
     console.log('email:', this.state.user.email);
     console.log('password:', this.state.user.password);
+    console.log('category:', this.state.user.selectedCategory)
   }
 
   /**
@@ -152,8 +163,10 @@ class SignUpPage extends React.Component {
           <SignUpForm
             onSubmit={this.processForm}
             onChange={this.changeUser}
+            handleSelection={this.handleSelection}
             errors={this.state.errors}
             user={this.state.user}
+            selectedCategory={this.state.selectedCategory}
             errStyleCont={errStyleCont}
             errStyleText={errStyleText}
           />

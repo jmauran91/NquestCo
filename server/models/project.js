@@ -10,6 +10,12 @@ const ProjectSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  tags: [{
+    type: String,
+  }],
+  category: {
+    type: String,
+  },
   ownername: {
     type: String
   },

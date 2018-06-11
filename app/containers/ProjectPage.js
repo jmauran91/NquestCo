@@ -227,12 +227,24 @@ class ProjectPage extends React.Component{
       var sortedPings = Convert.dateSort(this.state.pings, 'ping')
       var renderProjPings = sortedPings.map((ping, i) => {
         var date = Convert.prettifyDate(ping.createdAt)
+        let titletxt = ping.text.split('[').pop().split(']').shift();
+        let usertxt = ping.text.split(' has')[0]
+        let txtsplit = ping.text.split(" has").pop().split("[")[0]
+        let p_id = ping.projectId._id.toString();
+        if(typeof ping.userId._id === 'undefined'){
+          var u_id = ping.userId
+        }
+        else {
+          var u_id = ping.userId._id.toString();
+        }
+        let href_str = `/project/${p_id}`
+        let href_str_u = `/profile/${u_id}`
         return(
           <li
             key={i}
             className="ping-cell"
           >
-            <span>{ping.text}</span>
+            <span><a href={href_str_u}>{usertxt}</a> has{txtsplit} <a href={href_str}>[{titletxt}]</a></span>
             <span className="profile-ping-createdat">{date}</span>
           </li>
         )

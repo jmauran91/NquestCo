@@ -5,6 +5,7 @@ import Convert from '../modules/Convert';
 import NewProjectPage from '../containers/NewProjectPage';
 import ProjectListPage from '../containers/ProjectListPage';
 import ChatContainer from '../components/chat/ChatContainer';
+import Feed from '../components/Feed';
 import PropTypes from 'prop-types';
 
 class Dashboard extends React.Component {
@@ -13,13 +14,14 @@ class Dashboard extends React.Component {
 
     this.state = {
       current_user: {},
-      component: '',
+      component: 'feed',
       notiTally: 0,
       hamburgerShow: false,
       searchquery: '',
       searchProReturns: null,
       searchUsrReturns: null,
-      searchMode: 'projects'
+      searchMode: 'projects',
+      categorized_projects: []
     };
 
     this.handleFeatureClick = this.handleFeatureClick.bind(this);
@@ -29,10 +31,12 @@ class Dashboard extends React.Component {
     this.submitSearch = this.submitSearch.bind(this);
     this.searchModeChange = this.searchModeChange.bind(this);
     this.clearSearch = this.clearSearch.bind(this);
+    this.retrieveUserCategoryProjects = this.retrieveUserCategoryProjects.bind(this);
 
     this.getCurrentUser = Fetch.GetCurrentUser.bind(this);
     this.searchProjectsFetch = Fetch.searchProjects.bind(this);
     this.searchUsersFetch = Fetch.searchUsers.bind(this);
+    this.getProjectsByCategory = Fetch.getProjectsByCategory.bind(this);
   }
 
   handleSearchBar(event){
@@ -51,13 +55,30 @@ class Dashboard extends React.Component {
   }
 
   clearSearch(){
-    this.setState({ searchquery: '' })
+    this.setState({ searchquery: '', component: '' })
+  }
+
+  retrieveUserCategoryProjects(){
+    this.state.current_user.categories.forEach((categ, i) => {
+      this.getProjectsByCategory(categ)
+      .then((res) => {
+        let new_s = this.state.categorized_projects
+        new_s = new_s.concat(res.projects)
+        var new_state = Convert.dateSortProjects(new_s)
+        this.setState({ categorized_projects: new_state })
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    })
   }
 
   componentDidMount(){
     this.getCurrentUser()
     .then((response) => {
-      this.setState({ current_user: response })
+      this.setState({ current_user: response }, () => {
+        this.retrieveUserCategoryProjects();
+      })
     })
     .catch((err) => {
       console.log(err)
@@ -197,6 +218,13 @@ class Dashboard extends React.Component {
       }
     }
     var featSwitcher = () => {
+      if (this.state.component == 'feed'){
+        return(
+          <div>
+            <Feed />
+          </div>
+        )
+      }
       if (this.state.component == 'new_project'){
         return(
           <div>
@@ -326,6 +354,12 @@ class Dashboard extends React.Component {
                   {notiMsg}
                 </span>
               </li>
+              <li>
+                <button
+                  onClick={this.handleFeatureClick}
+                  name="feed"
+                > Feed </button>
+              </li>
             </ul>
             <a className="about-tag" style={aboutTagStyle} href="/about">About</a>
           </div>
@@ -338,6 +372,11 @@ class Dashboard extends React.Component {
                 </ul>
               </div>
             </div>
+            {this.state.component == 'feed'
+              && <Feed
+                  current_user={this.state.current_user}
+                  categorized_projects={this.state.categorized_projects}
+                  />}
             {this.state.component == 'new_project'
               && <NewProjectPage
                   owner_id={this.state.current_user._id}

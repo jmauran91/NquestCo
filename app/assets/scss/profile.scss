@@ -72,6 +72,12 @@
   margin: 0 !important;
 }
 
+.profile-categories {
+  padding: 4px;
+  font-weight: 250;
+  margin: 0 !important;
+}
+
 .profile-guestprojects {
   padding: 4px;
   font-weight: 250;
@@ -85,12 +91,16 @@
 }
 
 .profile-edit {
-  position: absolute;
-  top: 6px;
-  right: 24px;
   cursor: pointer;
   text-decoration: underline;
   color: blue;
+}
+
+.categories-edit {
+  cursor: pointer;
+  text-decoration: underline;
+  color: blue;
+
 }
 
 .avatar-upload {
@@ -153,6 +163,36 @@
 
 .profile-ping-createdat {
   float: right;
+}
+
+.profile-categories-editor {
+  position: absolute;
+  display: block;
+  top: 35%;
+  left: 15%;
+  height: 35vh;
+  width: 50vw;
+  padding: 24px 12px;
+  background-color: lighten(lightgrey, 5%);
+  z-index: 9;
+
+}
+
+.profile-categories-editor form {
+  display: block;
+  height: 100% !important;
+  max-height: 200px;
+  width: 100%;
+
+}
+
+.profile-categories-editor button {
+  display: block;
+  position: relative;
+  margin: 8px;
+  float: right;
+  cursor: pointer;
+
 }
 
 .profile-aboutme-editor {
