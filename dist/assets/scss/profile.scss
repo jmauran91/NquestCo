@@ -64,6 +64,9 @@
   font-size: 150%;
   font-weight: 500;
   margin: 0 !important;
+  padding-bottom: 24px;
+  border-bottom: 1px solid grey;
+
 }
 
 .profile-projects {
@@ -111,12 +114,22 @@
   padding: 8px;
   padding-left: 24px;
   height: 36px;
-  background-color: lighten(lightgrey, 10%);
+  background-color: lightgrey;
   border: 1px dashed darkgrey;
+  text-align: center;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dropzone span {
+
 }
 
 .upload-label {
-  margin-left: 60px;
+  display: block;
+  text-align: center;
 }
 
 .button {
@@ -221,4 +234,36 @@
   margin: 8px;
   float: right;
   cursor: pointer;
+}
+
+.profile-body-row {
+  display: flex;
+}
+
+.profile-body-column {
+  padding: 4px;
+  margin: 0px !important;
+  width: 25%;
+}
+
+.profbody-column-left {
+  width: 25%;
+}
+
+.profbody-column-mid {
+  width: 60%;
+  position: relative;
+}
+
+.profbody-column-right {
+  width: 15%;
+}
+
+.forbigtext-right {
+  position: absolute;
+  bottom: 20%;
+}
+
+
+.email-row {
 }

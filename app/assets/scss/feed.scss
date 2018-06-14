@@ -1,5 +1,5 @@
 .feed-container {
-  width: 70vw;
+  width: 65vw;
   height: 95%;
   position: absolute;
   top: 0;
@@ -16,7 +16,7 @@
   background-color: white;
   display: block;
   margin: 0 auto;
-  width: 50vw;
+  width: 95%;
 
 }
 
@@ -26,7 +26,6 @@
   font-weight: 300;
   font-weight: bold;
   padding: 12px;
-  padding-left: 0px;
   padding-top: 16px;
 
 }
@@ -38,10 +37,10 @@
 
 .feed-result-tile {
   padding: 12px;
-  margin: 12px;
   display: block;
   position: relative;
-  width: 100%;
+  width: 85%;
+  margin: 12px auto;
 }
 
 .feed-result-title {
@@ -61,20 +60,35 @@
   padding: 12px 6px;
   background-color: darken(lightgrey, 5%);
   width: 80%;
+  overflow: hidden;
 
+}
+
+.feed-date-container {
+  display: flex;
+  position: absolute;
+  top: 15%;
+  left: 80%;
+  justify-content: center;
+  width: 170px;
+}
+
+.feed-owner-container {
+  display: flex;
+  position: absolute;
+  bottom: 15%;
+  left: 80%;
+  justify-content: center;
+  width: 160px;
 }
 
 .feed-result-date {
-  position: absolute;
-  font-size: 70%;
-  top: 5%;
-  left: 80%;
+  font-family: 'Helvetica', sans-serif;
+  font-size: 90%;
 }
 
 .feed-result-owner {
-  position: absolute;
-  font-size: 70%;
-  bottom: 5%;
-  left: 80%;
+  font-family: 'Helvetica', sans-serif;
+  font-size: 90%;
 
 }

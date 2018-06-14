@@ -1898,7 +1898,9 @@
   padding: 4px;
   font-size: 150%;
   font-weight: 500;
-  margin: 0 !important; }
+  margin: 0 !important;
+  padding-bottom: 24px;
+  border-bottom: 1px solid grey; }
 
 .profile-projects {
   padding: 4px;
@@ -1934,11 +1936,17 @@
   padding: 8px;
   padding-left: 24px;
   height: 36px;
-  background-color: #ededed;
-  border: 1px dashed darkgrey; }
+  background-color: lightgrey;
+  border: 1px dashed darkgrey;
+  text-align: center;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center; }
 
 .upload-label {
-  margin-left: 60px; }
+  display: block;
+  text-align: center; }
 
 .button {
   margin-left: 120px !important; }
@@ -2026,6 +2034,28 @@
   margin: 8px;
   float: right;
   cursor: pointer; }
+
+.profile-body-row {
+  display: flex; }
+
+.profile-body-column {
+  padding: 4px;
+  margin: 0px !important;
+  width: 25%; }
+
+.profbody-column-left {
+  width: 25%; }
+
+.profbody-column-mid {
+  width: 60%;
+  position: relative; }
+
+.profbody-column-right {
+  width: 15%; }
+
+.forbigtext-right {
+  position: absolute;
+  bottom: 20%; }
 
 .signup-container {
   margin-top: 82px;
@@ -2304,7 +2334,7 @@
   display: block; }
 
 .feed-container {
-  width: 70vw;
+  width: 65vw;
   height: 95%;
   position: absolute;
   top: 0;
@@ -2320,7 +2350,7 @@
   background-color: white;
   display: block;
   margin: 0 auto;
-  width: 50vw; }
+  width: 95%; }
 
 .feed-banner {
   font-style: italic;
@@ -2328,7 +2358,6 @@
   font-weight: 300;
   font-weight: bold;
   padding: 12px;
-  padding-left: 0px;
   padding-top: 16px; }
 
 .feed-ul {
@@ -2337,10 +2366,10 @@
 
 .feed-result-tile {
   padding: 12px;
-  margin: 12px;
   display: block;
   position: relative;
-  width: 100%; }
+  width: 85%;
+  margin: 12px auto; }
 
 .feed-result-title {
   font-family: 'Helvetica', sans-serif;
@@ -2356,19 +2385,32 @@
   margin-top: 38px;
   padding: 12px 6px;
   background-color: #c6c6c6;
-  width: 80%; }
+  width: 80%;
+  overflow: hidden; }
+
+.feed-date-container {
+  display: flex;
+  position: absolute;
+  top: 15%;
+  left: 80%;
+  justify-content: center;
+  width: 170px; }
+
+.feed-owner-container {
+  display: flex;
+  position: absolute;
+  bottom: 15%;
+  left: 80%;
+  justify-content: center;
+  width: 160px; }
 
 .feed-result-date {
-  position: absolute;
-  font-size: 70%;
-  top: 5%;
-  left: 80%; }
+  font-family: 'Helvetica', sans-serif;
+  font-size: 90%; }
 
 .feed-result-owner {
-  position: absolute;
-  font-size: 70%;
-  bottom: 5%;
-  left: 80%; }
+  font-family: 'Helvetica', sans-serif;
+  font-size: 90%; }
 
 .dash-container, .profile-container, .project-show {
   margin-top: 80px; }

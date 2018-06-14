@@ -214,7 +214,7 @@ class ProfilePage extends React.Component{
       })
     }
     else {
-      var guestnames = ""
+      var guestnames = "not currently contributing to any projects"
     }
     if(!Convert.isArrEmpty(this.state._user.owned_projects)){
       var projnames = this.state._user.owned_projects.map((pro, i) => {
@@ -248,10 +248,10 @@ class ProfilePage extends React.Component{
       var categories = this.state._user.categories.map((category, i) => {
         var catelink = `/categories/${category}`
         if( (this.state._user.categories.length -1) - i == 0){
-           return(<a href={catelink}>{category}</a>)
+           return(<a key={i} href={catelink}>{category}</a>)
         }
         else {
-           return(<a href={catelink}>{category}</a> + ", ")
+           return(<a key={i} href={catelink}>{category}</a> + ", ")
         }
       })
       if(Convert.isStrExist(this.state.new_about)){
@@ -304,39 +304,54 @@ class ProfilePage extends React.Component{
               <form className="avatar-upload" onSubmit={this.picSubmit} style={avStyle}>
                 <label className="upload-label"> Add / Edit Profile Picture </label>
                 <Dropzone className="dropzone" onDrop={this.onDrop}>
-                  <p> Drag file or click to upload </p>
+                  <span className="no-select"> Drag file or click to upload </span>
                 </Dropzone>
                 <button className="button" type="submit"> Upload </button>
               </form>
             </div>
             <div className="profile-body-text">
-              <p className="profile-name">{name}</p>
-              <p className="profile-email">{email}</p>
-              <p className="profile-categories"> {name} is interested in these topics: {categories} <span onClick={this.editCategories} className="categories-edit"> Edit... </span></p>
-              <div className="profile-categories-editor" style={ctgStyle}>
-                <form>
-                  <ReactQuill
+              <div className="profile-name">{name} </div>
+              <div className="profile-email">{email} </div>
+              <br />
+              <div className="profile-body-row">
+                <div className="profile-categories profile-body-column profbody-column-left"> {name}'s topics: </div>
+                <div className="profile-body-column profbody-column-mid">{categories} </div>
+                <div className="profile-body-column profbody-column-right profile-edit" onClick={this.editCategories}> Edit... </div>
+                <div className="profile-categories-editor" style={ctgStyle}>
+                  <form>
+                    <ReactQuill
 
-                    value={this.state.categories}
-                    onChange={this.handleCategoriesChange}
-                  />
-                <button onClick={this.handleSubmitCategories}>Save</button>
-                <button onClick={this.cancelCtgEdit}>Cancel</button>
-                </form>
+                      value={this.state.categories}
+                      onChange={this.handleCategoriesChange}
+                    />
+                  <button onClick={this.handleSubmitCategories}>Save</button>
+                  <button onClick={this.cancelCtgEdit}>Cancel</button>
+                  </form>
+                </div>
               </div>
-              <p className="profile-projects"> Projects: {projnames}</p>
-              <p className="profile-guestprojects"> Contributing to: {guestnames} </p>
-              <p className="profile-about-me"> About: {aboutMe} <span onClick={this.editProfileHandle} className="profile-edit"> Edit... </span> </p>
-              <div className="profile-aboutme-editor" style={abtMeStyle}>
-                <form>
-                  <ReactQuill
+              <div className="profile-body-row">
+                <div className="profile-projects profile-body-column profbody-column-left"> Projects: </div>
+                <div className="profile-body-column profbody-column-mid">{projnames}</div>
+              </div>
+              <div className="profile-body-row">
+                <div className="profile-guestprojects profile-body-column profbody-column-left"> Contributing to:  </div>
+                <div className="profile-body-column profbody-column-mid">{guestnames}</div>
+              </div>
+              <div className="profile-body-row">
+                <div className="profile-about-me profile-body-column profbody-column-left"> About: </div>
+                <div className="profile-body-column profbody-column-mid">{aboutMe} </div>
+                <div className="profile-body-column profbody-column-right profile-edit" onClick={this.editProfileHandle} > Edit...</div>
+                <div className="profile-aboutme-editor" style={abtMeStyle}>
+                  <form>
+                    <ReactQuill
 
-                    value={this.state.quillText}
-                    onChange={this.quillHandleChange}
-                  />
-                  <button onClick={this.handleSubmitEdition}>Save</button>
-                  <button onClick={this.cancelAboutEdit}> Cancel </button>
-                </form>
+                      value={this.state.quillText}
+                      onChange={this.quillHandleChange}
+                    />
+                    <button onClick={this.handleSubmitEdition}>Save</button>
+                    <button onClick={this.cancelAboutEdit}> Cancel </button>
+                  </form>
+                </div>
               </div>
             </div>
             <div className="clearer"></div>
@@ -374,12 +389,25 @@ class ProfilePage extends React.Component{
               <img className="prof-pic" src={this.state._user.profpic} />
             </div>
             <div className="profile-body-text">
-              <p className="profile-name">{name}</p>
-              <p className="profile-email">{email}</p>
-              <p className="profile-categories"> {name} is interested in these topics: {categories} </p>
-              <p className="profile-projects"> Projects: {projnames}</p>
-              <p className="profile-guestprojects"> Contributing to: {guestnames} </p>
-              <p className="profile-about-me"> About: {aboutMe} </p>
+              <div className="profile-name">{name} </div>
+              <div className="profile-email">{email} </div>
+              <br />
+              <div className="profile-body-row">
+                <div className="profile-categories profile-body-column profbody-column-left"> {name}'s topics: </div>
+                <div className="profile-body-column profbody-column-mid">{categories} <span onClick={this.editCategories} className="categories-edit"> Edit... </span></div>
+              </div>
+              <div className="profile-body-row">
+                <div className="profile-projects profile-body-column profbody-column-left"> Projects: </div>
+                <div className="profile-body-column profbody-column-mid">{projnames}</div>
+              </div>
+              <div className="profile-body-row">
+                <div className="profile-guestprojects profile-body-column profbody-column-left"> Contributing to:  </div>
+                <div className="profile-body-column profbody-column-mid">{guestnames}</div>
+              </div>
+              <div className="profile-body-row">
+                <div className="profile-about-me profile-body-column profbody-column-left"> About: </div>
+                <div className="profile-body-column profbody-column-mid">{aboutMe} <span onClick={this.editProfileHandle} className="profile-edit"> Edit... </span></div>
+              </div>
             </div>
             <div className="clearer"></div>
           </div>
