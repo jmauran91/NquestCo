@@ -24,7 +24,13 @@
   width: 50vw;
 }
 
-#categorySelect {
+#categorySelect div {
+  padding: 8px;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  border-radius: 8px;
+  border-style: none;
+  width: 50vw;
+
 }
 
 .Select {

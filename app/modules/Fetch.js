@@ -439,6 +439,7 @@ class Fetch {
     })
     .then( response => response.json())
     .then((response) => {
+      debugger;
       if (response.projects){
         var projects = response.projects
         console.log(projects)
@@ -450,6 +451,7 @@ class Fetch {
       }
     })
     .catch((err) => {
+      debugger;
       console.log(err)
       this.setState({ no_project: err.msg })
     })

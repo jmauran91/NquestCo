@@ -228,14 +228,23 @@ router.get('/:id/projects', (req, res) => {
           var pj = projects[i]
           addNameToProject(pj, i)
           .then((result) => {
+            console.log("this is 'i' " + result.i)
             if(result.pobject.owner == u_id || result.pobject.users.indexOf(u_id) > -1 ){
               updated_projects.push(result.pobject)
+              console.log('this is updated projects array')
+              console.log(updated_projects)
               if( result.i == projects.length - 1 ) {
                 resolve(updated_projects)
               }
+              return true;
             }
-            else if ( result.i == projects.length - 1 ) {
-              reject()
+            else {
+              if( result.i != projects.length - 1){
+                return true;
+              }
+              else {
+                resolve(updated_projects)
+              }
             }
           })
           .catch((err) => {
@@ -249,6 +258,7 @@ router.get('/:id/projects', (req, res) => {
   var updated_projects = [];
   addProjectToArr()
   .then((result) => {
+
     res.status(200).json({ msg: 'here are your projects', projects: result })
   })
   .catch((err) => {
