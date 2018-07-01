@@ -1864,7 +1864,7 @@
 .profile-body {
   position: relative;
   width: 90%;
-  height: 50vh;
+  height: 55vh;
   padding: 8px;
   display: flex;
   flex-flow: row;
@@ -1877,10 +1877,10 @@
   flex-direction: column;
   margin: 0;
   border-radius: 50%;
-  min-width: 300px; }
+  width: 300px; }
 
 .prof-pic {
-  height: 80%;
+  height: 75%;
   border-radius: 50%; }
 
 .profile-body-text {
@@ -2368,7 +2368,8 @@
   padding-top: 16px; }
 
 .feed-ul {
-  padding: 0 !important;
+  padding: 0px;
+  padding-left: 80px;
   margin: 0 !important; }
 
 .feed-result-tile {
@@ -2376,8 +2377,7 @@
   display: block;
   position: relative;
   width: 92%;
-  margin: 12px auto;
-  margin-left: 80px; }
+  margin: 12px auto; }
 
 .feed-result-title {
   font-family: 'Helvetica', sans-serif;

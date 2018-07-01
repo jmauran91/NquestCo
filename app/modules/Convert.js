@@ -257,6 +257,10 @@ class Convert {
         var a = a_file.LastModified
         var b = b_file.LastModified
       }
+      if(type == 'msg'){
+        var a = a_file.createdAt
+        var b = b_file.createdAt
+      }
       else if(type == 'note'){
         var a = a_file.createdAt
         var b = b_file.createdAt
@@ -447,10 +451,8 @@ class Convert {
     }
 
     return arrayToSort.reverse()
-
-
-
   }
+
 
 
 

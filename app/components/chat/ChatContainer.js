@@ -28,15 +28,51 @@ class ChatContainer extends React.Component {
     this.convoSetter = this.convoSetter.bind(this);
     this.convoMsgsSetter = this.convoMsgsSetter.bind(this);
     this.funcOnConvSelect = this.funcOnConvSelect.bind(this);
+    this.meltConvosTogether = this.meltConvosTogether.bind(this);
 
-    
+
     this.getConvos = Fetch.GetConvos.bind(this);
     this.persistMessage = Fetch.PatchConvo.bind(this);
   }
 
   componentDidMount(){
-    this.getConvos();
+    this.getConvos()
+    .then((response) => {
+      if(response.message == "no conversations for this user yet"){
+        this.setState({ conversations: null})
+      }
+      else {
+        var conv_array = response.conversations_array
+        for( var n = 0, len = conv_array.length; n < len - 1; n++){
+          for( var j = 1; j < len ; j++){
+            /// IF THERE ARE TWO CONVERSATIONS WITH REVERSED
+            /// AUTHOR / RECIPIENT AND RECIPIENT / AUTHOR
+            /// THEN MELT THEM TOGETHER
+            try{
+              if(conv_array[n][0].author.name == conv_array[j][0].recipient && conv_array[j][0].author.name == conv_array[n][0].recipient){
+                conv_array[n] = this.meltConvosTogether(conv_array[n], conv_array[j])
+                conv_array.splice(j, 1)
+              }
+            }
+            catch(err){
+              console.log(err)
+            }
+          }
+        }
+        this.setState({ conversations: conv_array })
+      }
+    })
+    .catch((err) => {
+      console.log(err)
+    })
   }
+
+  meltConvosTogether(conv1, conv2){
+    var utiConvo = conv1.concat(conv2)
+    var meltedConvo = Convert.dateSort(utiConvo, 'msg')
+    return meltedConvo;
+  }
+
 
   funcOnConvSelect(id){
     var right_convo = this.state.conversations.find(conv => conv[0].conversationId === id)

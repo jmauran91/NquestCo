@@ -60,8 +60,10 @@ class ChatList extends React.Component{
               id={conversation[0].conversationId}
             >
               <img style={{
-                width: '45px', height: '45px',
-                borderRadius:'50%', float: 'left'}}
+                width: '38px', height: '45px',
+                borderRadius:'50%', float: 'left',
+                marginRight: '16px', 
+              }}
                 src={profpic} />
               <div className="convo-recipients" style={chatListStyle}>
                 {conv_recipients}

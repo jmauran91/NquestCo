@@ -74,7 +74,7 @@ class Fetch {
   static GetConvos(){
     var _id = this.props.current_user._id
     var url = "/chat/users/" + _id + "/conversations"
-    fetch(url, {
+    return fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -83,14 +83,8 @@ class Fetch {
     })
     .then(response => response.json())
     .then((response) => {
-      if(response.message == "no conversations for this user yet"){
         console.log(response)
-        this.setState({ conversations: null })
-      }
-      else {
-        console.log(response)
-        this.setState({ conversations: response.conversations_array })
-      }
+        return response;
     })
     .catch((err) => {
       console.log(err)
@@ -439,7 +433,6 @@ class Fetch {
     })
     .then( response => response.json())
     .then((response) => {
-      debugger;
       if (response.projects){
         var projects = response.projects
         console.log(projects)
@@ -451,7 +444,6 @@ class Fetch {
       }
     })
     .catch((err) => {
-      debugger;
       console.log(err)
       this.setState({ no_project: err.msg })
     })
