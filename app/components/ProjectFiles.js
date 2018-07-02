@@ -250,7 +250,7 @@ class ProjectFiles extends React.Component{
       var myAddFileStyle = {
         display: 'block',
         position: 'absolute',
-        top: '-200px',
+        top: '-190px',
         left: '-20px',
         backgroundColor: 'white',
         zIndex: '5',

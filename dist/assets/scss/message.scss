@@ -5,33 +5,39 @@
   overflow: scroll;
 }
 
+// .message-holder {
+//   width: 90%;
+//   display: block;
+//   position: relative;
+//   margin: 0;
+//   padding: 0;
+// }
+
 .message {
   display: block;
   box-sizing: border-box;
-  max-width:300px;
-  width: auto;
-  outline: none;
-  margin: 2px 8px;
-  padding: 8px;
+  // max-width:300px;
+  width: 95%;
   position: relative;
-  background-color: lighten(grey, 30%);
-  border-radius: 1.3em;
+  outline: none;
   clear: left;
-  float: left;
+  padding: 8px;
+  margin: 2px 8px;
+  height: 36px;
 
   user-select: none;
 
 }
 
 .from-me {
-  background-color: lighten(#18a29a, 6%);
   clear: right;
-  float: right;
+  padding: 8px;
+  margin: 2px 8px;
+
 }
 
 .message-body {
   margin: 0 4px;
-  position: relative;
   text-align: left;
   max-width: 90%;
   width: auto;
@@ -40,8 +46,22 @@
   font-size: 16px;
   line-height: 1.28;
   color: black;
+  position: relative;
+  background-color: lighten(grey, 30%);
+  padding: 8px;
+  margin: 2px 8px;
+  border-radius: 1.3em;
+  float: left;
+
 }
 
 .from-me span {
+  background-color: lighten(#18a29a, 6%);
+  border-radius: 1.3em;
+  padding: 8px;
+  margin: 2px 8px;
   color: white;
+  float: right;
+
+
 }

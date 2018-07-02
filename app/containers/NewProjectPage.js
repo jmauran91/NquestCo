@@ -132,6 +132,15 @@ class NewProjectPage extends React.Component{
     else {
       var successStyle, successTextStyle, successMsg;
     }
+    var cateSelectStyle = {
+      padding: '8px',
+      fontFamily: "'Helvetica', 'Arial', sans-serif",
+      borderRadius: '8px',
+      borderStyle: 'none',
+      width: '50vw',
+      lineHeight: '1.0em',
+      margin: '0 auto',
+    }
 
 
 
@@ -169,12 +178,14 @@ class NewProjectPage extends React.Component{
                 placeholder="Tags... (separated by comma and space)"
               />
             </li>
-            <li id="categorySelect">
+            <li >
               <Select
+                style={cateSelectStyle}
                 closeOnSelect={true}
                 clearable={true}
                 searchable={true}
                 name="category"
+                placeholder="Category..."
                 value={this.state.selectedCategory}
                 onChange={this.handleSelection}
                 options={[

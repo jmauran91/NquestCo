@@ -1364,13 +1364,6 @@
   border-style: none;
   width: 50vw; }
 
-#categorySelect div {
-  padding: 8px;
-  font-family: 'Helvetica', 'Arial', sans-serif;
-  border-radius: 8px;
-  border-style: none;
-  width: 50vw; }
-
 .dash-form-container button:hover {
   background-color: #e6e6e6;
   cursor: pointer; }
@@ -1817,26 +1810,22 @@
 .message {
   display: block;
   box-sizing: border-box;
-  max-width: 300px;
-  width: auto;
-  outline: none;
-  margin: 2px 8px;
-  padding: 8px;
+  width: 95%;
   position: relative;
-  background-color: #cdcdcd;
-  border-radius: 1.3em;
+  outline: none;
   clear: left;
-  float: left;
+  padding: 8px;
+  margin: 2px 8px;
+  height: 36px;
   user-select: none; }
 
 .from-me {
-  background-color: #1cbdb3;
   clear: right;
-  float: right; }
+  padding: 8px;
+  margin: 2px 8px; }
 
 .message-body {
   margin: 0 4px;
-  position: relative;
   text-align: left;
   max-width: 90%;
   width: auto;
@@ -1844,10 +1833,21 @@
   font-family: 'Helvetica Neue', Arial, sans-serif;
   font-size: 16px;
   line-height: 1.28;
-  color: black; }
+  color: black;
+  position: relative;
+  background-color: #cdcdcd;
+  padding: 8px;
+  margin: 2px 8px;
+  border-radius: 1.3em;
+  float: left; }
 
 .from-me span {
-  color: white; }
+  background-color: #1cbdb3;
+  border-radius: 1.3em;
+  padding: 8px;
+  margin: 2px 8px;
+  color: white;
+  float: right; }
 
 .profile-container {
   padding: 10px 60px;

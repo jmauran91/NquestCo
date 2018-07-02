@@ -9,11 +9,11 @@ class Message extends React.Component{
     const fromMe = this.props.fromMe ? 'from-me' : '';
 
     return (
-      <div className={`message ${fromMe}`}>
-        <span className='message-body'>
-          { this.props.message }
-        </span>
-      </div>
+        <div className={`message ${fromMe}`}>
+          <span className={`message-body`}>
+            { this.props.message }
+          </span>
+        </div>
     );
   }
 }
