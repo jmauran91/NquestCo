@@ -189,6 +189,7 @@ class ChatContainer extends React.Component {
             current_user={this.props.current_user}
             conversations={conversations}
             socket={this.socket}/>
+            
         </div>
         <div className="chatcell" style={chatCellStyle}>
           <ChatCell

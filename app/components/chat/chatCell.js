@@ -174,8 +174,13 @@ class ChatCell extends React.Component{
       }
       else if(this.props.current_convo !== 'conv-list-new-message'){
         if(!Convert.isArrEmpty(this.state.message_objects)){
-          let textindex = this.state.message_objects.length - 1
-          let text = `${this.state.message_objects[textindex].recipient}`
+          var textindex = this.state.message_objects.length - 1
+          if(this.props.current_user._id != this.state.message_objects[0].author._id){
+            var text = this.state.message_objects[textindex].recipient
+          }
+          else {
+            var text = this.state.message_objects[textindex].author.name
+          }
           message_objects = this.state.message_objects
           header = text;
           myStyle = {};

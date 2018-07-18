@@ -29,13 +29,19 @@ class Feed extends React.Component{
             key={i}
             style={feedStyle}
           >
-            <a href={url} className="feed-result-title"> {proj.title}</a>
-            <span className="feed-result-description"> {about} </span>
-            <div className="feed-date-container">
-            <span className="feed-result-date"> Updated at: {date} </span>
-            </div>
-            <div className="feed-owner-container">
-            <span className="feed-result-owner"> {author} </span>
+            <div className="feed-container-master">
+              <div className="feed-container-left">
+                <a href={url} className="feed-result-title"> {proj.title}</a>
+                <span className="feed-result-description"> {about} </span>
+              </div>
+              <div className="feed-container-right">
+                <div className="feed-date-container">
+                  <span className="feed-result-date"> Updated at: {date} </span>
+                </div>
+                <div className="feed-owner-container">
+                  <span className="feed-result-owner"> {author} </span>
+                </div>
+              </div>
             </div>
           </li>
         )

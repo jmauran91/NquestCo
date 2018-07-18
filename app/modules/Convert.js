@@ -269,6 +269,10 @@ class Convert {
         var a = a_file.createdAt
         var b = b_file.createdAt
       }
+      else if(type == 'convo'){
+        var a = a_file.props.createdat
+        var b = b_file.props.createdat
+      }
       if( year(a) > year(b)){
         return a_file
       }

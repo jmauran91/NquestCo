@@ -151,7 +151,7 @@ class ChatBox extends React.Component{
           console.log('nothing to send back')
           this.periodicallySaveChatbox();
         }
-      }, 20000)
+      }, 1000)
     }
   }
 
