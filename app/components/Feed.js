@@ -12,7 +12,35 @@ class Feed extends React.Component{
   render(){
 
     if(this.props.categorized_projects == null || this.props.categorized_projects.length == 0){
-      return null
+      if(Convert.isArrEmpty(this.props.category_subscriptions)){
+        <div className="feed-container">
+          <div className="feed-subcontainer">
+            <div className="feed-banner">
+              Feed:
+            </div>
+            <ul className="feed-ul">
+              <li>
+                you're not currently subscribed to any categories...
+              </li>
+            </ul>
+          </div>
+        </div>
+      }
+      else {
+        <div className="feed-container">
+          <div className="feed-subcontainer">
+            <div className="feed-banner">
+              Feed:
+            </div>
+            <ul className="feed-ul">
+              <li>
+                no projects for this category yet...
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      }
     }
     else {
       var feedStyle = {

@@ -381,6 +381,7 @@ class Dashboard extends React.Component {
               && <Feed
                   current_user={this.state.current_user}
                   categorized_projects={this.state.categorized_projects}
+                  category_subscriptions={this.state.current_user.categories}
                   />}
             {this.state.component == 'new_project'
               && <NewProjectPage
