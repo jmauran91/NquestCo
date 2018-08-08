@@ -10,6 +10,7 @@ class Feed extends React.Component{
   }
 
   render(){
+
     if(this.props.categorized_projects == null || this.props.categorized_projects.length == 0){
       return null
     }

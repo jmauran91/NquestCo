@@ -76,7 +76,13 @@ class Convert {
   static isArrEmpty(arr){
     if(arr){
       if (typeof arr !== 'undefined' && arr.length > 0) {
-        return false
+        if(arr[0].length == 0){
+          return true
+          // array's first element is empty string
+        }
+        else {
+          return false
+        }
       // the array is defined and has at least one element
       }
       else {

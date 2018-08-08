@@ -992,6 +992,7 @@ router.get('/categories/:category', (req, res) => {
       console.log('hit err')
       console.log(err)
     }
+    console.log(projects)
     res.status(200).json({msg: 'successfully retrieved projects by category', projects: projects })
   })
 })

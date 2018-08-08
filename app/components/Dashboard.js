@@ -59,18 +59,23 @@ class Dashboard extends React.Component {
   }
 
   retrieveUserCategoryProjects(){
-    this.state.current_user.categories.forEach((categ, i) => {
-      this.getProjectsByCategory(categ)
-      .then((res) => {
-        let new_s = this.state.categorized_projects
-        new_s = new_s.concat(res.projects)
-        var new_state = Convert.dateSortProjects(new_s)
-        this.setState({ categorized_projects: new_state })
+    if(!Convert.isArrEmpty(this.state.current_user.categories)){
+      this.state.current_user.categories.forEach((categ, i) => {
+        this.getProjectsByCategory(categ)
+        .then((res) => {
+          let new_s = this.state.categorized_projects
+          new_s = new_s.concat(res.projects)
+          var new_state = Convert.dateSortProjects(new_s)
+          this.setState({ categorized_projects: new_state })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
       })
-      .catch((err) => {
-        console.log(err)
-      })
-    })
+    }
+    else {
+      this.setState({ categorized_projects: null })
+    }
   }
 
   componentDidMount(){
